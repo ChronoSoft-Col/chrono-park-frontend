@@ -29,14 +29,14 @@ export default function ChronoCustomDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-4xl">
+      <DialogContent className="w-fit sm:max-w-none">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <DialogDescription>{description}</DialogDescription>
+        {description ? <DialogDescription>{description}</DialogDescription> : null}
         {renderContent}
+        {renderFooter ? <DialogFooter>{renderFooter}</DialogFooter> : null}
       </DialogContent>
-      <DialogFooter>{renderFooter}</DialogFooter>
     </Dialog>
   );
 }

@@ -1,6 +1,6 @@
 import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface";
 import { getInOutsAction } from "../actions/get-in-out.action";
-import { IN_OUT_DEFAULT_LIMIT } from "../constants";
+import { DEFAULT_LIMIT } from "@/src/shared/constants/pagination";
 import InOutDataListComponent from "./in-out-data-list.component";
 
 interface Props {
@@ -20,7 +20,7 @@ export default async function InOutDataFetchComponent({ searchParams }: Props) {
 
   const total = meta?.total ?? items.length;
   const totalPages = meta?.totalPages ?? 1;
-  const pageSize = meta?.limit ?? IN_OUT_DEFAULT_LIMIT;
+  const pageSize = meta?.limit ?? DEFAULT_LIMIT;
 
   return (
     <InOutDataListComponent

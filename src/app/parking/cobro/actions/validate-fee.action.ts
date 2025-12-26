@@ -1,7 +1,7 @@
 'use server'
 
-import { serverContainer } from "@/server/di/container";
 import { IValidateAmountParamsEntity, IValidateAmountResponseEntity, PaymentUsecase } from "@/server/domain/index";
+import { serverContainer } from "@/src/server/di/container";
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";

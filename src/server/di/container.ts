@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { container } from "tsyringe";
 
 import { InOutRepository, LoginRepository, ManualControlRepository } from "@/server/domain";
+import { ClosureRepository } from "@/server/domain/repositories/parking/closure.repository";
 import {
   CommonDatasourceService,
   CommonRepositoryImp,
@@ -14,6 +15,8 @@ import {
   PaymentDatasourceService,
   PaymentRepositoryImp,
 } from "@/server/infrastructure";
+import { ClosureDatasourceService } from "@/server/infrastructure/datasources/parking/closure-datasource.service";
+import { ClosureRepositoryImpl } from "@/server/infrastructure/repositories/parking/closure.repository-imp";
 
 if (!container.isRegistered("LoginRepository")) {
   container.register<LoginRepository>("LoginRepository", {
@@ -69,6 +72,19 @@ if(!container.isRegistered("PaymentDatasourceService")){
 if(!container.isRegistered("PaymentRepository")){
   container.register("PaymentRepository", { useClass: PaymentRepositoryImp });
 }
+
+if (!container.isRegistered("ClosureDatasourceService")) {
+  container.register<ClosureDatasourceService>("ClosureDatasourceService", {
+    useClass: ClosureDatasourceService,
+  });
+}
+
+if (!container.isRegistered("ClosureRepository")) {
+  container.register<ClosureRepository>("ClosureRepository", {
+    useClass: ClosureRepositoryImpl,
+  });
+}
+
 // set-company bindings removed (companies flow deprecated)
 
 export { container as serverContainer };

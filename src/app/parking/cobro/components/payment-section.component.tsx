@@ -25,7 +25,7 @@ import { useCommonContext } from "@/src/shared/context/common.context";
 import { generatePaymentAction } from "@/src/app/parking/cobro/actions/generate-payment.action";
 import { toast } from "sonner";
 import { ChronoInput } from "@chrono/chrono-input.component";
-import usePrint from "@/src/shared/hooks/common/use-print.hook";
+import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { IGeneratePaymentResponseEntity, IPrintPostPaymentInvoiceParamsEntity } from "@/server/domain";
 
 const steps = [

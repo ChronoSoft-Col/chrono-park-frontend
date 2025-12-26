@@ -2,6 +2,7 @@
 
 import { ReactNode, TransitionStartFunction, useMemo, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { DEFAULT_LIMIT_OPTIONS } from "@/src/shared/constants/pagination";
 
 import { cn } from "@/src/lib/utils";
 import {
@@ -32,8 +33,6 @@ export type ChronoPaginatorProps = {
   limitLabel?: ReactNode;
   className?: string;
 };
-
-const DEFAULT_LIMIT_OPTIONS = [5, 10, 20, 50];
 
 export function ChronoPaginator({
   totalPages,

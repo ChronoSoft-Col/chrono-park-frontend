@@ -10,15 +10,11 @@ import IErrorResponse from "@/src/shared/interfaces/generic/error-response.inter
 import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface";
 import { AxiosError } from "axios";
 import { z } from "zod";
-
-import {
-    IN_OUT_DEFAULT_LIMIT,
-    IN_OUT_DEFAULT_PAGE,
-} from "../constants";
+import { DEFAULT_PAGE, DEFAULT_LIMIT } from "@/src/shared/constants/pagination";
 
 const inOutSearchParamsSchema = z.object({
-    page: z.coerce.number().int().positive().default(IN_OUT_DEFAULT_PAGE),
-    limit: z.coerce.number().int().positive().default(IN_OUT_DEFAULT_LIMIT),
+    page: z.coerce.number().int().positive().default(DEFAULT_PAGE),
+    limit: z.coerce.number().int().positive().default(DEFAULT_LIMIT),
     status: z.enum(Object.values(InOutStatusEnum)).default(InOutStatusEnum.ACTIVE),
     vehicleTypeId: z.string().optional(),
     search: z.string().optional(),
