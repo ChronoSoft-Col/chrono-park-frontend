@@ -1,7 +1,7 @@
 'use server'
 
-import { container } from "@/di/container";
-import { IValidateAmountParamsEntity, IValidateAmountResponseEntity, PaymentUsecase } from "@/domain/index";
+import { serverContainer } from "@/server/di/container";
+import { IValidateAmountParamsEntity, IValidateAmountResponseEntity, PaymentUsecase } from "@/server/domain/index";
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";
@@ -9,7 +9,7 @@ import { AxiosError } from "axios";
 export async function validateFeeAction(params: IValidateAmountParamsEntity): Promise<IActionResponse<IValidateAmountResponseEntity>> {
     try {
         console.log("validateFeeAction params:", params);
-        const useCase = container.resolve(PaymentUsecase);
+        const useCase = serverContainer.resolve(PaymentUsecase);
         const response = await useCase.validateFee(params);
         return {
             data: response,

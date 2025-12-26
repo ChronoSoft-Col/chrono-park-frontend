@@ -4,4 +4,5 @@ export const ENVIRONMENT = {
     SESSION_COOKIE_NAME: process.env.SESSION_COOKIE_NAME || "chrono_session",
     SESSION_MAX_AGE: Number(process.env.SESSION_MAX_AGE ?? 60 * 60 * 8),
     DEBOUNCE_TIME: Number(process.env.NEXT_PUBLIC_DEBOUNCE_TIME ?? 300),
+    PRINTER_NAME: process.env.NEXT_PUBLIC_PRINTER_NAME || "EPSON",
 };

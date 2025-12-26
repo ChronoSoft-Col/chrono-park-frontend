@@ -1,5 +1,5 @@
 "use client"
-import { IInOutEntity } from "@/domain/index";
+import { IInOutEntity } from "@/server/domain";
 import { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
 import ChronoButton from "@chrono/chrono-button.component";
 

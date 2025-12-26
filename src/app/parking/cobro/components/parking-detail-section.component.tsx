@@ -3,6 +3,8 @@
 import EmptyState from "@/src/shared/components/empty-state.component";
 import { usePaymentContext } from "@/src/shared/context/payment.context";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
+import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
+import { ChronoValue } from "@chrono/chrono-value.component";
 import LabelValueComponent from "@/src/app/parking/cobro/components/label-value.component";
 import {
     ChronoCard,
@@ -71,17 +73,17 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
     const hiddenRules = Math.max(rules.length - visibleRules.length, 0);
 
     return (
-        <div className={cn("flex flex-col gap-2 overflow-y-auto pr-1 my-auto py-2", className)}>
+        <div className={cn("flex flex-col gap-2 overflow-y-auto pr-1 my-auto py-2 animate-in fade-in duration-500", className)}>
             <ChronoCard className="bg-card/95 h-min">
                 <ChronoCardHeader className="gap-2">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                            <ChronoSectionLabel size="base">
                                 Perfil de tarifa
-                            </p>
-                            <ChronoCardTitle className="text-lg font-semibold tracking-tight">
+                            </ChronoSectionLabel>
+                            <ChronoValue size="md">
                                 {detail.rateProfileName}
-                            </ChronoCardTitle>
+                            </ChronoValue>
                         </div>
                         <div className="flex flex-wrap items-center gap-1.5">
                             {detail.agreementName && (
@@ -100,9 +102,9 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
                                 <Wallet2 className="h-3.5 w-3.5" />
                             </span>
                             <div className="flex flex-col">
-                                <span className="text-[9px] font-semibold uppercase tracking-[0.3em]">
+                                <ChronoSectionLabel size="xs">
                                     Total estimado
-                                </span>
+                                </ChronoSectionLabel>
                                 <span className="text-[9px] text-foreground/70">
                                     Última actualización {exit.dateLabel} · {exit.timeLabel}
                                 </span>
@@ -110,9 +112,9 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
                         </div>
 
                         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-                            <p className="text-xl font-bold text-foreground">
+                            <ChronoValue size="lg" weight="bold">
                                 {formatCurrency(detail.finalAmount)}
-                            </p>
+                            </ChronoValue>
                             {discount > 0 && (
                                 <ChronoBadge className="border-green-500/40 bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-700">
                                     Descuento {discount}%

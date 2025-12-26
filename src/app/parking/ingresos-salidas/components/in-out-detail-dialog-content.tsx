@@ -2,8 +2,10 @@
 
 import * as React from "react";
 
-import { IInOutEntity } from "@/domain/index";
+import { IInOutEntity } from "@/server/domain";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
+import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
+import { ChronoValue } from "@chrono/chrono-value.component";
 import { ChronoSeparator } from "@chrono/chrono-separator.component";
 import { useCommonContext } from "@/src/shared/context/common.context";
 
@@ -24,9 +26,9 @@ export function InOutDetailDialogContent({ item }: InOutDetailDialogContentProps
   const isClosed = Boolean(item.exitTime);
 
   const vehicleTypeLabel = React.useMemo(() => {
-    const fromCatalog = vehicleTypes.find((type) => type.value === item.vehicleType.id);
-    return fromCatalog?.label ?? item.vehicleType.name;
-  }, [item.vehicleType.id, item.vehicleType.name, vehicleTypes]);
+    const fromCatalog = vehicleTypes.find((type) => type.value === item.vehicle.vehicleType.id);
+    return fromCatalog?.label ?? item.vehicle.vehicleType.name;
+  }, [item.vehicle.vehicleType.id, item.vehicle.vehicleType.name, vehicleTypes]);
 
   const detailRows = [
     { label: "Placa", value: item.vehicle.licensePlate },
@@ -47,10 +49,12 @@ export function InOutDetailDialogContent({ item }: InOutDetailDialogContentProps
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Placa</p>
-          <p className="text-3xl font-semibold tracking-tight text-foreground">
+          <ChronoSectionLabel size="base" className="tracking-[0.25em]">
+            Placa
+          </ChronoSectionLabel>
+          <ChronoValue size="xl">
             {item.vehicle.licensePlate}
-          </p>
+          </ChronoValue>
         </div>
         <ChronoBadge variant="outline" className="text-xs font-semibold">
           {vehicleTypeLabel}

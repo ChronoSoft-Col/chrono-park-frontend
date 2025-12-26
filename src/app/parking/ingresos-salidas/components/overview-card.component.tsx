@@ -6,13 +6,15 @@ import {
   ChronoCardDescription,
   ChronoCardContent,
 } from "@chrono/chrono-card.component";
+import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
+
 export function InOutOverviewCard() {
   return (
     <ChronoCard className="border-border/60 bg-card/90 shadow-sm">
       <ChronoCardHeader className="gap-1.5 px-5 pb-3 pt-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
+        <ChronoSectionLabel size="md" className="text-primary">
           Resumen
-        </p>
+        </ChronoSectionLabel>
         <ChronoCardTitle className="text-2xl lg:text-3xl">Ingresos &amp; salidas</ChronoCardTitle>
         <ChronoCardDescription className="max-w-3xl text-sm">
           Visualiza en un mismo lugar el detalle de cada vehículo, su tarifa aplicada y el estado de ocupación del parqueadero.

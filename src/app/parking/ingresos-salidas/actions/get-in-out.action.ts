@@ -1,8 +1,8 @@
 'use server'
 
-import { container } from "@/di/container";
+import { serverContainer } from "@/server/di/container";
 
-import { IListInOutResponseEntity, InOutUsecase } from "@/domain/index";
+import { IListInOutResponseEntity, InOutUsecase } from "@/server/domain/index";
 import { buildSearchParams } from "@/src/lib/search-params";
 import { InOutStatusEnum } from "@/src/shared/enums/parking/in-out-status.enum";
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
@@ -29,7 +29,7 @@ export async function getInOutsAction(
 ): Promise<IActionResponse<IListInOutResponseEntity>> {
     try {
         const params = buildSearchParams(inOutSearchParamsSchema, searchParams);
-        const useCase = container.resolve(InOutUsecase);
+        const useCase = serverContainer.resolve(InOutUsecase);
         const response = await useCase.listInOuts(params);
         console.log("InOuts fetched with params:", params);
         return { success: true, data: response };

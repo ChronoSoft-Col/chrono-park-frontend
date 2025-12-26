@@ -1,7 +1,9 @@
 "use client";
 
+import "reflect-metadata"
+
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, ScanQrCode } from "lucide-react";
+import { ScanQrCode, Banknote } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import ChronoButton from "@chrono/chrono-button.component";
@@ -11,17 +13,20 @@ import {
   ChronoCardDescription,
   ChronoCardFooter,
   ChronoCardHeader,
-  ChronoCardTitle,
 } from "@chrono/chrono-card.component";
 import ChronoCashInput from "@chrono/chrono-cash-input.component";
 import { ChronoLabel } from "@chrono/chrono-label.component";
+import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
+import { ChronoValue } from "@chrono/chrono-value.component";
 import EmptyState from "@/src/shared/components/empty-state.component";
 import { usePaymentContext } from "@/src/shared/context/payment.context";
-import { PaymentMethodEnum } from "@/src/shared/enums/parking/payment-method.enum";
+import { UseDialogContext } from "@/src/shared/context/dialog.context";
+import { useCommonContext } from "@/src/shared/context/common.context";
 import { generatePaymentAction } from "@/src/app/parking/cobro/actions/generate-payment.action";
 import { toast } from "sonner";
-import { PAYMENT_METHODS } from "@/src/shared/constants/payment-methods";
 import { ChronoInput } from "@chrono/chrono-input.component";
+import usePrint from "@/src/shared/hooks/common/use-print.hook";
+import { IGeneratePaymentResponseEntity, IPrintPostPaymentInvoiceParamsEntity } from "@/server/domain";
 
 const steps = [
   { id: "method", badge: "1", title: "Método de pago", description: "" },
@@ -41,8 +46,11 @@ type PaymentSectionProps = {
 };
 
 export function PaymentSectionComponent({ className }: PaymentSectionProps) {
-  const { validateRaw } = usePaymentContext();
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodEnum | null>(null);
+  const { validateRaw, clearValidateResult } = usePaymentContext();
+  const { showYesNoDialog, closeDialog } = UseDialogContext();
+  const { paymentMethods } = useCommonContext();
+  const { printPostPaymentInvoice } = usePrint();
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [amountReceived, setAmountReceived] = useState("0");
   const [notes, setNotes] = useState("");
   const [currentStep, setCurrentStep] = useState(0);
@@ -63,52 +71,93 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   const nextStep = () => setCurrentStep((prev) => clampStep(prev + 1));
   const prevStep = () => setCurrentStep((prev) => clampStep(prev - 1));
   const goToStep = (index: number) => setCurrentStep(clampStep(index));
-  const autoAdvanceFromStep = (stepIndex: number) => {
-    setCurrentStep((prev) => {
-      if (prev !== stepIndex) return prev;
-      return clampStep(prev + 1);
-    });
-  };
 
-  const handleMethodSelect = (methodId: PaymentMethodEnum) => {
+  const handleMethodSelect = (methodId: string) => {
     setSelectedMethod(methodId);
   };
 
-  const isLastStep = currentStep === steps.length - 1;
+  const resetPaymentForm = () => {
+    setSelectedMethod(null);
+    setAmountReceived("0");
+    setNotes("");
+    setCurrentStep(0);
+  };
 
-  const handleRegisterPayment = async () => {
+  const handlePrintPrompt = async (paymentData: IPrintPostPaymentInvoiceParamsEntity) => {
+    showYesNoDialog({
+      title: "Imprimir comprobante",
+      description: "¿Desea imprimir el comprobante de pago?",
+      handleYes: async () => {
+        const toastId = toast.loading("Enviando impresión...");
+        if (paymentData) {
+          const res = await printPostPaymentInvoice(paymentData).finally(() => {
+            clearValidateResult();
+            closeDialog();
+          });
+
+          if (!res.success) {
+            toast.error("Error al imprimir el comprobante", {
+              description: "Intenta nuevamente más tarde desde la sección de pagos.",
+              id: toastId,
+            },)
+          } else {
+            toast.success("Impresión enviada correctamente", {
+              id: toastId,
+            });
+          }
+        }
+      },
+      handleNo: () => {
+        closeDialog();
+      },
+    });
+  };
+
+  const processPayment = async () => {
+    const res = await generatePaymentAction({
+      parkingSessionId: parkingSessionId!,
+      paymentMethodId: selectedMethod!,
+      amountReceived: Number(amountReceived),
+      notes,
+    });
+    
+    if(!res.success || !res.data){
+      toast.error("Error al registrar el pago", {
+        description: res.error || "Intenta nuevamente más tarde.",
+      });
+      return;
+    }
+
+    toast.success("Pago registrado exitosamente");
+    const dataToPrint: IPrintPostPaymentInvoiceParamsEntity = {
+      ...res.data.data
+    }
+    await handlePrintPrompt(dataToPrint);
+    resetPaymentForm();
+  };
+
+  const validatePaymentData = (): boolean => {
     if (!parkingSessionId) {
       toast.error("No hay una sesión de parqueo activa");
-      return;
+      return false;
     }
 
     if (!selectedMethod) {
       toast.error("Debes seleccionar un método de pago");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleRegisterPayment = async () => {
+    if (!validatePaymentData()) {
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const result = await generatePaymentAction({
-        parkingSessionId,
-        paymentMethod: selectedMethod,
-        amountReceived: Number(amountReceived),
-        notes,
-      });
-
-      if (!result.success) {
-        toast.error(result.error || "Error al registrar el pago");
-        return;
-      }
-
-      toast.success("Pago registrado exitosamente");
-      console.log("Pago registrado:", result.data);
-
-      // Resetear formulario
-      setSelectedMethod(null);
-      setAmountReceived("0");
-      setNotes("");
-      setCurrentStep(0);
+      await processPayment();
     } catch (error) {
       console.error("Error al registrar pago:", error);
       toast.error("Error inesperado al registrar el pago");
@@ -116,6 +165,8 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
       setIsSubmitting(false);
     }
   };
+
+  const isLastStep = currentStep === steps.length - 1;
 
   const handleContinue = () => {
     if (isLastStep) {
@@ -140,26 +191,28 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   }
 
   return (
-    <ChronoCard className={cn("gap-0 flex h-full flex-col overflow-hidden", className)}>
+    <ChronoCard className={cn("gap-0 flex h-full flex-col overflow-hidden animate-in fade-in duration-500", className)}>
       <ChronoCardHeader className="space-y-1.5">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+            <ChronoSectionLabel size="xs">
               Total del cobro
-            </p>
-            <ChronoCardTitle className="text-xl font-semibold tracking-tight">
+            </ChronoSectionLabel>
+            <ChronoValue size="lg">
               {formatCurrency(totalAmount)}
-            </ChronoCardTitle>
+            </ChronoValue>
           </div>
           <div className="text-right">
-            <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+            <ChronoSectionLabel size="xs">
               Cambio estimado
-            </p>
-            <p
-              className={cn("text-lg font-semibold", changeValue > 0 ? "text-emerald-400" : "text-muted-foreground")}
+            </ChronoSectionLabel>
+            <ChronoValue
+              size="md"
+              className={changeValue > 0 ? "text-emerald-400" : ""}
+              muted={changeValue === 0}
             >
               {changeValue > 0 ? formatCurrency(changeValue) : "--"}
-            </p>
+            </ChronoValue>
           </div>
         </div>
         <ChronoCardDescription className="text-[10px]">
@@ -174,11 +227,13 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
       </ChronoCardHeader>
 
       <ChronoCardContent className="flex-1 overflow-y-auto py-0 pr-1 flex flex-col">
-        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.35em] text-muted-foreground pt-1">
-          <span>Pasos</span>
-          <span>
+        <div className="flex items-center justify-between pt-1">
+          <ChronoSectionLabel size="md" className="tracking-[0.35em]">
+            Pasos
+          </ChronoSectionLabel>
+          <ChronoSectionLabel size="md" className="tracking-[0.35em]">
             {currentStep + 1}/{steps.length}
-          </span>
+          </ChronoSectionLabel>
         </div>
 
         <div className="flex flex-wrap gap-1">
@@ -217,8 +272,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
                   <div>
                     {step.id === "method" && (
                       <div className="grid gap-1.5 grid-cols-3">
-                        {PAYMENT_METHODS.map((method) => {
-                          const Icon = method.icon;
+                        {paymentMethods.map((method) => {
                           return (
                             <button
                               key={method.value}
@@ -237,7 +291,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
                                   ? "bg-primary/20 text-primary"
                                   : "bg-muted/50 text-muted-foreground"
                               )}>
-                                <Icon className="h-4 w-4" />
+                                <Banknote className="h-4 w-4" />
                               </div>
                               <span className="text-sm font-semibold">{method.label}</span>
                             </button>
@@ -281,7 +335,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
                           {[ 
                             {
                               label: "Método de pago",
-                              value: PAYMENT_METHODS.find((method) => method.value === selectedMethod)?.label ?? "--",
+                              value: paymentMethods.find((method) => method.value === selectedMethod)?.label ?? "--",
                             },
                             {
                               label: "Monto recibido",

@@ -40,6 +40,12 @@
       "@/infraestructure/*": [
         "./src/infraestructure/*"
       ],
+      "@/server/*": [
+        "./src/server/*"
+      ],
+      "@/client/*": [
+        "./src/client/*"
+      ],
       "@/public/*": [
         "./public/*"
       ],

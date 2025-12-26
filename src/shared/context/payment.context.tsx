@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { IValidateAmountParamsEntity, IValidateAmountResponseEntity } from "@/domain/index";
+import { IValidateAmountParamsEntity, IValidateAmountResponseEntity } from "@/server/domain";
 import { validateFeeAction } from "@/src/app/parking/cobro/actions/validate-fee.action";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";

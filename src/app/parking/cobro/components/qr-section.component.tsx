@@ -8,6 +8,7 @@ import { ChronoDateTimePicker } from "@chrono/chrono-date-time-picker.component"
 import ChronoQrScannerInput from "@chrono/chrono-qr-scanner-input.component";
 import ChronoPlateInput from "@chrono/chrono-plate-input.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
+import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import {
   ChronoCard,
   ChronoCardContent,
@@ -16,10 +17,11 @@ import {
   ChronoCardTitle,
 } from "@chrono/chrono-card.component";
 
-import { IValidateAmountParamsEntity } from "@/src/domain";
 import { usePaymentContext } from "@/src/shared/context/payment.context";
 import { cn } from "@/src/lib/utils";
 import { useDebouncedCallback } from "use-debounce";
+
+import { IValidateAmountParamsEntity } from "@/server/domain";
 
 type QrSectionProps = {
   className?: string;
@@ -92,11 +94,13 @@ function QrFormComponent({
         onChange={handleFormChange}
       >
         <div className="flex flex-col gap-3 rounded-xl">
-          <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+          <div className="flex items-center gap-1.5">
             <ChronoBadge variant="outline" className="border-primary/40 text-foreground">
               Paso 1
             </ChronoBadge>
-            <span>Hora de salida</span>
+            <ChronoSectionLabel size="sm">
+              Hora de salida
+            </ChronoSectionLabel>
           </div>
           <Controller
             control={validateFeeForm.control}
@@ -116,11 +120,13 @@ function QrFormComponent({
         </div>
 
         <div className="flex flex-col gap-3 rounded-xl pb-1">
-          <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+          <div className="flex items-center gap-1.5">
             <ChronoBadge variant="outline" className="border-primary/40 text-foreground">
               Paso 2
             </ChronoBadge>
-            <span>QR o placa</span>
+            <ChronoSectionLabel size="sm">
+              QR o placa
+            </ChronoSectionLabel>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
@@ -152,7 +158,7 @@ function QrFormComponent({
                     id="plate"
                     value={field.value as string ?? ""}
                     onClear={onClear}
-                    placeholder="Placa (ej: ABC123 o ABC12D)"
+                    placeholder="Placa"
                   />
 
                   {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}

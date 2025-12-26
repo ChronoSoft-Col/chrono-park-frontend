@@ -2,9 +2,9 @@
 
 import { AxiosError } from "axios";
 
-import { container } from "@/di/container";
-import { LoginUseCase } from "@/domain/index";
-import type { ILoginParams } from "@/domain/entities/auth/login-params.entity";
+import { serverContainer } from "@/server/di/container";
+import { LoginUseCase } from "@/server/domain/index";
+import type { ILoginParams } from "@/server/domain/entities/auth/login-params.entity";
 // company/permission types not used here; kept in todo for future mapping
 import type { TApplication } from "@/src/shared/types/auth/application.type";
 import type IActionResponse from "@/src/shared/interfaces/generic/action-response";
@@ -30,7 +30,7 @@ export async function loginAction(
   params: ILoginParams
 ): Promise<IActionResponse<LoginActionResult>> {
   try {
-    const useCase = container.resolve(LoginUseCase);
+    const useCase = serverContainer.resolve(LoginUseCase);
     const response = await useCase.execute(params);
 
     if (!response.success || !response.data) {

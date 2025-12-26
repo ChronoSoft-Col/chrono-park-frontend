@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { IInOutEntity } from "@/domain/index";
+import { IInOutEntity } from "@/server/domain";
 import { ChronoDataTable } from "@chrono/chrono-data-table.component";
 import { ChronoPaginator } from "@chrono/chrono-paginator.component";
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { getRateProfileAction } from "@/src/app/global-actions/get-common.action";
-import { IGenerateManualIncomeParamsEntity } from "@/src/domain";
 import { ChronoDateTimePicker } from "@chrono/chrono-date-time-picker.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import ChronoButton from "@chrono/chrono-button.component";
@@ -39,6 +38,7 @@ import { useState } from "react";
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { generateManualIncomeAction } from "../actions/generate-manual-income.action";
+import { IGenerateManualIncomeParamsEntity } from "@/src/server/domain";
 
 export default function ManualIncomeFormComponent() {
   const { vehicleTypes } = useCommonContext();

@@ -9,7 +9,7 @@ import { EyeIcon, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { loginAction } from "@/src/app/auth/actions/login.action";
-import { ILoginParams } from "@/domain/index";
+import { ILoginParams } from "@/server/domain/index";
 import ChronoButton from "@chrono/chrono-button.component";
 import {
   ChronoCard,
