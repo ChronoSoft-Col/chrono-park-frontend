@@ -4,11 +4,12 @@ import { PrintRepository } from "@/client/domain/repositories/printer/print.repo
 import { IPrintRequestEntity } from "@/client/domain/entities/printer/print-request.entity";
 import axios from "axios";
 import { injectable } from "tsyringe";
+import { ENVIRONMENT } from "@/src/shared/constants/environment";
 
 @injectable()
 export class PrintDatasourceService implements PrintRepository {
   async sendToPrinter(request: IPrintRequestEntity): Promise<boolean> {
-    const apiUrl = process.env.NEXT_PUBLIC_PRINTER_APIURL || "http://localhost:8080";
+    const apiUrl = ENVIRONMENT.PRINTER_API_URL
 
     try {
       await axios.post(`${apiUrl}/imprimir`, {
