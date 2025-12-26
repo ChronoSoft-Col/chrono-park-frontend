@@ -70,13 +70,9 @@ export default function ParkingPage() {
     return (
       <section className="space-y-4">
         <p>Sesión no disponible.</p>
-        <button
-          type="button"
-          className="underline text-sm"
-          onClick={() => refresh(true)}
-        >
+        <ChronoButton type="button" variant="link" size="sm" onClick={() => refresh(true)}>
           Reintentar
-        </button>
+        </ChronoButton>
       </section>
     );
   }

@@ -56,7 +56,7 @@ export function ClosureDetailDialog({ closure, operatorName }: Props) {
   const rateSummary = parseJsonMaybe<RateSummary>(closure.detail?.rateSummary);
 
   return (
-    <div className="max-h-[70vh] space-y-6 overflow-y-auto">
+    <div className="max-h-[70vh] space-y-6 overflow-y-auto px-4">
       {/* Información General */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div>

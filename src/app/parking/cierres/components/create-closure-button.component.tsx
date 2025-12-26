@@ -1,21 +1,25 @@
 "use client";
 
-import { Button } from "@/src/shared/components/ui/button";
+import ChronoButton from "@chrono/chrono-button.component";
 import { Plus } from "lucide-react";
-import { useState } from "react";
-import CreateClosureDialog from "./create-closure-dialog.component";
+import { UseDialogContext } from "@/src/shared/context/dialog.context";
+import CreateClosureDialogContent from "./create-closure-dialog.component";
 
 export default function CreateClosureButton() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { openDialog } = UseDialogContext();
 
   return (
-    <>
-      <Button onClick={() => setIsOpen(true)} className="gap-2">
-        <Plus className="h-4 w-4" />
-        Nuevo Cierre
-      </Button>
-
-      <CreateClosureDialog isOpen={isOpen} onClose={() => setIsOpen(false)} />
-    </>
+    <ChronoButton
+      onClick={() => {
+        openDialog({
+          title: "Crear Nuevo Cierre de Caja",
+          description: "",
+          content: <CreateClosureDialogContent />,
+        });
+      }}
+      icon={<Plus className="h-4 w-4" />}
+    >
+      Nuevo Cierre
+    </ChronoButton>
   );
 }
