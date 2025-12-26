@@ -65,8 +65,10 @@ export function getServerApi(queryParams?: Record<string, unknown>) {
       // 🔐 Si hay un 401, cerrar sesión automáticamente
       if (status === 401) {
         // Nota: en Server Components no se pueden modificar cookies.
-        // Redirigimos al login y dejamos que el cliente haga el signOut (DELETE /api/session).
-        redirect("/auth/login?reason=expired");
+        // Redirigimos a un Route Handler que sí puede destruir la cookie y luego mandar al login.
+        redirect(
+          `/api/session/logout?next=${encodeURIComponent("/auth/login?reason=expired")}`
+        );
       }
 
       return Promise.reject(error);

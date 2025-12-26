@@ -26,7 +26,7 @@ import { generatePaymentAction } from "@/src/app/parking/cobro/actions/generate-
 import { toast } from "sonner";
 import { ChronoInput } from "@chrono/chrono-input.component";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
-import { IGeneratePaymentResponseEntity, IPrintPostPaymentInvoiceParamsEntity } from "@/server/domain";
+import { IPrintPostPaymentInvoiceParamsEntity } from "@/server/domain";
 
 const steps = [
   { id: "method", badge: "1", title: "Método de pago", description: "" },

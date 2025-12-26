@@ -31,8 +31,6 @@ export async function listClosuresAction(
       data: result,
     };
   } catch (error) {
-    console.log(error)
-    console.error("Error listing closures:", (error as AxiosError<IErrorResponse>).response?.data);
     return {
       success: false,
       error: (error as AxiosError<IErrorResponse>).response?.data.message || "Error al listar los cierres",
