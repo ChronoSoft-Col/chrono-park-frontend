@@ -19,44 +19,44 @@ type MethodBucket = {
 type SummaryByMethod = Record<string, MethodBucket>;
 type RateSummary = Record<string, { total: string; count: number }>;
 
+const safeFormatDateTime = (value?: string | null) => {
+  if (!value) return "-";
+  try {
+    return format(new Date(value), "dd/MM/yyyy HH:mm", { locale: es });
+  } catch {
+    return "-";
+  }
+};
+
+const formatCurrency = (value?: string | null) => {
+  if (!value) return "$0.00";
+  const parsed = Number(value);
+  const safe = Number.isFinite(parsed) ? parsed : 0;
+  return `$${safe.toLocaleString("es-AR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+};
+
+const parseJsonMaybe = <T,>(value: unknown): T | null => {
+  if (!value) return null;
+  if (typeof value === "object") return value as T;
+  if (typeof value !== "string") return null;
+
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+};
+
 export function ClosureDetailDialog({ closure, operatorName }: Props) {
-
-  const safeFormatDateTime = (value?: string | null) => {
-    if (!value) return "-";
-    try {
-      return format(new Date(value), "dd/MM/yyyy HH:mm", { locale: es });
-    } catch {
-      return "-";
-    }
-  };
-
-  const formatCurrency = (value?: string | null) => {
-    if (!value) return "$0.00";
-    const parsed = Number(value);
-    const safe = Number.isFinite(parsed) ? parsed : 0;
-    return `$${safe.toLocaleString("es-AR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  };
-
-  const parseJsonMaybe = <T,>(value: unknown): T | null => {
-    if (!value) return null;
-    if (typeof value === "object") return value as T;
-    if (typeof value !== "string") return null;
-
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return null;
-    }
-  };
 
   const summaryByMethod = parseJsonMaybe<SummaryByMethod>(closure.detail?.summary);
   const rateSummary = parseJsonMaybe<RateSummary>(closure.detail?.rateSummary);
 
   return (
-    <div className="overflow-y-auto space-y-6 max-h-[70vh] px-4">
+    <div className="max-h-[70vh] space-y-6 overflow-y-auto">
       {/* Información General */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div>
@@ -109,88 +109,91 @@ export function ClosureDetailDialog({ closure, operatorName }: Props) {
       <div className="space-y-4 rounded-lg border border-border/60 bg-muted/40 p-4">
         <ChronoSectionLabel size="md">Resumen por método de pago</ChronoSectionLabel>
 
-            {!summaryByMethod || Object.keys(summaryByMethod).length === 0 ? (
-              <p className="text-sm text-muted-foreground">Sin resumen disponible.</p>
-            ) : (
-              <div className="space-y-4">
-                {Object.entries(summaryByMethod).map(([methodName, bucket]) => (
-                  <div key={methodName} className="rounded-lg border border-border/60 bg-card/60 p-4 space-y-3">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <ChronoSectionLabel size="sm">{methodName}</ChronoSectionLabel>
-                        <span className="text-xs text-muted-foreground">Total del método</span>
-                      </div>
-                      <ChronoValue size="lg">{formatCurrency(bucket?.total ?? null)}</ChronoValue>
-                    </div>
-
-                    {bucket?.data && Object.keys(bucket.data).length > 0 && (
-                      <div className="overflow-x-auto">
-                        <div className="min-w-[560px] space-y-2">
-                          <div className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-background/40 p-3">
-                            <span className="text-xs text-muted-foreground">Tarifa</span>
-                            <span className="text-xs text-muted-foreground">Cantidad</span>
-                            <span className="text-xs text-muted-foreground text-right">Total</span>
-                          </div>
-
-                          {Object.entries(bucket.data).map(([rateName, rateData]) => (
-                            <div
-                              key={`${methodName}-${rateName}`}
-                              className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-background/60 p-3"
-                            >
-                              <div>
-                                <ChronoValue size="sm">{rateName}</ChronoValue>
-                              </div>
-                              <div>
-                                <ChronoValue size="sm">{String(rateData?.count ?? 0)}</ChronoValue>
-                              </div>
-                              <div className="text-right">
-                                <ChronoValue size="sm">{formatCurrency(rateData?.total ?? null)}</ChronoValue>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+        {!summaryByMethod || Object.keys(summaryByMethod).length === 0 ? (
+          <p className="text-sm text-muted-foreground">Sin resumen disponible.</p>
+        ) : (
+          <div className="space-y-4">
+            {Object.entries(summaryByMethod).map(([methodName, bucket]) => (
+              <div
+                key={methodName}
+                className="space-y-3 rounded-lg border border-border/60 bg-card/60 p-4"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <ChronoSectionLabel size="sm">{methodName}</ChronoSectionLabel>
+                    <span className="text-xs text-muted-foreground">Total del método</span>
                   </div>
-                ))}
+                  <ChronoValue size="lg">{formatCurrency(bucket?.total ?? null)}</ChronoValue>
+                </div>
+
+                {bucket?.data && Object.keys(bucket.data).length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <div className="min-w-[560px] space-y-2">
+                      <div className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-background/40 p-3">
+                        <span className="text-xs text-muted-foreground">Tarifa</span>
+                        <span className="text-xs text-muted-foreground">Cantidad</span>
+                        <span className="text-right text-xs text-muted-foreground">Total</span>
+                      </div>
+
+                      {Object.entries(bucket.data).map(([rateName, rateData]) => (
+                        <div
+                          key={`${methodName}-${rateName}`}
+                          className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-background/60 p-3"
+                        >
+                          <div>
+                            <ChronoValue size="sm">{rateName}</ChronoValue>
+                          </div>
+                          <div>
+                            <ChronoValue size="sm">{String(rateData?.count ?? 0)}</ChronoValue>
+                          </div>
+                          <div className="text-right">
+                            <ChronoValue size="sm">{formatCurrency(rateData?.total ?? null)}</ChronoValue>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </div>
-            )}
+            ))}
           </div>
+        )}
+      </div>
 
       {/* Resumen por tarifa */}
       <div className="space-y-4 rounded-lg border border-border/60 bg-muted/40 p-4">
         <ChronoSectionLabel size="md">Resumen por tarifa</ChronoSectionLabel>
 
-            {!rateSummary || Object.keys(rateSummary).length === 0 ? (
-              <p className="text-sm text-muted-foreground">Sin resumen disponible.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <div className="min-w-[560px] space-y-2">
-                  <div className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-background/40 p-3">
-                    <span className="text-xs text-muted-foreground">Tarifa</span>
-                    <span className="text-xs text-muted-foreground">Cantidad</span>
-                    <span className="text-xs text-muted-foreground text-right">Total</span>
-                  </div>
-
-                  {Object.entries(rateSummary).map(([rateName, rateData]) => (
-                    <div
-                      key={rateName}
-                      className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-card/60 p-3"
-                    >
-                      <div>
-                        <ChronoValue size="sm">{rateName}</ChronoValue>
-                      </div>
-                      <div>
-                        <ChronoValue size="sm">{String(rateData?.count ?? 0)}</ChronoValue>
-                      </div>
-                      <div className="text-right">
-                        <ChronoValue size="sm">{formatCurrency(rateData?.total ?? null)}</ChronoValue>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+        {!rateSummary || Object.keys(rateSummary).length === 0 ? (
+          <p className="text-sm text-muted-foreground">Sin resumen disponible.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <div className="min-w-[560px] space-y-2">
+              <div className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-background/40 p-3">
+                <span className="text-xs text-muted-foreground">Tarifa</span>
+                <span className="text-xs text-muted-foreground">Cantidad</span>
+                <span className="text-right text-xs text-muted-foreground">Total</span>
               </div>
-            )}
+
+              {Object.entries(rateSummary).map(([rateName, rateData]) => (
+                <div
+                  key={rateName}
+                  className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-card/60 p-3"
+                >
+                  <div>
+                    <ChronoValue size="sm">{rateName}</ChronoValue>
+                  </div>
+                  <div>
+                    <ChronoValue size="sm">{String(rateData?.count ?? 0)}</ChronoValue>
+                  </div>
+                  <div className="text-right">
+                    <ChronoValue size="sm">{formatCurrency(rateData?.total ?? null)}</ChronoValue>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

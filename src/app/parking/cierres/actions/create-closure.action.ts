@@ -20,7 +20,6 @@ export async function createClosureAction(
       data: closure,
     };
   } catch (error) {
-    console.error("Error creating closure:", JSON.stringify((error as AxiosError<IErrorResponse>).response?.data, null, 2));
     return {
       success: false,
       error: (error as AxiosError<IErrorResponse>).response?.data.message || "Error al crear el cierre",
