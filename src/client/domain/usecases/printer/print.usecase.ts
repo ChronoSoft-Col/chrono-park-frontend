@@ -8,6 +8,7 @@ import { IPrinterOperationEntity } from "../../entities/printer/printer-operatio
 import { ENVIRONMENT } from "@/src/shared/constants/environment";
 import { IPrintPostPaymentInvoiceParamsEntity } from "@/src/server/domain";
 import { IClosureEntity } from "@/src/server/domain/entities/parking/closure.entity";
+import { printerOps } from "./printer-operations";
 
 @injectable()
 export class PrintUsecase {
@@ -24,32 +25,33 @@ export class PrintUsecase {
     }
     
     const operations: IPrinterOperationEntity[] = [];
-    
-    operations.push({ accion: "text", datos: "\n" });
-    operations.push({ accion: "textalign", datos: "center" });
-    operations.push({ accion: "bold", datos: "on" });
-    operations.push({ accion: "text", datos: "TICKET DE PAGO" });
-    operations.push({ accion: "bold", datos: "off" });
-    operations.push({ accion: "text", datos: "----------------------------------------" });
-    operations.push({ accion: "textalign", datos: "left" });
-    
-    operations.push({ accion: "text", datos: `Placa: ${params.session.vehicle.licensePlate}` });
-    operations.push({ accion: "text", datos: `Tipo: ${params.session.vehicle.vehicleType.name}` });
-    operations.push({ accion: "text", datos: `Ingreso: ${new Date(params.session.entryTime).toLocaleString()}` });
-    operations.push({ accion: "text", datos: `Salida: ${new Date(params.session.exitTime).toLocaleString()}` });
-    operations.push({ accion: "text", datos: "----------------------------------------" });
-    
-    operations.push({ accion: "text", datos: `Monto calculado: $${params.session.calculatedAmount.toLocaleString()}` });
+
+    operations.push(printerOps.feed(1));
+    operations.push(printerOps.align("center"));
+    operations.push(printerOps.fontSize(2));
+    operations.push(printerOps.text("TICKET DE PAGO"));
+    operations.push(printerOps.fontSize(1));
+    operations.push(printerOps.separator());
+    operations.push(printerOps.align("left"));
+
+    operations.push(printerOps.text(`Placa: ${params.session.vehicle.licensePlate}`));
+    operations.push(printerOps.text(`Tipo: ${params.session.vehicle.vehicleType.name}`));
+    operations.push(printerOps.text(`Ingreso: ${new Date(params.session.entryTime).toLocaleString()}`));
+    operations.push(printerOps.text(`Salida: ${new Date(params.session.exitTime).toLocaleString()}`));
+    operations.push(printerOps.separator());
+
+    operations.push(printerOps.text(`Monto calculado: $${params.session.calculatedAmount.toLocaleString()}`));
     if (params.session.discount > 0) {
-      operations.push({ accion: "text", datos: `Descuento: $${params.session.discount.toLocaleString()}` });
+      operations.push(printerOps.text(`Descuento: $${params.session.discount.toLocaleString()}`));
     }
-    operations.push({ accion: "bold", datos: "on" });
-    operations.push({ accion: "text", datos: `Total: $${params.totalAmount.toLocaleString()}` });
-    operations.push({ accion: "bold", datos: "off" });
-    operations.push({ accion: "text", datos: `Recibido: $${params.amountReceived.toLocaleString()}` });
-    operations.push({ accion: "text", datos: `Cambio: $${params.change.toLocaleString()}` });
-    operations.push({ accion: "text", datos: "----------------------------------------" });
-    operations.push({ accion: "text", datos: "\n\n" });
+
+    operations.push(printerOps.fontSize(2));
+    operations.push(printerOps.text(`Total: $${params.totalAmount.toLocaleString()}`));
+    operations.push(printerOps.fontSize(1));
+    operations.push(printerOps.text(`Recibido: $${params.amountReceived.toLocaleString()}`));
+    operations.push(printerOps.text(`Cambio: $${params.change.toLocaleString()}`));
+    operations.push(printerOps.separator());
+    operations.push(printerOps.feed(2));
 
     const printerName = ENVIRONMENT.PRINTER_NAME;
     
@@ -61,8 +63,41 @@ export class PrintUsecase {
     return this.printRepository.sendToPrinter(printRequest);
   }
 
-  async printClosureReceipt(closure: IClosureEntity): Promise<boolean> {
+  async printClosureReceipt(
+    closure: IClosureEntity,
+    options?: { operatorName?: string }
+  ): Promise<boolean> {
     const operations: IPrinterOperationEntity[] = [];
+
+    type MethodBucket = {
+      total: string;
+      data: Record<string, { total: string; count: number }>;
+    };
+    type SummaryByMethod = Record<string, MethodBucket>;
+    type RateSummary = Record<string, { total: string; count: number }>;
+
+    const formatDateTime = (value?: string | null) => {
+      if (!value) return "-";
+      try {
+        return new Intl.DateTimeFormat("es-CO", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(new Date(value));
+      } catch {
+        return "-";
+      }
+    };
+
+    const parseJsonMaybe = <T,>(value: unknown): T | null => {
+      if (!value) return null;
+      if (typeof value === "object") return value as T;
+      if (typeof value !== "string") return null;
+      try {
+        return JSON.parse(value) as T;
+      } catch {
+        return null;
+      }
+    };
 
     const formatCurrency = (value?: string | null) => {
       if (!value) return "$0.00";
@@ -71,29 +106,80 @@ export class PrintUsecase {
       return `$${safe.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
-    operations.push({ accion: "text", datos: "\n" });
-    operations.push({ accion: "textalign", datos: "center" });
-    operations.push({ accion: "bold", datos: "on" });
-    operations.push({ accion: "text", datos: "CIERRE DE CAJA" });
-    operations.push({ accion: "bold", datos: "off" });
-    operations.push({ accion: "text", datos: "========================================" });
-    operations.push({ accion: "textalign", datos: "left" });
+    const pushLine = (value = "") => operations.push(printerOps.text(value));
+    const separator = () => operations.push(printerOps.separator());
+    const strongSeparator = () => operations.push(printerOps.strongSeparator());
 
-    operations.push({ accion: "text", datos: `Tipo: ${closure.closureType === "PARCIAL" ? "Parcial" : "Total"}` });
-    operations.push({ accion: "text", datos: `Fecha: ${new Date(closure.createdOn).toLocaleString()}` });
-    operations.push({ accion: "text", datos: "========================================" });
+    const summaryByMethod = parseJsonMaybe<SummaryByMethod>(closure.detail?.summary);
+    const rateSummary = parseJsonMaybe<RateSummary>(closure.detail?.rateSummary);
 
-    operations.push({ accion: "text", datos: `Periodo:` });
-    operations.push({ accion: "text", datos: `Desde: ${new Date(closure.startedAt).toLocaleString()}` });
-    operations.push({ accion: "text", datos: `Hasta: ${new Date(closure.finishedAt).toLocaleString()}` });
-    operations.push({ accion: "text", datos: "----------------------------------------" });
+    operations.push(printerOps.feed(1));
+    operations.push(printerOps.align("center"));
+    operations.push(printerOps.fontSize(2));
+    operations.push(printerOps.text("CIERRE DE CAJA"));
+    operations.push(printerOps.fontSize(1));
+    strongSeparator();
+    operations.push(printerOps.align("left"));
 
-    operations.push({ accion: "bold", datos: "on" });
-    operations.push({ accion: "text", datos: `Total Recaudado: ${formatCurrency(closure.totalCollected)}` });
-    operations.push({ accion: "bold", datos: "off" });
-    operations.push({ accion: "text", datos: "========================================" });
+    pushLine(`Tipo: ${closure.closureType === "PARCIAL" ? "Parcial" : "Total"}`);
+    pushLine(`Creado: ${formatDateTime(closure.createdOn)}`);
+    if (options?.operatorName) {
+      pushLine(`Operador: ${options.operatorName}`);
+    }
+    if (closure.detail?.recordedAt) {
+      pushLine(`Registrado: ${formatDateTime(closure.detail.recordedAt)}`);
+    }
+    strongSeparator();
 
-    operations.push({ accion: "text", datos: "\n\n" });
+    pushLine("Período:");
+    pushLine(`Desde: ${formatDateTime(closure.startedAt)}`);
+    pushLine(`Hasta: ${formatDateTime(closure.finishedAt)}`);
+    separator();
+
+    operations.push(printerOps.fontSize(2));
+    pushLine(`Total Recaudado: ${formatCurrency(closure.totalCollected)}`);
+    operations.push(printerOps.fontSize(1));
+
+    strongSeparator();
+
+    // Resumen por método de pago (igual que el detalle)
+    pushLine("Resumen por método de pago:");
+    if (!summaryByMethod || Object.keys(summaryByMethod).length === 0) {
+      pushLine("(Sin resumen disponible)");
+    } else {
+      for (const [methodName, bucket] of Object.entries(summaryByMethod)) {
+        separator();
+        operations.push({ accion: "bold", datos: "on" });
+        pushLine(methodName);
+        operations.push({ accion: "bold", datos: "off" });
+        pushLine(`Total del método: ${formatCurrency(bucket?.total ?? null)}`);
+
+        const rateEntries = Object.entries(bucket?.data ?? {});
+        if (rateEntries.length > 0) {
+          for (const [rateName, rateData] of rateEntries) {
+            pushLine(`${rateName}`);
+            pushLine(`  Cant: ${String(rateData?.count ?? 0)}  Total: ${formatCurrency(rateData?.total ?? null)}`);
+          }
+        }
+      }
+    }
+
+    strongSeparator();
+
+    // Resumen por tarifa (igual que el detalle)
+    pushLine("Resumen por tarifa:");
+    if (!rateSummary || Object.keys(rateSummary).length === 0) {
+      pushLine("(Sin resumen disponible)");
+    } else {
+      for (const [rateName, rateData] of Object.entries(rateSummary)) {
+        pushLine(`${rateName}`);
+        pushLine(`  Cant: ${String(rateData?.count ?? 0)}  Total: ${formatCurrency(rateData?.total ?? null)}`);
+      }
+    }
+
+    strongSeparator();
+
+    operations.push(printerOps.feed(2));
 
     const printerName = ENVIRONMENT.PRINTER_NAME;
 

@@ -2,10 +2,10 @@
 
 import { IClosureListItemEntity } from "@/server/domain/entities/parking/closure-list-item.entity";
 import { ChronoDataTableColumn } from "@/src/shared/components/chrono-soft/chrono-data-table.component";
-import { Button } from "@/src/shared/components/ui/button";
 import { Eye } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import ChronoButton from "@chrono/chrono-button.component";
 
 const formatDateTime = (value?: string | null) => {
   if (!value) return "-";
@@ -53,15 +53,15 @@ export const createClosureColumns = (
     headerClassName: "text-right",
     cellClassName: "text-right",
     cell: (row) => (
-      <Button
+      <ChronoButton
         variant="outline"
         size="sm"
         onClick={() => onViewDetail?.(row)}
-        className="gap-2"
+        className="text-xs font-semibold"
+        icon={<Eye className="h-4 w-4" />}
       >
-        <Eye className="h-4 w-4" />
         Ver
-      </Button>
+      </ChronoButton>
     ),
   },
 ];

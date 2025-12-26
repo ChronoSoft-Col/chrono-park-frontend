@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOff, Loader2 } from "lucide-react";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 import { loginAction } from "@/src/app/auth/actions/login.action";
 import { ILoginParams } from "@/server/domain/index";
+import { signOut } from "@/src/lib/session-client";
 import ChronoButton from "@chrono/chrono-button.component";
 import {
   ChronoCard,
@@ -46,6 +47,12 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromPath = searchParams.get("from") ?? undefined;
+
+  useEffect(() => {
+    // Si llegamos al login con una cookie vencida/invalidada, la limpiamos desde el cliente.
+    // (En Server Components no se puede modificar cookies directamente)
+    signOut().catch(() => null);
+  }, []);
 
   const form = useForm<ILoginParams>({
     resolver: zodResolver(LoginSchema),

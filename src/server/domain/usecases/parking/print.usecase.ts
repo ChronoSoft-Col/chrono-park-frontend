@@ -5,6 +5,7 @@ import { PrintRepository } from "@/server/domain/repositories/parking/print.repo
 import { IPrintPostPaymentInvoiceParamsEntity } from "@/server/domain/index";
 import { ENVIRONMENT } from "@/src/shared/constants/environment";
 import { IPrinterOperationEntity, IPrintRequestEntity } from "@/src/client/domain";
+import { printerOps } from "@/src/client/domain/usecases/printer/printer-operations";
 
 @injectable()
 export class PrintUsecase {
@@ -15,32 +16,33 @@ export class PrintUsecase {
   ): Promise<boolean> {
     
     const operations: IPrinterOperationEntity[] = [];
-    
-    operations.push({ accion: "text", datos: "\n" });
-    operations.push({ accion: "textalign", datos: "center" });
-    operations.push({ accion: "bold", datos: "on" });
-    operations.push({ accion: "text", datos: "TICKET DE PAGO" });
-    operations.push({ accion: "bold", datos: "off" });
-    operations.push({ accion: "text", datos: "----------------------------------------" });
-    operations.push({ accion: "textalign", datos: "left" });
-    
-    operations.push({ accion: "text", datos: `Placa: ${params.session.vehicle.licensePlate}` });
-    operations.push({ accion: "text", datos: `Tipo: ${params.session.vehicle.vehicleType.name}` });
-    operations.push({ accion: "text", datos: `Ingreso: ${new Date(params.session.entryTime).toLocaleString()}` });
-    operations.push({ accion: "text", datos: `Salida: ${new Date(params.session.exitTime).toLocaleString()}` });
-    operations.push({ accion: "text", datos: "----------------------------------------" });
-    
-    operations.push({ accion: "text", datos: `Monto calculado: $${params.session.calculatedAmount.toLocaleString()}` });
+
+    operations.push(printerOps.feed(1));
+    operations.push(printerOps.align("center"));
+    operations.push(printerOps.fontSize(2));
+    operations.push(printerOps.text("TICKET DE PAGO"));
+    operations.push(printerOps.fontSize(1));
+    operations.push(printerOps.separator());
+    operations.push(printerOps.align("left"));
+
+    operations.push(printerOps.text(`Placa: ${params.session.vehicle.licensePlate}`));
+    operations.push(printerOps.text(`Tipo: ${params.session.vehicle.vehicleType.name}`));
+    operations.push(printerOps.text(`Ingreso: ${new Date(params.session.entryTime).toLocaleString()}`));
+    operations.push(printerOps.text(`Salida: ${new Date(params.session.exitTime).toLocaleString()}`));
+    operations.push(printerOps.separator());
+
+    operations.push(printerOps.text(`Monto calculado: $${params.session.calculatedAmount.toLocaleString()}`));
     if (params.session.discount > 0) {
-      operations.push({ accion: "text", datos: `Descuento: $${params.session.discount.toLocaleString()}` });
+      operations.push(printerOps.text(`Descuento: $${params.session.discount.toLocaleString()}`));
     }
-    operations.push({ accion: "bold", datos: "on" });
-    operations.push({ accion: "text", datos: `Total: $${params.totalAmount.toLocaleString()}` });
-    operations.push({ accion: "bold", datos: "off" });
-    operations.push({ accion: "text", datos: `Recibido: $${params.amountReceived.toLocaleString()}` });
-    operations.push({ accion: "text", datos: `Cambio: $${params.change.toLocaleString()}` });
-    operations.push({ accion: "text", datos: "----------------------------------------" });
-    operations.push({ accion: "text", datos: "\n\n" });
+
+    operations.push(printerOps.fontSize(2));
+    operations.push(printerOps.text(`Total: $${params.totalAmount.toLocaleString()}`));
+    operations.push(printerOps.fontSize(1));
+    operations.push(printerOps.text(`Recibido: $${params.amountReceived.toLocaleString()}`));
+    operations.push(printerOps.text(`Cambio: $${params.change.toLocaleString()}`));
+    operations.push(printerOps.separator());
+    operations.push(printerOps.feed(2));
 
     const printerName = ENVIRONMENT.PRINTER_NAME;
     

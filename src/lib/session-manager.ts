@@ -244,15 +244,11 @@ export function createSessionManager<TSession, TSerialized = TSession>(
       const value = await readCookie();
       const envelope = decodeEnvelope(value);
       if (!envelope) {
-        if (value) {
-          await deleteCookie();
-        }
         return null;
       }
 
       const resolved = resolve(envelope);
       if (!resolved) {
-        await deleteCookie();
         return null;
       }
 
@@ -274,15 +270,11 @@ export function createSessionManager<TSession, TSerialized = TSession>(
       const value = await readCookie();
       const envelope = decodeEnvelope(value);
       if (!envelope) {
-        if (value) {
-          await deleteCookie();
-        }
         return null;
       }
 
       const resolved = resolve(envelope);
       if (!resolved) {
-        await deleteCookie();
         return null;
       }
 

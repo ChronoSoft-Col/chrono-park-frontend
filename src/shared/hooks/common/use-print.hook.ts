@@ -16,8 +16,7 @@ export function usePrint() {
         success: result,
         data: result,
       };
-    } catch (error) {
-      
+    } catch {
       return {
         success: false,
         data: false,
@@ -25,10 +24,14 @@ export function usePrint() {
     }
   }, []);
 
-  const printClosureReceipt = useCallback(async (closure: IClosureEntity): Promise<IActionResponse<boolean>> => {
+  const printClosureReceipt = useCallback(
+    async (
+      closure: IClosureEntity,
+      options?: { operatorName?: string }
+    ): Promise<IActionResponse<boolean>> => {
     try {
       const useCase = clientContainer.resolve(PrintUsecase);
-      const result = await useCase.printClosureReceipt(closure);
+      const result = await useCase.printClosureReceipt(closure, options);
       return {
         success: result,
         data: result,

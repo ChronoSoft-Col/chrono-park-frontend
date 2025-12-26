@@ -1,5 +1,6 @@
 import { ComponentProps, ReactNode } from "react";
 import { Button, buttonVariants } from "../ui/button";
+import { Loader2 } from "lucide-react";
 
 export type ChronoButtonProps = ComponentProps<typeof Button> & {
     loading?: boolean;
@@ -19,6 +20,11 @@ export default function ChronoButton({
     ...buttonProps
 }: ChronoButtonProps) {
     const isDisabled = disabled || loading;
+    const leftIcon = loading ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+    ) : (
+        icon
+    );
 
     return (
         <Button {...buttonProps} asChild={asChild} disabled={isDisabled}>
@@ -26,9 +32,7 @@ export default function ChronoButton({
                 children
             ) : (
                 <>
-                    {icon && iconPosition === "left" && (
-                       icon
-                    )}
+                    {(loading || icon) && iconPosition === "left" && leftIcon}
                     {children}
                     {icon && iconPosition === "right" && (
                        icon

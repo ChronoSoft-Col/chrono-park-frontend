@@ -1,9 +1,8 @@
 // lib/api/server.ts
 import axios, { AxiosError } from "axios";
 import { ENVIRONMENT } from "../shared/constants/environment";
-import { destroySession, getSession } from "./session";
+import { getSession } from "./session";
 import { redirect } from "next/navigation";
-import { toast } from "sonner";
 
 let apiServer: ReturnType<typeof axios.create> | null = null;
 
@@ -65,13 +64,9 @@ export function getServerApi(queryParams?: Record<string, unknown>) {
 
       // 🔐 Si hay un 401, cerrar sesión automáticamente
       if (status === 401) {
-        try {
-          await destroySession();
-          toast.info("Tu sesión ha expirado. Por favor, inicia sesión de nuevo.");
-          redirect("/auth/login");
-        } catch (destroyError) {
-          console.error("Error al cerrar sesión tras 401", destroyError);
-        }
+        // Nota: en Server Components no se pueden modificar cookies.
+        // Redirigimos al login y dejamos que el cliente haga el signOut (DELETE /api/session).
+        redirect("/auth/login?reason=expired");
       }
 
       return Promise.reject(error);

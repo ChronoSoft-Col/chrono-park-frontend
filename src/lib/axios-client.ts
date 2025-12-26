@@ -3,7 +3,7 @@
 
 import axios, { AxiosInstance } from "axios";
 import { ENVIRONMENT } from "../shared/constants/environment";
-import { getClientSession } from "./session-client";
+import { getClientSession, signOut } from "./session-client";
 
 // Declaración global para singleton en HMR
 declare global {
@@ -55,6 +55,25 @@ function createAxiosClient() {
 
     return config;
   });
+
+  // Interceptor: manejar expiración/invalidación del token en cliente
+  instance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const status = error?.response?.status;
+      const requestUrl = String(error?.config?.url ?? "");
+
+      if (status === 401 && typeof window !== "undefined") {
+        // Evitar loop si justo estamos intentando loguear
+        if (!requestUrl.includes("/auth/login")) {
+          await signOut();
+          window.location.assign("/auth/login?reason=expired");
+        }
+      }
+
+      return Promise.reject(error);
+    }
+  );
 
   return instance;
 }
