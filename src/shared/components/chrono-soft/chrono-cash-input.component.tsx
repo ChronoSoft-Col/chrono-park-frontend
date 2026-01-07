@@ -116,7 +116,7 @@ const ChronoCashInput = forwardRef<HTMLInputElement, ChronoCashInputProps>(
     return (
       <div
         className={cn(
-          "flex items-center gap-4 rounded-xl border border-border/40 px-4 shadow-md transition-colors duration-200 bg-background",
+          "flex items-center gap-4 rounded-xl border border-border px-4 transition-colors duration-200 bg-background/90",
           focused && "border-primary",
           className,
         )}
@@ -137,7 +137,7 @@ const ChronoCashInput = forwardRef<HTMLInputElement, ChronoCashInputProps>(
             onFocus={handleFocus}
             onBlur={handleBlur}
             className={cn(
-              "border-0 px-0 text-base font-medium shadow-none tracking-wide focus-visible:ring-0",
+              "border-0 bg-transparent px-0 text-base font-medium shadow-none tracking-wide focus-visible:ring-0 dark:bg-transparent",
               props.readOnly && "text-muted-foreground",
             )}
           />

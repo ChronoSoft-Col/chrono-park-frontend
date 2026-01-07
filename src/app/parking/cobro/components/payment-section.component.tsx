@@ -3,7 +3,7 @@
 import "reflect-metadata"
 
 import { useMemo, useState } from "react";
-import { ScanQrCode, Banknote } from "lucide-react";
+import { ScanQrCode, Banknote, ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import ChronoButton from "@chrono/chrono-button.component";
@@ -51,7 +51,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   const { paymentMethods } = useCommonContext();
   const { printPostPaymentInvoice } = usePrint();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
-  const [amountReceived, setAmountReceived] = useState("0");
+  const [amountReceived, setAmountReceived] = useState("");
   const [notes, setNotes] = useState("");
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -383,18 +383,12 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
       <ChronoCardFooter>
         <div className="ml-auto flex items-center gap-2 text-xs">
           {currentStep > 0 && (
-            <ChronoButton variant="ghost" size="sm" onClick={prevStep}>
-              Atrás
-            </ChronoButton>
+            <ChronoButton variant="ghost" size="icon-lg" onClick={prevStep} icon={<ArrowBigLeft/>}/>
           )}
           {currentStep < steps.length - 1 ? (
-            <ChronoButton size="sm" onClick={handleContinue}>
-              Siguiente
-            </ChronoButton>
+            <ChronoButton size="icon-lg" icon={<ArrowBigRight/>} onClick={handleContinue}/>
           ) : (
-            <ChronoButton size="sm" onClick={handleRegisterPayment} disabled={isSubmitting}>
-              {isSubmitting ? "Procesando..." : "Registrar pago"}
-            </ChronoButton>
+            <ChronoButton size="icon-lg" onClick={handleRegisterPayment} disabled={isSubmitting} icon={<Banknote/>}/>
           )}
         </div>
       </ChronoCardFooter>

@@ -99,8 +99,8 @@ const ChronoPlateInput = forwardRef<HTMLInputElement, ChronoPlateInputProps>(
     return (
       <div
         className={cn(
-          "flex items-center gap-4 rounded-xl border border-border/40 px-4 shadow-md transition-colors duration-200 bg-background",
-          focused && "border-primary",
+          "flex items-center gap-4 rounded-xl border border-border px-4 transition-colors duration-200 bg-background/90",
+          focused && "border-primary", 
           className,
         )}
       >
