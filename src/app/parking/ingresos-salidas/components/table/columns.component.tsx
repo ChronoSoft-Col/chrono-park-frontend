@@ -61,7 +61,7 @@ export const createInOutColumns = (
             <ChronoButton
               type="button"
               size="icon-sm"
-              variant="outline"
+              variant="secondary"
               aria-label="Ver detalle"
               onClick={() => onViewDetail?.(row)}
             >
@@ -76,7 +76,7 @@ export const createInOutColumns = (
             <ChronoButton
               type="button"
               size="icon-sm"
-              variant="outline"
+              variant="default"
               aria-label="Imprimir"
               onClick={() => onPrint?.(row)}
             >

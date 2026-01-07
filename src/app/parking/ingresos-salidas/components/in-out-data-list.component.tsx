@@ -12,6 +12,7 @@ import { InOutDetailDialogContent } from "./in-out-detail-dialog-content";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { toast } from "sonner";
 import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
+import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
 
 interface Props {
   items: IInOutEntity[];
@@ -26,7 +27,7 @@ export default function InOutDataListComponent({
   totalPages,
   pageSize,
 }: Props) {
-  const { openDialog } = UseDialogContext();
+  const { openDialog, closeDialog } = UseDialogContext();
   const { printIncomeReceipt } = usePrint();
 
   const handleViewDetail = React.useCallback(
@@ -35,9 +36,10 @@ export default function InOutDataListComponent({
         title: `Detalle de ${item.vehicle.licensePlate}`,
         description: "Información detallada del movimiento seleccionado",
         content: <InOutDetailDialogContent item={item} />,
+        footer: <ChronoButton onClick={closeDialog} className="w-full" variant={"secondary"}>Cerrar</ChronoButton>,
       });
     },
-    [openDialog]
+    [openDialog, closeDialog]
   );
 
   const handlePrint = React.useCallback(
