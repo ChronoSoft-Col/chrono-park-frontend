@@ -24,6 +24,9 @@ export class PaymentDatasourceService extends AxiosServerInstance implements Pay
                 ...rest,
                 notes: rest.notes || ""
             })
-            .then(response => response.data);
+            .then(response => {
+                console.log(response.data);
+                return response.data;
+            });
     }
 }

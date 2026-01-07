@@ -8,11 +8,20 @@ import { IPrinterOperationEntity } from "../../entities/printer/printer-operatio
 import { ENVIRONMENT } from "@/src/shared/constants/environment";
 import { IPrintPostPaymentInvoiceParamsEntity } from "@/src/server/domain";
 import { IClosureEntity } from "@/src/server/domain/entities/parking/closure.entity";
+import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
 import { printerOps } from "./printer-operations";
 
 @injectable()
 export class PrintUsecase {
   constructor(@inject("PrintRepository") private printRepository: PrintRepository) {}
+
+  private sanitizeText(value: string): string {
+    // Algunas impresoras/servicios (ESC/POS) fallan con acentos.
+    // Quitamos tildes/diacriticos para evitar caracteres raros.
+    return String(value ?? "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
 
   async printPostPaymentInvoice(
     params: IPrintPostPaymentInvoiceParamsEntity
@@ -160,11 +169,7 @@ export class PrintUsecase {
 
     const summaryByMethod = parseJsonMaybe<SummaryByMethod>(closure.detail?.summary);
     const rateSummary = parseJsonMaybe<RateSummary>(closure.detail?.rateSummary);
-
-    operations.push(printerOps.feed(1));
-    operations.push(printerOps.align("center"));
-    operations.push(printerOps.text("CIERRE DE CAJA"));
-    operations.push(printerOps.fontSize(1));
+    
     strongSeparator();
     operations.push(printerOps.align("left"));
 
@@ -253,6 +258,58 @@ export class PrintUsecase {
 
     const printRequest: IPrintRequestEntity = {
       nombre_impresora: printerName,
+      operaciones: operations,
+    };
+
+    return this.printRepository.sendToPrinter(printRequest);
+  }
+
+  async printIncomeReceipt(body: TPrintIncomeBody): Promise<boolean> {
+    const operations: IPrinterOperationEntity[] = [];
+
+    const pushLine = (value = "") => operations.push(printerOps.text(this.sanitizeText(value)));
+
+    operations.push(printerOps.feed(1));
+    operations.push(printerOps.align("center"));
+
+    // Header
+    if (body.informationPrinter?.headerMessage) {
+      pushLine(body.informationPrinter.headerMessage);
+      operations.push(printerOps.separator());
+    } else {
+      pushLine("TICKET DE INGRESO");
+      operations.push(printerOps.separator());
+    }
+
+    operations.push(printerOps.align("left"));
+    pushLine(`Fecha ingreso: ${new Date(body.entryTime).toLocaleString("es-CO")}`);
+    pushLine(`Tipo vehiculo: ${body.vehicleType}`);
+    pushLine(`Placa: ${body.vehiclePlate}`);
+
+    operations.push(printerOps.separator());
+    operations.push(printerOps.align("center"));
+
+    // QR con el parkingSessionId
+    operations.push(printerOps.qr(this.sanitizeText(body.parkingSessionId)));
+
+    operations.push(printerOps.align("left"));
+
+    if (body.informationPrinter?.bodyMessage) {
+      pushLine(body.informationPrinter.bodyMessage);
+    }
+
+    if (body.informationPrinter?.insurancePolicyInfo) {
+      pushLine(body.informationPrinter.insurancePolicyInfo);
+    }
+
+    if (body.informationPrinter?.footerMessage) {
+      pushLine(body.informationPrinter.footerMessage);
+    }
+
+    operations.push(printerOps.feed(2));
+
+    const printRequest: IPrintRequestEntity = {
+      nombre_impresora: ENVIRONMENT.PRINTER_NAME,
       operaciones: operations,
     };
 

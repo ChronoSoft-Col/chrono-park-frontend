@@ -6,6 +6,7 @@ import { PrintUsecase } from "@/client/domain/usecases/printer/print.usecase";
 import { clientContainer } from "@/client/di/container";
 import IActionResponse from "../../interfaces/generic/action-response";
 import { IClosureEntity } from "@/server/domain/entities/parking/closure.entity";
+import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
 
 export function usePrint() {
   const printPostPaymentInvoice = useCallback(async (paymentData: IPrintPostPaymentInvoiceParamsEntity): Promise<IActionResponse<boolean>> => {
@@ -45,6 +46,23 @@ export function usePrint() {
     }
   }, []);
 
-  return { printPostPaymentInvoice, printClosureReceipt };
+  const printIncomeReceipt = useCallback(async (body: TPrintIncomeBody): Promise<IActionResponse<boolean>> => {
+    try {
+      const useCase = clientContainer.resolve(PrintUsecase);
+      const result = await useCase.printIncomeReceipt(body);
+      return {
+        success: result,
+        data: result,
+      };
+    } catch (error) {
+      console.error("Error printing income receipt:", error);
+      return {
+        success: false,
+        data: false,
+      };
+    }
+  }, []);
+
+  return { printPostPaymentInvoice, printClosureReceipt, printIncomeReceipt };
 }
 

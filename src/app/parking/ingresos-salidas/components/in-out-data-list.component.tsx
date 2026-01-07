@@ -9,6 +9,9 @@ import { ChronoPaginator } from "@chrono/chrono-paginator.component";
 import { createInOutColumns } from "./table/columns.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import { InOutDetailDialogContent } from "./in-out-detail-dialog-content";
+import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
+import { toast } from "sonner";
+import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
 
 interface Props {
   items: IInOutEntity[];
@@ -24,6 +27,7 @@ export default function InOutDataListComponent({
   pageSize,
 }: Props) {
   const { openDialog } = UseDialogContext();
+  const { printIncomeReceipt } = usePrint();
 
   const handleViewDetail = React.useCallback(
     (item: IInOutEntity) => {
@@ -36,7 +40,35 @@ export default function InOutDataListComponent({
     [openDialog]
   );
 
-  const columns = React.useMemo(() => createInOutColumns(handleViewDetail), [handleViewDetail]);
+  const handlePrint = React.useCallback(
+    async (item: IInOutEntity) => {
+      const body: TPrintIncomeBody = {
+        parkingSessionId: item.id,
+        vehiclePlate: item.vehicle.licensePlate,
+        vehicleType: item.vehicle.vehicleType.name,
+        entryTime: item.entryTime,
+        informationPrinter: {
+          headerMessage: "",
+          bodyMessage: "",
+          footerMessage: "",
+          insurancePolicyInfo: "",
+        },
+      };
+
+      const res = await printIncomeReceipt(body);
+      if (!res.success) {
+        toast.error("No se pudo imprimir el ticket de ingreso");
+        return;
+      }
+      toast.success("Ticket de ingreso enviado a la impresora");
+    },
+    [printIncomeReceipt]
+  );
+
+  const columns = React.useMemo(
+    () => createInOutColumns(handleViewDetail, handlePrint),
+    [handleViewDetail, handlePrint]
+  );
   const safeTotalPages = Math.max(1, totalPages || Math.ceil(total / pageSize) || 1);
   return (
     <section className="space-y-6">
