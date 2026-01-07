@@ -188,7 +188,7 @@ export function ChronoPaginator({
 
       {showLimitSelector && limitOptions.length > 0 && (
         <div className="flex w-full items-center justify-center gap-2 xl:w-auto xl:justify-end">
-          <span className="text-sm text-muted-foreground">{limitLabel}</span>
+          <span className="text-xs text-muted-foreground">{limitLabel}</span>
           <ChronoSelect value={String(currentLimit)} onValueChange={handleLimitChange} disabled={pending}>
             <ChronoSelectTrigger className="w-24">
               <ChronoSelectValue placeholder={String(currentLimit)} />

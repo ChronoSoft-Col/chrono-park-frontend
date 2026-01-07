@@ -118,8 +118,8 @@ const ChronoPlateInput = forwardRef<HTMLInputElement, ChronoPlateInputProps>(
           onFocus={handleFocus}
           onBlur={handleBlur}
           className={cn(
-            "border-0 px-0 text-2xl font-medium shadow-none tracking-[0.3em] uppercase focus-visible:ring-0",
-            "placeholder:normal-case placeholder:tracking-normal placeholder:text-base placeholder:font-normal",
+            "border-0 bg-transparent px-0 text-xl font-medium shadow-none tracking-[0.3em] uppercase focus-visible:ring-0 dark:bg-transparent",
+            "placeholder:normal-case placeholder:tracking-normal placeholder:text-sm placeholder:font-normal",
             props.readOnly && "text-muted-foreground",
           )}
         />

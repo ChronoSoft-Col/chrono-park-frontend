@@ -10,7 +10,7 @@ export function ChronoLabel({ className, required, children, ...props }: ChronoL
   return (
     <Label
       className={cn(
-        "chrono-label uppercase tracking-[0.2em] text-xs text-muted-foreground",
+        "chrono-label uppercase tracking-[0.2em] text-[11px] text-muted-foreground",
         required && "after:ml-1 after:text-destructive after:content-['*']",
         className
       )}

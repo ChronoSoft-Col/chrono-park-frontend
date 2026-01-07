@@ -28,7 +28,7 @@ export function ChronoFormControl(props: React.ComponentProps<typeof FormControl
 }
 
 export function ChronoFormDescription({ className, ...props }: React.ComponentProps<typeof FormDescription>) {
-  return <FormDescription className={cn("chrono-form__description text-xs", className)} {...props} />;
+  return <FormDescription className={cn("chrono-form__description text-[11px]", className)} {...props} />;
 }
 
 export function ChronoFormMessage({ className, ...props }: React.ComponentProps<typeof FormMessage>) {

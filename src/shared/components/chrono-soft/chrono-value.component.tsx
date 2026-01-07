@@ -4,10 +4,10 @@ import { cn } from "@/src/lib/utils";
 import { ReactNode } from "react";
 
 const sizeVariants = {
-  sm: "text-base",
-  md: "text-lg",
-  lg: "text-xl",
-  xl: "text-2xl",
+  sm: "text-sm",
+  md: "text-base",
+  lg: "text-lg",
+  xl: "text-xl",
 } as const;
 
 const weightVariants = {

@@ -44,7 +44,7 @@ export function QrScanInput<
           onChange={(event: ChangeEvent<HTMLInputElement>) => onScan(event.target.value)}
           placeholder="Escanea el QR de ingreso"
           className={cn(
-            "border-0 border-b-2 rounded-none focus-visible:ring-0 text-lg px-0 bg-transparent",
+            "",
             flash && "animate-pulse border-b-green-500"
           )}
         />

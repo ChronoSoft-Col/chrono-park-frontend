@@ -117,7 +117,7 @@ const ChronoQrScannerInput = forwardRef<HTMLInputElement, ChronoQrScannerInputPr
           onFocus={handleFocus}
           onBlur={handleBlur}
           className={cn(
-            "border-0 px-0 text-lg font-medium shadow-none tracking-wide focus-visible:ring-0",
+            "border-0 bg-transparent px-0 text-base font-medium shadow-none tracking-wide ring-0 focus-visible:ring-0 dark:bg-transparent",
             props.readOnly && "text-muted-foreground",
           )}
         />

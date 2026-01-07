@@ -90,7 +90,7 @@ export function ChronoDataTable<T extends object>({
       <TableBody>
         {isLoading && (
           <TableRow>
-            <TableCell colSpan={columns.length} className="text-center text-sm text-muted-foreground">
+            <TableCell colSpan={columns.length} className="text-center text-xs text-muted-foreground">
               {loadingMessage}
             </TableCell>
           </TableRow>
@@ -98,7 +98,7 @@ export function ChronoDataTable<T extends object>({
 
         {showEmptyState && (
           <TableRow>
-            <TableCell colSpan={columns.length} className="text-center text-sm text-muted-foreground">
+            <TableCell colSpan={columns.length} className="text-center text-xs text-muted-foreground">
               {emptyMessage}
             </TableCell>
           </TableRow>

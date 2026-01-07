@@ -18,7 +18,7 @@ export default function ChronoTitle({
   return (
     <Tag
       className={clsx(
-        "chrono-title text-2xl font-semibold tracking-tight text-foreground",
+        "chrono-title text-xl font-semibold tracking-tight text-foreground",
         className,
       )}
     >

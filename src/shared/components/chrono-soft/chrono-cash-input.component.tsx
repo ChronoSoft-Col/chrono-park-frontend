@@ -126,7 +126,7 @@ const ChronoCashInput = forwardRef<HTMLInputElement, ChronoCashInputProps>(
         </div>
 
         <div className="flex-1 flex items-baseline gap-1">
-          <span className="text-lg font-medium text-muted-foreground">$</span>
+          <span className="text-base font-medium text-muted-foreground">$</span>
           <ChronoInput
             ref={assignRef}
             {...props}
@@ -137,7 +137,7 @@ const ChronoCashInput = forwardRef<HTMLInputElement, ChronoCashInputProps>(
             onFocus={handleFocus}
             onBlur={handleBlur}
             className={cn(
-              "border-0 px-0 text-lg font-medium shadow-none tracking-wide focus-visible:ring-0",
+              "border-0 px-0 text-base font-medium shadow-none tracking-wide focus-visible:ring-0",
               props.readOnly && "text-muted-foreground",
             )}
           />

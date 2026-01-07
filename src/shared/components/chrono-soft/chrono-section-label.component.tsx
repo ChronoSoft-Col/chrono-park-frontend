@@ -4,10 +4,10 @@ import { cn } from "@/src/lib/utils";
 import { ReactNode } from "react";
 
 const sizeVariants = {
-  xs: "text-[9px]",
-  sm: "text-[10px]",
-  md: "text-[11px]",
-  base: "text-xs",
+  xs: "text-[8px]",
+  sm: "text-[9px]",
+  md: "text-[10px]",
+  base: "text-[11px]",
 } as const;
 
 interface ChronoSectionLabelProps {
