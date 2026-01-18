@@ -11,6 +11,7 @@ import { buildSearchParams } from "@/src/lib/search-params";
 import { DEFAULT_PAGE, DEFAULT_LIMIT } from "@/src/shared/constants/pagination";
 import { ClosureTypeEnum } from "@/src/shared/enums/parking/closure-type.enum";
 import z from "zod";
+import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
 
 const closureSearchParamsSchema = z.object({
   page: z.coerce.number().int().positive().default(DEFAULT_PAGE),
@@ -31,6 +32,7 @@ export async function listClosuresAction(
       data: result,
     };
   } catch (error) {
+    rethrowNextNavigationErrors(error);
     return {
       success: false,
       error: (error as AxiosError<IErrorResponse>).response?.data.message || "Error al listar los cierres",

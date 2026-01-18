@@ -5,6 +5,7 @@ import { serverContainer } from "@/src/server/di/container";
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";
+import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
 
 export async function validateFeeAction(params: IValidateAmountParamsEntity): Promise<IActionResponse<IValidateAmountResponseEntity>> {
     try {
@@ -16,6 +17,7 @@ export async function validateFeeAction(params: IValidateAmountParamsEntity): Pr
             success: true
         };
     } catch (error) {
+        rethrowNextNavigationErrors(error);
         console.log("validateFeeAction error:", (error as AxiosError<IErrorResponse>).response?.data);
         return {
             success: false,

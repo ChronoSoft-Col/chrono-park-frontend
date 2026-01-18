@@ -6,6 +6,7 @@ import { IClosureEntity } from "@/server/domain/entities/parking/closure.entity"
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";
+import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
 
 export async function getClosureByIdAction(
   id: string
@@ -19,6 +20,7 @@ export async function getClosureByIdAction(
       data: closure,
     };
   } catch (error) {
+    rethrowNextNavigationErrors(error);
     console.error("Error getting closure:", error);
     return {
       success: false,

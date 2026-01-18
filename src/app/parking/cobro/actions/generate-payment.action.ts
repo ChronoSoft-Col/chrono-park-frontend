@@ -5,6 +5,7 @@ import { IGeneratePaymentParamsEntity, IGeneratePaymentResponseEntity, PaymentUs
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";
+import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
 
 export async function generatePaymentAction(params: IGeneratePaymentParamsEntity): Promise<IActionResponse<IGeneratePaymentResponseEntity>> {
     try {
@@ -19,6 +20,7 @@ export async function generatePaymentAction(params: IGeneratePaymentParamsEntity
             success: true
         };
     } catch (error) {
+        rethrowNextNavigationErrors(error);
         console.log("generatePaymentAction error:", (error as AxiosError).response?.data);
         return {
             success: false,

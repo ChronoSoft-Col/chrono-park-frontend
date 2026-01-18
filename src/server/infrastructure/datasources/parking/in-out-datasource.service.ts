@@ -17,6 +17,8 @@ export class InOutDatasourceService
   ): Promise<IListInOutResponseEntity> {
     return this.api
       .get<IListInOutResponseEntity>("/parking-sessions/list", { params })
-      .then((response) => response.data);
+      .then((response) => response.data)
+      .catch(e=> console.log(e)) as unknown as IListInOutResponseEntity
+      ;
   }
 }

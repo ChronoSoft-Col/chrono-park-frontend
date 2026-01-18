@@ -12,6 +12,7 @@ import type IActionResponse from "@/src/shared/interfaces/generic/action-respons
 import type { SessionTokens, SessionUser } from "@/src/shared/types/auth/session.type";
 import type IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { createSession } from "@/src/lib/session";
+import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
 
 export type LoginActionResult = {
   user: SessionUser;
@@ -73,6 +74,7 @@ export async function loginAction(
       },
     };
   } catch (error) {
+    rethrowNextNavigationErrors(error);
     const axiosError = error as AxiosError<IErrorResponse>;
     console.error("Error en loginAction:", axiosError);
     const message =

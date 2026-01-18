@@ -7,6 +7,7 @@ import { IClosureEntity } from "@/server/domain/entities/parking/closure.entity"
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";
+import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
 
 export async function createClosureAction(
   params: ICloseClosureParamsEntity
@@ -20,6 +21,7 @@ export async function createClosureAction(
       data: closure,
     };
   } catch (error) {
+    rethrowNextNavigationErrors(error);
     return {
       success: false,
       error: (error as AxiosError<IErrorResponse>).response?.data.message || "Error al crear el cierre",

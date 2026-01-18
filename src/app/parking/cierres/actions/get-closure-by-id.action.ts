@@ -6,6 +6,7 @@ import type IActionResponse from "@/src/shared/interfaces/generic/action-respons
 import type IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import type { IClosureEntity } from "@/server/domain/entities/parking/closure.entity";
 import { AxiosError } from "axios";
+import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
 
 export async function getClosureByIdAction(id: string): Promise<IActionResponse<IClosureEntity>> {
   try {
@@ -17,6 +18,7 @@ export async function getClosureByIdAction(id: string): Promise<IActionResponse<
       data: result,
     };
   } catch (error) {
+    rethrowNextNavigationErrors(error);
     console.error("Error getting closure by id:", (error as AxiosError<IErrorResponse>).response?.data);
 
     return {

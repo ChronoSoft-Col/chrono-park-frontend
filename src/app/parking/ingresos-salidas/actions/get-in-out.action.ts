@@ -11,6 +11,7 @@ import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface
 import { AxiosError } from "axios";
 import { z } from "zod";
 import { DEFAULT_PAGE, DEFAULT_LIMIT } from "@/src/shared/constants/pagination";
+import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
 
 const inOutSearchParamsSchema = z.object({
     page: z.coerce.number().int().positive().default(DEFAULT_PAGE),
@@ -30,6 +31,7 @@ export async function getInOutsAction(
         console.log("InOuts fetched with params:", params);
         return { success: true, data: response };
     } catch (error) {
+        rethrowNextNavigationErrors(error);
         return {
             success: false,
             error:
