@@ -9,8 +9,8 @@ export interface ICustomerEntity {
         shortName: string;
     }
     documentNumber: string;
-    email: string;
-    phoneNumber: string;
+    email?: string;
+    phoneNumber?: string;
     agreementId?: string;
     isActive: boolean;
     createdAt: Date;

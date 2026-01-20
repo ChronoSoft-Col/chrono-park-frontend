@@ -33,19 +33,12 @@ export default function CustomersDataListComponent({
   const handleOpenCreateCustomer = React.useCallback(() => {
     openDialog({
       title: "Crear cliente",
-      description: "",
+      description: "Registra un nuevo cliente y sus vehículos",
       content: <CreateCustomerDialogContent />,
-      footer: (
-        <ChronoButton
-          onClick={closeDialog}
-          className="w-full"
-          variant={"secondary"}
-        >
-          Cerrar
-        </ChronoButton>
-      ),
+      dialogClassName: "w-full sm:max-w-5xl",
+      contentClassName: "max-h-[75vh] overflow-y-auto pr-1",
     });
-  }, [openDialog, closeDialog]);
+  }, [openDialog]);
 
   const handleViewDetail = React.useCallback(
     (item: ICustomerEntity) => {

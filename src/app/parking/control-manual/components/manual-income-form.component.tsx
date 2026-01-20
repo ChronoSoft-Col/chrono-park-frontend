@@ -268,8 +268,8 @@ const IncomeForm = ({
                     </ChronoSelectTrigger>
                     <ChronoSelectContent>
                       {rateProfiles?.map((profile) => (
-                        <ChronoSelectItem key={profile.value} value={profile.value}>
-                          {profile.label}
+                        <ChronoSelectItem key={profile.id} value={profile.id}>
+                          {profile.name}
                         </ChronoSelectItem>
                       ))}
                     </ChronoSelectContent>

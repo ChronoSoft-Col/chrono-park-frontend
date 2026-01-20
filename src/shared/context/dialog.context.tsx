@@ -21,6 +21,8 @@ type OpenDialogOptions = {
   description: string;
   content: ReactNode;
   footer?: ReactNode;
+  dialogClassName?: string;
+  contentClassName?: string;
 }
 
 type TDialogContext = {
@@ -29,6 +31,8 @@ type TDialogContext = {
   description: string;
   renderContent: ReactNode;
   renderFooter: ReactNode;
+  dialogClassName?: string;
+  contentClassName?: string;
   showYesNoDialog: (options: YesNoDialogOptions) => void;
     openDialog: (options: OpenDialogOptions) => void;
     setIsOpen: (isOpen: boolean) => void;
@@ -49,12 +53,16 @@ export const DialogProvider = ({ children }: DialogProviderProps) => {
   const [renderContent, setRenderContent] = useState<ReactNode>(null);
   const [renderFooter, setRenderFooter] = useState<ReactNode>(null);
   const [description, setDescription] = useState("");
+  const [dialogClassName, setDialogClassName] = useState<string | undefined>(undefined);
+  const [contentClassName, setContentClassName] = useState<string | undefined>(undefined);
 
   const resetDialogState = useCallback(() => {
     setTitle("");
     setDescription("");
     setRenderContent(null);
     setRenderFooter(null);
+    setDialogClassName(undefined);
+    setContentClassName(undefined);
   }, []);
 
   const closeDialog = useCallback(() => {
@@ -80,12 +88,16 @@ export const DialogProvider = ({ children }: DialogProviderProps) => {
     title,
     description,
     content,
-    footer
+    footer,
+    dialogClassName,
+    contentClassName,
   }: OpenDialogOptions) => {
     setTitle(title);
     setDescription(description);
     setRenderContent(content);
     setRenderFooter(footer ?? null);
+    setDialogClassName(dialogClassName);
+    setContentClassName(contentClassName);
     setIsOpen(true);
   };
 
@@ -98,6 +110,8 @@ export const DialogProvider = ({ children }: DialogProviderProps) => {
         renderFooter,
         showYesNoDialog,
         description,
+        dialogClassName,
+        contentClassName,
         openDialog,
         setIsOpen,
         closeDialog,

@@ -13,7 +13,7 @@ import {
 } from "../ui/dialog";
 
 export default function ChronoCustomDialog() {
-  const { isOpen, title, renderContent, renderFooter, description, setIsOpen, closeDialog } =
+  const { isOpen, title, renderContent, renderFooter, description, setIsOpen, closeDialog, dialogClassName, contentClassName } =
     UseDialogContext();
 
   const handleOpenChange = useCallback(
@@ -29,12 +29,12 @@ export default function ChronoCustomDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="w-fit sm:max-w-none">
+      <DialogContent className={"w-fit sm:max-w-none " + (dialogClassName ?? "") }>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         {description ? <DialogDescription>{description}</DialogDescription> : null}
-        {renderContent}
+        <div className={contentClassName ?? ""}>{renderContent}</div>
         {renderFooter ? <DialogFooter>{renderFooter}</DialogFooter> : null}
       </DialogContent>
     </Dialog>

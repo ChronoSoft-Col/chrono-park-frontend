@@ -37,20 +37,32 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
         toast.error(`Error validando los datos: ${res.error}`);
         return false;
       }
-      // res.data is IGeneralResponse<IAmountDetailEntity>
-      setValidateRaw(res.data ?? null);
 
       const vehiclePlate = res.data?.data?.vehicle?.licensePlate?.trim?.() ?? "";
       const providedPlate = params.licensePlate?.trim?.() ?? "";
       const providedQr = params.parkingSessionId?.trim?.() ?? "";
 
-      if (!vehiclePlate && providedQr && !providedPlate) {
-        toast.warning("La sesión no tiene placa registrada", {
-          description: "Ingresa la placa y se validará de nuevo con QR + placa.",
-        });
-      } else {
-        toast.success("Datos validados correctamente");
+      // If backend doesn't provide vehicle info, don't set validated state.
+      // This forces the user to enter the plate and revalidate to continue.
+      if (!vehiclePlate) {
+        setValidateRaw(null);
+
+        if (providedQr && !providedPlate) {
+          toast.warning("La sesión no tiene placa registrada", {
+            description: "Ingresa la placa para validar de nuevo y continuar.",
+          });
+        } else {
+          toast.error("No se pudo validar el vehículo", {
+            description: "Verifica la placa y vuelve a intentar.",
+          });
+        }
+
+        return false;
       }
+
+      // res.data is IGeneralResponse<IAmountDetailEntity>
+      setValidateRaw(res.data ?? null);
+      toast.success("Datos validados correctamente");
       return true;
     } catch (error) {
       setValidateRaw(null);
