@@ -2,7 +2,7 @@
 
 import "reflect-metadata"
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScanQrCode, Banknote, ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
@@ -55,9 +55,12 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   const [notes, setNotes] = useState("");
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingGenerate, setPendingGenerate] = useState(false);
 
   const totalAmount = validateRaw?.data?.finalAmount ?? 0;
   const parkingSessionId = validateRaw?.data?.parkingSessionId;
+  const validatedLicensePlate = validateRaw?.data?.vehicle?.licensePlate?.trim?.() ?? "";
+  const hasValidatedPlate = Boolean(validatedLicensePlate);
 
   const changeValue = useMemo(() => {
     const parsed = Number(amountReceived);
@@ -142,6 +145,14 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
       return false;
     }
 
+    if (!hasValidatedPlate) {
+      toast.error("Falta la placa del vehículo", {
+        description: "Ingresa la placa al lado del QR para revalidar y continuar.",
+      });
+      setPendingGenerate(true);
+      return false;
+    }
+
     if (!selectedMethod) {
       toast.error("Debes seleccionar un método de pago");
       return false;
@@ -149,6 +160,19 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
 
     return true;
   };
+
+  useEffect(() => {
+    if (!pendingGenerate) return;
+    if (!hasValidatedPlate) return;
+
+    // Only auto-continue if the rest of the required data is ready.
+    if (!parkingSessionId) return;
+    if (!selectedMethod) return;
+
+    setPendingGenerate(false);
+    handleRegisterPayment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingGenerate, hasValidatedPlate, parkingSessionId, selectedMethod]);
 
   const handleRegisterPayment = async () => {
     if (!validatePaymentData()) {

@@ -39,7 +39,18 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
       }
       // res.data is IGeneralResponse<IAmountDetailEntity>
       setValidateRaw(res.data ?? null);
-      toast.success("Datos validados correctamente");
+
+      const vehiclePlate = res.data?.data?.vehicle?.licensePlate?.trim?.() ?? "";
+      const providedPlate = params.licensePlate?.trim?.() ?? "";
+      const providedQr = params.parkingSessionId?.trim?.() ?? "";
+
+      if (!vehiclePlate && providedQr && !providedPlate) {
+        toast.warning("La sesión no tiene placa registrada", {
+          description: "Ingresa la placa y se validará de nuevo con QR + placa.",
+        });
+      } else {
+        toast.success("Datos validados correctamente");
+      }
       return true;
     } catch (error) {
       setValidateRaw(null);

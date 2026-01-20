@@ -10,11 +10,11 @@ function hasDigest(error: unknown): error is NextNavigationError {
 }
 
 export function isNextRedirectError(error: unknown): error is NextNavigationError {
-  return hasDigest(error) && error.digest.startsWith("NEXT_REDIRECT");
+  return hasDigest(error) && Boolean(error.digest?.startsWith("NEXT_REDIRECT"));
 }
 
 export function isNextNotFoundError(error: unknown): error is NextNavigationError {
-  return hasDigest(error) && error.digest.startsWith("NEXT_NOT_FOUND");
+  return hasDigest(error) && Boolean(error.digest?.startsWith("NEXT_NOT_FOUND"));
 }
 
 /**

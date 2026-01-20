@@ -1,7 +1,7 @@
 "use client";
 
 import { Controller, useForm } from "react-hook-form";
-import { ValidateFeeSchema } from "@/src/shared/schemas/parking/validate-fee.schema";
+import { ValidateFeeForm, ValidateFeeSchema } from "@/src/shared/schemas/parking/validate-fee.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChronoField, ChronoFieldError } from "@chrono/chrono-field.component";
 import { ChronoDateTimePicker } from "@chrono/chrono-date-time-picker.component";
@@ -57,7 +57,7 @@ function QrFormComponent({
   onValidateFee: (data: IValidateAmountParamsEntity) => Promise<boolean>;
   onClear: () => void;
 }) {
-  const validateFeeForm = useForm({
+  const validateFeeForm = useForm<ValidateFeeForm>({
     resolver: zodResolver(ValidateFeeSchema),
     defaultValues: {
       exitTime: new Date(),
@@ -67,7 +67,7 @@ function QrFormComponent({
   });
 
   const handleFormChange = useDebouncedCallback(async () => {
-    const values = validateFeeForm.getValues() as IValidateAmountParamsEntity;
+    const values = validateFeeForm.getValues();
     const hasQr = Boolean(values.parkingSessionId?.trim());
     const hasPlate = Boolean(values.licensePlate?.trim());
     
@@ -79,8 +79,8 @@ function QrFormComponent({
     if (!result) return;
 
     const payload: IValidateAmountParamsEntity = {
-      parkingSessionId: values.parkingSessionId || undefined,
-      licensePlate: values.licensePlate || undefined,
+      parkingSessionId: values.parkingSessionId?.trim() ? values.parkingSessionId.trim() : undefined,
+      licensePlate: values.licensePlate?.trim() ? values.licensePlate.trim() : undefined,
       exitTime: values.exitTime,
     };
 
