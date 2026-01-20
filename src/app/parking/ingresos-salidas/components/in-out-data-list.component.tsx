@@ -5,6 +5,7 @@ import * as React from "react";
 import { IInOutEntity } from "@/server/domain";
 import { ChronoDataTable } from "@chrono/chrono-data-table.component";
 import { ChronoPaginator } from "@chrono/chrono-paginator.component";
+import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout.component";
 
 import { createInOutColumns } from "./table/columns.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
@@ -73,9 +74,8 @@ export default function InOutDataListComponent({
   );
   const safeTotalPages = Math.max(1, totalPages || Math.ceil(total / pageSize) || 1);
   return (
-    <section className="space-y-6">
-
-      <div className="rounded-3xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+    <ChronoViewWithTableLayout
+      table={(
         <ChronoDataTable
           data={items}
           columns={columns}
@@ -83,14 +83,13 @@ export default function InOutDataListComponent({
           getRowKey={(row) => row.id}
           emptyMessage="Sin registros para mostrar"
         />
-      </div>
-
-      <div className="rounded-2xl border border-dashed border-border/60 bg-muted/40 p-4">
+      )}
+      paginator={(
         <ChronoPaginator
           totalPages={safeTotalPages}
           className="flex-col gap-4 p-0 sm:flex-row sm:flex-nowrap sm:items-center sm:justify-between"
         />
-      </div>
-    </section>
+      )}
+    />
   );
 }

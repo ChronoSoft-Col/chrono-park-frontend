@@ -1,6 +1,5 @@
 import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface";
 import CustomersDataListComponent from "./customers-data-list.component";
-import { DEFAULT_LIMIT } from "@/src/shared/constants/pagination";
 import { resolveMetaData } from "@/src/lib/utils";
 import listCustomersAction from "../actions/list-customers.action";
 import { ICustomerEntity } from "@/src/server/domain";
@@ -19,11 +18,11 @@ export default async function CustomersDataFetchComponent({ searchParams }: Prop
   const { items, total, totalPages, pageSize } = resolveMetaData<ICustomerEntity>(response.data.data);
 
   return (
-    // <CustomersDataListComponent
-    //   items={items}
-    //   total={total}
-    //   totalPages={totalPages}
-    //   pageSize={pageSize}
-    // />
+    <CustomersDataListComponent
+      items={items}
+      total={total}
+      totalPages={totalPages}
+      pageSize={pageSize}
+    />
   );
 }

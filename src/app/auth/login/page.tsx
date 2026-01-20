@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EyeIcon, EyeOff, Loader2 } from "lucide-react";
+import { EyeIcon, EyeOff, Loader2, LogIn } from "lucide-react";
 import { toast } from "sonner";
 
 import { loginAction } from "@/src/app/auth/actions/login.action";
@@ -182,8 +182,7 @@ export default function LoginPage() {
                 )}
               />
 
-              <ChronoButton type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+              <ChronoButton type="submit" icon={<LogIn />} size="lg" className="w-full" disabled={isSubmitting} loading={isSubmitting}>
                 Iniciar sesión
               </ChronoButton>
             </form>

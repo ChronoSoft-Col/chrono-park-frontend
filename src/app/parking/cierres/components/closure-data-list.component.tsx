@@ -4,6 +4,7 @@ import type { IClosureEntity } from "@/server/domain/entities/parking/closure.en
 import { IClosureListItemEntity } from "@/server/domain/entities/parking/closure-list-item.entity";
 import { ChronoDataTable } from "@/src/shared/components/chrono-soft/chrono-data-table.component";
 import { ChronoPaginator } from "@/src/shared/components/chrono-soft/chrono-paginator.component";
+import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -119,8 +120,8 @@ export default function ClosureDataListComponent({
   const safeTotalPages = Math.max(1, totalPages || Math.ceil(total / pageSize) || 1);
 
   return (
-    <section className="space-y-6">
-      <div className="rounded-3xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur">
+    <ChronoViewWithTableLayout
+      table={(
         <ChronoDataTable
           columns={columns}
           data={items}
@@ -128,15 +129,14 @@ export default function ClosureDataListComponent({
           getRowKey={(row) => row.id}
           emptyMessage="Sin cierres para mostrar"
         />
-      </div>
-
-      <div className="rounded-2xl border border-dashed border-border/60 bg-muted/40 p-4">
+      )}
+      paginator={(
         <ChronoPaginator
           totalPages={safeTotalPages}
           className="flex-col gap-4 p-0 sm:flex-row sm:flex-nowrap sm:items-center sm:justify-between"
         />
-      </div>
-    </section>
+      )}
+    />
   );
 }
 
