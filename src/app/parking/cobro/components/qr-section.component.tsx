@@ -38,12 +38,12 @@ export function QrSectionComponent({ className }: QrSectionProps) {
   };
 
   return (
-    <ChronoCard className={cn("overflow-hidden pb-0", className)}>
-      <ChronoCardContent className="flex h-full flex-col">
-      <ChronoCardHeader className="px-0">
-        <ChronoCardTitle className="text-lg font-semibold">Validar tarifa</ChronoCardTitle>
-        <ChronoCardDescription>Escanea el QR para validar la tarifa de parqueo</ChronoCardDescription>
-      </ChronoCardHeader>
+    <ChronoCard className={cn("min-w-0 overflow-hidden pb-0", className)}>
+      <ChronoCardContent className="flex h-full min-h-0 flex-col">
+        <ChronoCardHeader className="px-0">
+          <ChronoCardTitle className="text-lg font-semibold">Validar tarifa</ChronoCardTitle>
+          <ChronoCardDescription>Escanea el QR para validar la tarifa de parqueo</ChronoCardDescription>
+        </ChronoCardHeader>
         <QrFormComponent onValidateFee={onValidateFee} onClear={clearValidateResult} />
       </ChronoCardContent>
     </ChronoCard>
@@ -90,7 +90,7 @@ function QrFormComponent({
 
   return (
       <form
-        className="flex flex-col gap-4 my-4 overflow-y-auto"
+        className="my-4 flex min-h-0 flex-col gap-4 overflow-y-auto"
         onChange={handleFormChange}
       >
         <div className="flex flex-col gap-3 rounded-xl">
@@ -129,12 +129,12 @@ function QrFormComponent({
             </ChronoSectionLabel>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-3">
+          <div className="flex min-w-0 flex-col gap-3 lg:flex-row">
             <Controller
               control={validateFeeForm.control}
               name="parkingSessionId"
               render={({ field, fieldState }) => (
-                <ChronoField data-invalid={fieldState.invalid} className="flex-1">
+                <ChronoField data-invalid={fieldState.invalid} className="min-w-0 flex-1">
                   <ChronoQrScannerInput
                     {...field}
                     id="parkingSessionId"
@@ -152,7 +152,7 @@ function QrFormComponent({
               control={validateFeeForm.control}
               name="licensePlate"
               render={({ field, fieldState }) => (
-                <ChronoField data-invalid={fieldState.invalid} className="flex-1">
+                <ChronoField data-invalid={fieldState.invalid} className="min-w-0 flex-1">
                   <ChronoPlateInput
                     {...field}
                     id="licensePlate"

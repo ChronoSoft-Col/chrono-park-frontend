@@ -53,7 +53,7 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
 
     if (!detail) {
         return (
-            <section className={cn("flex h-full max-h-[88vh] flex-col overflow-y-auto pr-1", className)}>
+            <section className={cn("flex h-full min-w-0 flex-col overflow-y-auto pr-1", className)}>
                 <div className="flex flex-1 items-center justify-center px-4">
                     <EmptyState
                         title="No hay datos registrados"
@@ -73,7 +73,7 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
     const hiddenRules = Math.max(rules.length - visibleRules.length, 0);
 
     return (
-        <div className={cn("flex flex-col gap-2 overflow-y-auto pr-1 my-auto py-2 animate-in fade-in duration-500", className)}>
+        <div className={cn("flex min-w-0 flex-col gap-2 overflow-y-auto pr-1 py-2 lg:my-auto animate-in fade-in duration-500", className)}>
             <ChronoCard className="bg-card/95 h-min">
                 <ChronoCardHeader className="gap-2">
                     <div className="flex flex-wrap items-start justify-between gap-3">

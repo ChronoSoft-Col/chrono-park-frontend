@@ -17,7 +17,7 @@ export default function FooterComponent() {
       }}
     >
       <p className="text-center text-sm mb-0 text-muted-foreground">
-        &copy; {new Date().getFullYear()} Chronosoft. All rights reserved.
+        &copy; {new Date().getFullYear()} Chronosoft. Todos los derechos reservados.
       </p>
       <ThemeSwitcher className="absolute right-4 bottom-2" />
     </footer>

@@ -215,7 +215,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   }
 
   return (
-    <ChronoCard className={cn("gap-0 flex h-full flex-col overflow-hidden animate-in fade-in duration-500", className)}>
+    <ChronoCard className={cn("flex h-full min-w-0 flex-col gap-0 overflow-hidden animate-in fade-in duration-500", className)}>
       <ChronoCardHeader className="space-y-1.5">
         <div className="flex items-center justify-between gap-2">
           <div>
@@ -250,7 +250,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
         </div>
       </ChronoCardHeader>
 
-      <ChronoCardContent className="flex-1 overflow-y-auto py-0 pr-1 flex flex-col">
+      <ChronoCardContent className="flex flex-1 min-w-0 flex-col overflow-y-auto py-0 pr-1">
         <div className="flex items-center justify-between pt-1">
           <ChronoSectionLabel size="md" className="tracking-[0.35em]">
             Pasos
@@ -260,7 +260,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
           </ChronoSectionLabel>
         </div>
 
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 min-w-0">
           {steps.map((step, index) => {
             const isActive = currentStep === index;
             return (
@@ -269,7 +269,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
                 type="button"
                 onClick={() => goToStep(index)}
                 className={cn(
-                  "flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold transition-all",
+                  "flex min-w-0 items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold transition-all",
                   isActive
                     ? "border-primary/50 bg-primary/10 text-foreground"
                     : "border-border/50 text-muted-foreground hover:border-primary/40"
@@ -278,7 +278,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
                 <ChronoBadge variant="outline" className="w-5 shrink-0 border-primary/30 text-[10px]">
                   {step.badge}
                 </ChronoBadge>
-                <span>{step.title}</span>
+                <span className="truncate">{step.title}</span>
               </button>
             );
           })}
@@ -293,9 +293,9 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
               return (
                 <div key={step.id} className="flex w-full shrink-0 basis-full flex-col gap-2 p-1.5 justify-center">
 
-                  <div>
+                  <div className="min-w-0">
                     {step.id === "method" && (
-                      <div className="grid gap-1.5 grid-cols-3">
+                      <div className="grid gap-1.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                         {paymentMethods.map((method) => {
                           return (
                             <button
@@ -303,7 +303,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
                               type="button"
                               onClick={() => handleMethodSelect(method.value)}
                               className={cn(
-                                "w-full rounded-lg border px-2.5 py-2 text-left shadow-sm transition-all flex items-center gap-2.5",
+                                "flex w-full min-w-0 items-center gap-2.5 rounded-lg border px-2.5 py-2 text-left shadow-sm transition-all",
                                 selectedMethod === method.value
                                   ? "border-primary/60 bg-primary/10 text-foreground"
                                   : "border-border/60 bg-background/60 text-muted-foreground hover:border-primary/40"
@@ -317,7 +317,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
                               )}>
                                 <Banknote className="h-4 w-4" />
                               </div>
-                              <span className="text-sm font-semibold">{method.label}</span>
+                              <span className="min-w-0 truncate text-sm font-semibold">{method.label}</span>
                             </button>
                           );
                         })}

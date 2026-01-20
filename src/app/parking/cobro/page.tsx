@@ -4,13 +4,14 @@ import { PaymentSectionComponent } from "./components/payment-section.component"
 
 export default function Page() {
   return (
-    <section className="grid h-full max-h-full min-h-0 grid-cols-2 gap-8">
-      <div className="col-span-1 flex h-full min-h-0 flex-col gap-4 justify-center">
-        <QrSectionComponent className="h-min min-h-0" />
+    <section className="grid h-full max-h-full min-h-0 grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
+      <div className="flex h-full min-h-0 min-w-0 flex-col justify-center gap-4">
+        <QrSectionComponent className="h-min min-h-0 min-w-0" />
 
-        <PaymentSectionComponent className="h-min min-h-0" />
+        <PaymentSectionComponent className="h-min min-h-0 min-w-0" />
       </div>
-      <QrDetailSectionComponent className="min-h-0" />
+
+      <QrDetailSectionComponent className="min-h-0 min-w-0" />
     </section>
   );
 }
