@@ -1,6 +1,8 @@
 import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface";
 import { listClosuresAction } from "../actions/list-closures.action";
 import ClosureDataListComponent from "./closure-data-list.component";
+import { resolveMetaData } from "@/src/lib/utils";
+import { IClosureListItemEntity } from "@/src/server/domain/entities/parking/closure-list-item.entity";
 
 interface Props {
   searchParams?: IPageProps["searchParams"];
@@ -14,18 +16,15 @@ export default async function ClosureDataFetchComponent({ searchParams }: Props)
     console.error("Error details:", res.error);
     return <div>Error cargando cierres</div>;
   }
-
-    const { data: {
-        items, meta
-    } } = res.data;
+  const { items, total, totalPages, pageSize, page } = resolveMetaData<IClosureListItemEntity>(res.data.data);
 
   return (
     <ClosureDataListComponent
       items={items}
-      total={meta.total}
-      totalPages={meta.totalPages}
-      pageSize={meta.limit}
-      currentPage={meta.page}
+      total={total}
+      totalPages={totalPages}
+      pageSize={pageSize}
+      currentPage={page}
     />
   );
 }
