@@ -37,7 +37,7 @@ export function ChronoViewWithTableLayout({
   return (
     <section className={cn("space-y-6", className)}>
       {(title || description || action) && (
-        <header className={cn("flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between", headerClassName)}>
+        <header className={cn("flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between", headerClassName)}>
           <div className="space-y-1">
             {title && <h2 className="text-lg font-semibold">{title}</h2>}
             {description && <p className="text-xs text-muted-foreground">{description}</p>}
@@ -51,6 +51,7 @@ export function ChronoViewWithTableLayout({
                 icon={action.icon}
                 disabled={action.disabled}
                 loading={action.loading}
+                size={"lg"}
               >
                 {action.label}
               </ChronoButton>

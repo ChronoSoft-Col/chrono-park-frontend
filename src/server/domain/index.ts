@@ -43,6 +43,7 @@ export * from "./entities/parking/list-in-out-response.entity"
 export * from "./entities/parking/customer.entity"
 export * from "./entities/parking/list-customers-params.entity"
 export * from "./entities/parking/list-customers-response.enitity"
+export * from "./entities/parking/create-customer-params.entity"
 
 export * from "./entities/parking/close-closure-params.entity"
 export * from "./entities/parking/closure.entity"

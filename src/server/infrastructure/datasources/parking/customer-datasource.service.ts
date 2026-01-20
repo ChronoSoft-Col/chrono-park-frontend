@@ -1,12 +1,19 @@
 import { injectable } from "tsyringe";
 import { AxiosServerInstance } from "../axios-server.intance";
-import { IListCustomersParamsEntity, IListCustomersResponseEntity, CustomerRepository } from "@/server/domain/index";
+import { IListCustomersParamsEntity, IListCustomersResponseEntity, CustomerRepository, ICreateCustomerParamsEntity } from "@/server/domain/index";
+import IEmptyResponse from "@/src/shared/interfaces/generic/empty-response";
 
 @injectable()
 export class CustomerDatasourceService extends AxiosServerInstance implements CustomerRepository {
     async listCustomers(params: IListCustomersParamsEntity): Promise<IListCustomersResponseEntity> {
         return this.api
             .get<IListCustomersResponseEntity>("/customers", { params })
+            .then(response => response.data);
+    }
+
+    async createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse> {
+        return this.api
+            .post<IEmptyResponse>("/customers", params)
             .then(response => response.data);
     }
 }

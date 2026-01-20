@@ -27,7 +27,7 @@ export default function ChronoButton({
     );
 
     return (
-        <Button {...buttonProps} asChild={asChild} disabled={isDisabled}>
+        <Button {...buttonProps} asChild={asChild} disabled={isDisabled} size={buttonProps.size}>
             {asChild ? (
                 children
             ) : (

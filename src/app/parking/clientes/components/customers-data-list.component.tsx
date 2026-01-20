@@ -9,9 +9,11 @@ import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout
 
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
+import { Plus } from "lucide-react";
 
 import { createCustomerColumns } from "./table/columns.component";
 import { CustomersDetailDialogContent } from "./customers-detail-dialog-content";
+import { CreateCustomerDialogContent } from "./create-customer-dialog.component";
 
 interface Props {
   items: ICustomerEntity[];
@@ -27,6 +29,23 @@ export default function CustomersDataListComponent({
   pageSize,
 }: Props) {
   const { openDialog, closeDialog } = UseDialogContext();
+
+  const handleOpenCreateCustomer = React.useCallback(() => {
+    openDialog({
+      title: "Crear cliente",
+      description: "",
+      content: <CreateCustomerDialogContent />,
+      footer: (
+        <ChronoButton
+          onClick={closeDialog}
+          className="w-full"
+          variant={"secondary"}
+        >
+          Cerrar
+        </ChronoButton>
+      ),
+    });
+  }, [openDialog, closeDialog]);
 
   const handleViewDetail = React.useCallback(
     (item: ICustomerEntity) => {
@@ -61,6 +80,11 @@ export default function CustomersDataListComponent({
     <ChronoViewWithTableLayout
       title="Clientes"
       description="Lista de clientes registrados en el sistema"
+      action={{
+        label: "Crear cliente",
+        icon: <Plus className="h-4 w-4" />,
+        onClick: handleOpenCreateCustomer,
+      }}
       table={
         <ChronoDataTable
           data={items}

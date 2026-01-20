@@ -2,8 +2,10 @@ import { inject, injectable } from "tsyringe";
 import {
     IListCustomersParamsEntity,
     IListCustomersResponseEntity,
-    CustomerRepository
+    CustomerRepository,
+    ICreateCustomerParamsEntity
 } from "@/server/domain";
+import IEmptyResponse from "@/src/shared/interfaces/generic/empty-response";
 
 @injectable()
 export class CustomerUsecase implements CustomerRepository {
@@ -11,5 +13,9 @@ export class CustomerUsecase implements CustomerRepository {
 
     listCustomers(params: IListCustomersParamsEntity): Promise<IListCustomersResponseEntity> {
         return this.customerRepository.listCustomers(params);
+    }
+
+    createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse> {
+        return this.customerRepository.createCustomer(params);
     }
 }
