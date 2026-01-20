@@ -13,6 +13,8 @@ import { createClosureColumns } from "./table/columns.component";
 import { getClosureByIdAction } from "../actions/get-closure-by-id.action";
 import { toast } from "sonner";
 import ChronoButton from "@chrono/chrono-button.component";
+import { Plus } from "lucide-react";
+import CreateClosureDialogContent from "./create-closure-dialog.component";
 
 interface Props {
   items: IClosureListItemEntity[];
@@ -81,6 +83,14 @@ export default function ClosureDataListComponent({
   const { printClosureReceipt } = usePrint();
   const detailRequestInFlightRef = useRef(false);
 
+  const handleOpenCreateClosure = useCallback(() => {
+    openDialog({
+      title: "Crear Nuevo Cierre de Caja",
+      description: "",
+      content: <CreateClosureDialogContent />,
+    });
+  }, [openDialog]);
+
   const handleViewDetail = useCallback(async (closure: IClosureListItemEntity) => {
     if (detailRequestInFlightRef.current) return;
 
@@ -121,6 +131,13 @@ export default function ClosureDataListComponent({
 
   return (
     <ChronoViewWithTableLayout
+      title="Cierres de caja"
+      description="Lista de cierres registrados en el sistema"
+      action={{
+        label: "Nuevo cierre",
+        icon: <Plus className="h-4 w-4" />,
+        onClick: handleOpenCreateClosure,
+      }}
       table={(
         <ChronoDataTable
           columns={columns}

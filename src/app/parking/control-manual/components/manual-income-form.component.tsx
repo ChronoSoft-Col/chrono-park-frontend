@@ -17,7 +17,7 @@ import {
   ChronoFieldError,
   ChronoFieldLabel,
 } from "@chrono/chrono-field.component";
-import { ChronoInput } from "@chrono/chrono-input.component";
+import ChronoPlateInput from "@chrono/chrono-plate-input.component";
 import {
   ChronoSelect,
   ChronoSelectContent,
@@ -34,7 +34,7 @@ import {
 import { TRateProfile } from "@/src/shared/types/common/rate-profile.type";
 import { TVehicleType } from "@/src/shared/types/common/vehicle-types.type";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarPlus, CarFront, Check, LoaderCircle } from "lucide-react";
+import { Check, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -44,33 +44,32 @@ import { IGenerateManualIncomeParamsEntity } from "@/src/server/domain";
 export default function ManualIncomeFormComponent() {
   const { vehicleTypes } = useCommonContext();
 
-  const onManualIncomeSubmit = async (params: ManualIncomeForm): Promise<boolean> => {
+  const onManualIncomeSubmit = async (
+    params: ManualIncomeForm,
+  ): Promise<boolean> => {
     const data: IGenerateManualIncomeParamsEntity = {
       ...params,
       entryTime: params.entryTime.toISOString(),
-    }
+    };
     const response = await generateManualIncomeAction(data);
-    if(!response.success) {
+    if (!response.success) {
       toast.error("Error generando ingreso manual: " + response.error);
       return false;
-    };
+    }
 
     toast.success("Ingreso manual generado correctamente");
     return true;
   };
 
   return (
-    <section className="flex h-full w-full flex-1">
-      <IncomeForm vehicleTypes={vehicleTypes} onSubmit={onManualIncomeSubmit} />
-    </section>
+    <IncomeForm vehicleTypes={vehicleTypes} onSubmit={onManualIncomeSubmit} />
   );
 }
 
 const fieldContainerClasses =
   "rounded-lg border border-border bg-card/80 p-4 shadow-sm transition-colors focus-within:border-primary data-[invalid=true]:border-destructive";
 
-const fieldLabelClasses =
-  "text-xs font-medium text-muted-foreground";
+const fieldLabelClasses = "text-xs font-medium text-muted-foreground";
 
 const IncomeForm = ({
   vehicleTypes,
@@ -130,7 +129,7 @@ const IncomeForm = ({
 
   return (
     <form onSubmit={handleFormSubmit} className="flex h-full w-full">
-      <ChronoCard className="flex w-full flex-1 flex-col">
+      <ChronoCard className="flex h-full w-full flex-col">
         <ChronoCardHeader>
           <div className="flex flex-wrap items-center gap-2">
             <ChronoBadge
@@ -146,89 +145,85 @@ const IncomeForm = ({
             )}
           </div>
           <div>
-            <ChronoCardTitle className="text-2xl font-semibold text-foreground">Registrar ingreso manual</ChronoCardTitle>
+            <ChronoCardTitle className="text-2xl font-semibold text-foreground">
+              Registrar ingreso manual
+            </ChronoCardTitle>
             <ChronoCardDescription className="text-sm text-muted-foreground">
-              Registra entradas manuales manteniendo consistencia con el módulo de cobro.
+              Registra entradas manuales manteniendo consistencia con el módulo
+              de cobro.
             </ChronoCardDescription>
           </div>
         </ChronoCardHeader>
 
         <ChronoCardContent className="space-y-4">
-          <div className="rounded-xl border border-border/60 bg-muted/20 px-4 py-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <CarFront className="h-5 w-5" />
-              </span>
-              <div className="flex flex-col">
-                <p className="text-xs font-semibold text-muted-foreground">Sesión manual</p>
-                <p className="text-sm text-foreground/80">
-                  Completa los datos para registrar un ingreso respaldado por el sistema.
-                </p>
-              </div>
+          <div className="grid gap-3 lg:grid-cols-2">
+            <div className="grid gap-3 lg:col-span-2 lg:grid-cols-2">
+              <Controller
+                control={control}
+                name="licensePlate"
+                render={({ field, fieldState }) => (
+                  <ChronoField
+                    data-invalid={fieldState.invalid}
+                    className={`${fieldContainerClasses} min-w-0`}
+                  >
+                    <ChronoFieldLabel htmlFor="licensePlate" className={fieldLabelClasses}>
+                      Placa
+                    </ChronoFieldLabel>
+                    <ChronoPlateInput
+                      {...field}
+                      id="licensePlate"
+                      placeholder="QJJ15G"
+                      className="mt-1"
+                    />
+                    {fieldState.invalid && (
+                      <ChronoFieldError errors={[fieldState.error]} />
+                    )}
+                  </ChronoField>
+                )}
+              />
+
+              <Controller
+                name="vehicleTypeId"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <ChronoField
+                    data-invalid={fieldState.invalid}
+                    className={`${fieldContainerClasses} min-w-0`}
+                  >
+                    <ChronoFieldLabel htmlFor="vehicleTypeId" className={fieldLabelClasses}>
+                      Tipo de vehículo
+                    </ChronoFieldLabel>
+
+                    <ChronoVehicleTypeSelect
+                      value={field.value ?? ""}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        vehicleTypeChanged(value);
+                      }}
+                      options={vehicleTypes ?? []}
+                      className="mt-1"
+                    />
+
+                    {fieldState.invalid && (
+                      <ChronoFieldError errors={[fieldState.error]} />
+                    )}
+                  </ChronoField>
+                )}
+              />
             </div>
-
-            <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1 text-foreground font-medium">
-                <CalendarPlus className="h-3.5 w-3.5" />
-                <span>Registro en tiempo real</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-2">
-            <Controller
-              control={control}
-              name="licensePlate"
-              render={({ field, fieldState }) => (
-                <ChronoField
-                  data-invalid={fieldState.invalid}
-                  className={`${fieldContainerClasses} md:col-span-2`}
-                >
-                  <ChronoFieldLabel htmlFor="licensePlate" className={fieldLabelClasses}>
-                    Placa
-                  </ChronoFieldLabel>
-                  <ChronoInput
-                    {...field}
-                    id="licensePlate"
-                    placeholder="QJJ15G"
-                    className="mt-1 h-12 text-lg font-semibold uppercase tracking-[0.6em]"
-                    maxLength={6}
-                  />
-                  {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-                </ChronoField>
-              )}
-            />
-
-            <Controller
-              name="vehicleTypeId"
-              control={control}
-              render={({ field, fieldState }) => (
-                <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                  <ChronoFieldLabel htmlFor="vehicleTypeId" className={fieldLabelClasses}>
-                    Tipo de vehículo
-                  </ChronoFieldLabel>
-
-                  <ChronoVehicleTypeSelect
-                    value={field.value ?? ""}
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      vehicleTypeChanged(value);
-                    }}
-                    options={vehicleTypes ?? []}
-                    className="mt-1"
-                  />
-
-                  {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-                </ChronoField>
-              )}
-            />
 
             <Controller
               name="entryTime"
               control={control}
               render={({ field, fieldState }) => (
-                <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                  <ChronoFieldLabel htmlFor="entryTime" className={fieldLabelClasses}>
+                <ChronoField
+                  data-invalid={fieldState.invalid}
+                  className={fieldContainerClasses}
+                >
+                  <ChronoFieldLabel
+                    htmlFor="entryTime"
+                    className={fieldLabelClasses}
+                  >
                     Fecha y hora de ingreso
                   </ChronoFieldLabel>
 
@@ -237,7 +232,9 @@ const IncomeForm = ({
                     setDate={(value) => field.onChange(value)}
                   />
 
-                  {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <ChronoFieldError errors={[fieldState.error]} />
+                  )}
                 </ChronoField>
               )}
             />
@@ -246,8 +243,14 @@ const IncomeForm = ({
               name="rateProfileId"
               control={control}
               render={({ field, fieldState }) => (
-                <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                  <ChronoFieldLabel htmlFor="rateProfileId" className={fieldLabelClasses}>
+                <ChronoField
+                  data-invalid={fieldState.invalid}
+                  className={fieldContainerClasses}
+                >
+                  <ChronoFieldLabel
+                    htmlFor="rateProfileId"
+                    className={fieldLabelClasses}
+                  >
                     Perfil de tarifa
                   </ChronoFieldLabel>
                   <ChronoSelect
@@ -266,7 +269,9 @@ const IncomeForm = ({
                       ))}
                     </ChronoSelectContent>
                   </ChronoSelect>
-                  {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <ChronoFieldError errors={[fieldState.error]} />
+                  )}
                 </ChronoField>
               )}
             />

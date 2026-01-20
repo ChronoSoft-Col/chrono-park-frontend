@@ -96,7 +96,7 @@ export default function ChronoVehicleTypeSelect({
   return (
     <div
       className={cn(
-        "flex items-center gap-4 rounded-xl border border-border px-4 transition-colors duration-200 bg-background/90",
+        "flex w-full min-w-0 items-center gap-4 rounded-xl border border-border px-4 transition-colors duration-200 bg-background/90",
         (focused || open) && "border-primary",
         disabled && "opacity-70",
         className,
@@ -112,7 +112,7 @@ export default function ChronoVehicleTypeSelect({
         {iconNode}
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <ChronoSelect
           value={value ?? ""}
           onValueChange={(nextValue) => onValueChange?.(nextValue)}
@@ -122,20 +122,19 @@ export default function ChronoVehicleTypeSelect({
         >
           <ChronoSelectTrigger
             className={cn(
-              "w-full min-w-0",
+              "w-full! min-w-0!",
               "h-10 border-0",
+              "px-0",
               "text-xl font-medium focus:ring-0 focus-visible:ring-0",
               "data-placeholder:text-sm data-placeholder:font-normal",
-              // Make it behave like ChronoPlateInput: the container has the background.
               "bg-transparent dark:bg-transparent backdrop-blur-0",
-              "hover:bg-transparent dark:hover:bg-transparent",
               triggerClassName,
             )}
             ref={triggerRef}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
           >
-            <ChronoSelectValue placeholder={placeholder} />
+            <ChronoSelectValue placeholder={placeholder} className="line-clamp-1" />
           </ChronoSelectTrigger>
 
           <ChronoSelectContent>

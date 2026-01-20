@@ -28,7 +28,7 @@ import {
 } from "@/src/shared/schemas/parking/create-customer.schema";
 
 const fieldContainerClasses =
-  "rounded-lg border border-border bg-card/80 p-4 shadow-sm transition-colors focus-within:border-primary data-[invalid=true]:border-destructive";
+  "rounded-lg border border-border bg-card/80 p-4 shadow-sm transition-colors focus-within:border-primary data-[invalid=true]:border-destructive min-w-0";
 
 const fieldLabelClasses = "text-xs font-medium text-muted-foreground";
 
