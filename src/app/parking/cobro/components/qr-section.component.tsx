@@ -32,7 +32,7 @@ export function QrSectionComponent({ className }: QrSectionProps) {
 
   const onValidateFee = async (data: IValidateAmountParamsEntity) => {
     clearValidateResult();
-    if (!data.parkingSessionId && !data.plate) return false;
+    if (!data.parkingSessionId && !data.licensePlate) return false;
     const success = await validateFee(data);
     return success;
   };
@@ -62,14 +62,14 @@ function QrFormComponent({
     defaultValues: {
       exitTime: new Date(),
       parkingSessionId: "",
-      plate: "",
+      licensePlate: "",
     },
   });
 
   const handleFormChange = useDebouncedCallback(async () => {
     const values = validateFeeForm.getValues() as IValidateAmountParamsEntity;
     const hasQr = Boolean(values.parkingSessionId?.trim());
-    const hasPlate = Boolean(values.plate?.trim());
+    const hasPlate = Boolean(values.licensePlate?.trim());
     
     // Solo validar si hay QR o placa
     if (!hasQr && !hasPlate) return;
@@ -80,7 +80,7 @@ function QrFormComponent({
 
     const payload: IValidateAmountParamsEntity = {
       parkingSessionId: values.parkingSessionId || undefined,
-      plate: values.plate || undefined,
+      licensePlate: values.licensePlate || undefined,
       exitTime: values.exitTime,
     };
 
@@ -150,12 +150,12 @@ function QrFormComponent({
 
             <Controller
               control={validateFeeForm.control}
-              name="plate"
+              name="licensePlate"
               render={({ field, fieldState }) => (
                 <ChronoField data-invalid={fieldState.invalid} className="flex-1">
                   <ChronoPlateInput
                     {...field}
-                    id="plate"
+                    id="licensePlate"
                     value={field.value as string ?? ""}
                     onClear={onClear}
                     placeholder="Placa"

@@ -1,3 +1,4 @@
+import IIdName from "@/src/shared/interfaces/generic/id-name.interface";
 import { IRuleAppliedEntity } from "./rule-applied.entity";
 
 export interface IAmountDetailEntity {
@@ -13,4 +14,12 @@ export interface IAmountDetailEntity {
     agreementName: string;
     appliedRules: IRuleAppliedEntity[];
     gracePeriodMinutes: number;
+
+    billedMinutes: number;
+
+    vehicle: {
+        id: string;
+        licensePlate: string;
+        vehicleType: IIdName;
+    };
 }

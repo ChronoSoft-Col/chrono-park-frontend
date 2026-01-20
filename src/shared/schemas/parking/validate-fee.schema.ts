@@ -22,7 +22,7 @@ export const ValidateFeeSchema = z.object({
     .refine((v) => v === "" || z.string().uuid().safeParse(v).success, {
       message: "Código QR inválido",
     }),
-  plate: z
+  licensePlate: z
     .preprocess(normalizePlate, z.string())
     .refine((v) => v === "" || isValidColombianPlate(v), {
       message: "Placa inválida (CO)",
@@ -32,7 +32,7 @@ export const ValidateFeeSchema = z.object({
   }),
 }).superRefine((data, ctx) => {
   const hasQr = Boolean(data.parkingSessionId);
-  const hasPlate = Boolean(data.plate);
+  const hasPlate = Boolean(data.licensePlate);
 
   if (!hasQr && !hasPlate) {
     ctx.addIssue({
@@ -43,7 +43,7 @@ export const ValidateFeeSchema = z.object({
     ctx.addIssue({
       code: "custom",
       message: "Debes ingresar QR o placa",
-      path: ["plate"],
+      path: ["licensePlate"],
     });
     return;
   }
@@ -57,7 +57,7 @@ export const ValidateFeeSchema = z.object({
     ctx.addIssue({
       code: "custom",
       message: "Usa solo QR o solo placa (no ambos)",
-      path: ["plate"],
+      path: ["licensePlate"],
     });
   }
 });

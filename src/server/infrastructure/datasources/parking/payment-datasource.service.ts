@@ -4,9 +4,9 @@ import { AxiosServerInstance } from "../axios-server.intance";
 @injectable()
 export class PaymentDatasourceService extends AxiosServerInstance implements PaymentRepository {
     async validateFee(params: IValidateAmountParamsEntity): Promise<IValidateAmountResponseEntity> {
-        const { parkingSessionId, plate, exitTime } = params;
+        const { parkingSessionId, licensePlate, exitTime } = params;
 
-        const identifier = parkingSessionId || plate;
+        const identifier = parkingSessionId || licensePlate;
         if (!identifier) {
             throw new Error("Se requiere QR o placa para validar la tarifa");
         }
