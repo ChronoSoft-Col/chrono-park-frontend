@@ -33,6 +33,7 @@ export default async function listCustomersAction(
     return { success: true, data: response };
   } catch (error) {
     rethrowNextNavigationErrors(error);
+    console.error("Error in listCustomersAction:", error);
     return {
       success: false,
       error:

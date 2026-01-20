@@ -1,11 +1,13 @@
 import "reflect-metadata";
 import { container } from "tsyringe";
 
-import { InOutRepository, LoginRepository, ManualControlRepository } from "@/server/domain";
+import { InOutRepository, LoginRepository, ManualControlRepository, CustomerRepository } from "@/server/domain";
 import { ClosureRepository } from "@/server/domain/repositories/parking/closure.repository";
 import {
   CommonDatasourceService,
   CommonRepositoryImp,
+  CustomerDatasourceService,
+  CustomerRepositoryImp,
   InOutDatasourceService,
   InOutRepositoryImp,
   LoginDatasourceService,
@@ -83,6 +85,15 @@ if (!container.isRegistered("ClosureRepository")) {
   container.register<ClosureRepository>("ClosureRepository", {
     useClass: ClosureRepositoryImpl,
   });
+}
+
+if (!container.isRegistered("CustomerRepository")) {
+  container.register<CustomerRepository>("CustomerRepository", { useClass: CustomerRepositoryImp });
+}
+
+// Optional explicit registration: CustomerRepositoryImp injects CustomerDatasourceService by class token.
+if (!container.isRegistered(CustomerDatasourceService)) {
+  container.register(CustomerDatasourceService, { useClass: CustomerDatasourceService });
 }
 
 // set-company bindings removed (companies flow deprecated)

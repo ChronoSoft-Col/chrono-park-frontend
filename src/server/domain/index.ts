@@ -5,6 +5,7 @@ export * from "./repositories/parking/common.repository"
 export * from "./repositories/parking/payment.repository"
 export * from "./repositories/parking/in-out.repository"
 export * from "./repositories/parking/customer.repository"
+export * from "./repositories/parking/closure.repository"
 
 //USE CASES
 export * from "./usecases/auth/login.usecase";
@@ -13,6 +14,7 @@ export * from "./usecases/parking/common.usecase";
 export * from "./usecases/parking/payment.usecase";
 export * from "./usecases/parking/in-out.usecase";
 export * from "./usecases/parking/customer.usecase";
+export * from "./usecases/parking/closure.usecase";
 
 //ENTITIES
 export * from "./entities/auth/get-permissions-response.entity";
@@ -41,3 +43,8 @@ export * from "./entities/parking/list-in-out-response.entity"
 export * from "./entities/parking/customer.entity"
 export * from "./entities/parking/list-customers-params.entity"
 export * from "./entities/parking/list-customers-response.enitity"
+
+export * from "./entities/parking/close-closure-params.entity"
+export * from "./entities/parking/closure.entity"
+export * from "./entities/parking/list-closure-params.entity"
+export * from "./entities/parking/list-closure-response.entity"

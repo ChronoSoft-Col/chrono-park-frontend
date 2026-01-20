@@ -10,7 +10,7 @@ interface Props {
 
 export default async function CustomersDataFetchComponent({ searchParams }: Props) {
   const response = await listCustomersAction(searchParams);
-
+  console.log("listCustomersAction response:", response);
   if (!response.success || !response.data || !response.data.success) {
     return <div>Error cargando clientes</div>;
   }

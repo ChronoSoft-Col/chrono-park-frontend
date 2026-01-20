@@ -1,9 +1,12 @@
 import { injectable, inject } from "tsyringe";
-import { ICloseClosureParamsEntity } from "../../entities/parking/close-closure-params.entity";
-import { IClosureEntity } from "../../entities/parking/closure.entity";
-import { IListClosureParamsEntity } from "../../entities/parking/list-closure-params.entity";
-import { IListClosureResponseEntity } from "../../entities/parking/list-closure-response.entity";
-import { ClosureRepository } from "../../repositories/parking/closure.repository";
+
+import {
+  ClosureRepository,
+  ICloseClosureParamsEntity,
+  IClosureEntity,
+  IListClosureParamsEntity,
+  IListClosureResponseEntity
+} from "@/server/domain/index";
 
 
 @injectable()

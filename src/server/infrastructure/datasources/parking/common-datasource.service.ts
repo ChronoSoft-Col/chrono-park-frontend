@@ -11,7 +11,7 @@ export class CommonDatasourceService extends AxiosServerInstance {
   }
 
   async getRateProfiles(vehicleTypeId: string): Promise<IGeneralResponse<TRateProfile, false>> {
-    return this.api.get(`/rate-profile`, { params: { vehicleTypeId } }).then((res) => res.data);
+    return this.api.get(`/rate-profiles`, { params: { vehicleTypeId } }).then((res) => res.data);
   }
 
 }
