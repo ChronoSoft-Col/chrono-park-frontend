@@ -127,7 +127,7 @@ export default function ChronoVehicleTypeSelect({
               "px-0",
               "text-xl font-medium focus:ring-0 focus-visible:ring-0",
               "data-placeholder:text-sm data-placeholder:font-normal",
-              "bg-transparent dark:bg-transparent backdrop-blur-0",
+              "bg-transparent dark:bg-transparent dark:hover:bg-transparent backdrop-blur-0",
               triggerClassName,
             )}
             ref={triggerRef}
