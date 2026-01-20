@@ -91,7 +91,6 @@ if (!container.isRegistered("CustomerRepository")) {
   container.register<CustomerRepository>("CustomerRepository", { useClass: CustomerRepositoryImp });
 }
 
-// Optional explicit registration: CustomerRepositoryImp injects CustomerDatasourceService by class token.
 if (!container.isRegistered(CustomerDatasourceService)) {
   container.register(CustomerDatasourceService, { useClass: CustomerDatasourceService });
 }

@@ -75,6 +75,8 @@ export default function InOutDataListComponent({
   const safeTotalPages = Math.max(1, totalPages || Math.ceil(total / pageSize) || 1);
   return (
     <ChronoViewWithTableLayout
+      title="Ingresos y Salidas"
+      description="Lista de ingresos y salidas de vehículos en el sistema"
       table={(
         <ChronoDataTable
           data={items}

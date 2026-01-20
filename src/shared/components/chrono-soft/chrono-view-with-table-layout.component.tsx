@@ -3,10 +3,18 @@
 import type { ReactNode } from "react";
 
 import { cn } from "@/src/lib/utils";
+import ChronoButton from "@chrono/chrono-button.component";
 
 export type ChronoViewWithTableLayoutProps = {
   title?: ReactNode;
   description?: ReactNode;
+  action?: {
+    label: ReactNode;
+    icon?: ReactNode;
+    onClick: () => void;
+    disabled?: boolean;
+    loading?: boolean;
+  };
   table: ReactNode;
   paginator?: ReactNode;
   className?: string;
@@ -18,6 +26,7 @@ export type ChronoViewWithTableLayoutProps = {
 export function ChronoViewWithTableLayout({
   title,
   description,
+  action,
   table,
   paginator,
   className,
@@ -27,10 +36,26 @@ export function ChronoViewWithTableLayout({
 }: ChronoViewWithTableLayoutProps) {
   return (
     <section className={cn("space-y-6", className)}>
-      {(title || description) && (
-        <header className={cn("space-y-1", headerClassName)}>
-          {title && <h2 className="text-lg font-semibold">{title}</h2>}
-          {description && <p className="text-xs text-muted-foreground">{description}</p>}
+      {(title || description || action) && (
+        <header className={cn("flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between", headerClassName)}>
+          <div className="space-y-1">
+            {title && <h2 className="text-lg font-semibold">{title}</h2>}
+            {description && <p className="text-xs text-muted-foreground">{description}</p>}
+          </div>
+
+          {action && (
+            <div className="flex justify-start sm:justify-end">
+              <ChronoButton
+                type="button"
+                onClick={action.onClick}
+                icon={action.icon}
+                disabled={action.disabled}
+                loading={action.loading}
+              >
+                {action.label}
+              </ChronoButton>
+            </div>
+          )}
         </header>
       )}
 
