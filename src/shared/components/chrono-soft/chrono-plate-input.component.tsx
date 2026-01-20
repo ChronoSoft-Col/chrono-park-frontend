@@ -8,7 +8,7 @@ import {
   useState,
   type ComponentProps,
 } from "react";
-import { CarFront, RefreshCcw } from "lucide-react";
+import { IdCard, RefreshCcw } from "lucide-react";
 
 import { cn } from "@/src/lib/utils";
 import ChronoButton from "./chrono-button.component";
@@ -105,7 +105,7 @@ const ChronoPlateInput = forwardRef<HTMLInputElement, ChronoPlateInputProps>(
         )}
       >
         <div className="flex h-10 w-12 items-center justify-center rounded-full text-primary">
-          <CarFront className="h-6 w-6" />
+          <IdCard  className="h-6 w-6" />
         </div>
 
         <ChronoInput

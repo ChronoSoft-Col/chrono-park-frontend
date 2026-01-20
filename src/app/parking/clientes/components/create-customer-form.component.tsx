@@ -2,7 +2,7 @@
 
 import { Controller, type Resolver, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Save, Trash2, X } from "lucide-react";
 
 import ChronoButton from "@chrono/chrono-button.component";
 import {
@@ -18,6 +18,8 @@ import {
   ChronoSelectTrigger,
   ChronoSelectValue,
 } from "@chrono/chrono-select.component";
+import ChronoPlateInput from "@chrono/chrono-plate-input.component";
+import ChronoVehicleTypeSelect from "@chrono/chrono-vehicle-type-select.component";
 
 import { useCommonContext } from "@/src/shared/context/common.context";
 import {
@@ -106,7 +108,7 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
               <ChronoFieldLabel htmlFor="documentNumber" className={fieldLabelClasses}>
                 Número de documento
               </ChronoFieldLabel>
-              <ChronoInput {...field} id="documentNumber" placeholder="123456789" className="mt-1 h-12" />
+              <ChronoInput {...field} id="documentNumber" placeholder="123456789" className="mt-1" />
               {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
             </ChronoField>
           )}
@@ -120,7 +122,7 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
               <ChronoFieldLabel htmlFor="firstName" className={fieldLabelClasses}>
                 Nombre
               </ChronoFieldLabel>
-              <ChronoInput {...field} id="firstName" placeholder="Juan" className="mt-1 h-12" />
+              <ChronoInput {...field} id="firstName" placeholder="Juan" className="mt-1" />
               {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
             </ChronoField>
           )}
@@ -134,7 +136,7 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
               <ChronoFieldLabel htmlFor="lastName" className={fieldLabelClasses}>
                 Apellido
               </ChronoFieldLabel>
-              <ChronoInput {...field} id="lastName" placeholder="Pérez" className="mt-1 h-12" />
+              <ChronoInput {...field} id="lastName" placeholder="Pérez" className="mt-1" />
               {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
             </ChronoField>
           )}
@@ -148,7 +150,7 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
               <ChronoFieldLabel htmlFor="email" className={fieldLabelClasses}>
                 Email (opcional)
               </ChronoFieldLabel>
-              <ChronoInput {...field} id="email" placeholder="correo@dominio.com" className="mt-1 h-12" />
+              <ChronoInput {...field} id="email" placeholder="correo@dominio.com" className="mt-1" />
               {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
             </ChronoField>
           )}
@@ -162,7 +164,7 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
               <ChronoFieldLabel htmlFor="phoneNumber" className={fieldLabelClasses}>
                 Teléfono (opcional)
               </ChronoFieldLabel>
-              <ChronoInput {...field} id="phoneNumber" placeholder="3000000000" className="mt-1 h-12" />
+              <ChronoInput {...field} id="phoneNumber" placeholder="3000000000" className="mt-1" />
               {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
             </ChronoField>
           )}
@@ -179,7 +181,7 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
               <ChronoFieldLabel htmlFor="agreementId" className={fieldLabelClasses}>
                 Convenio (opcional)
               </ChronoFieldLabel>
-              <ChronoInput {...field} id="agreementId" placeholder="ID de convenio" className="mt-1 h-12" />
+              <ChronoInput {...field} id="agreementId" placeholder="ID de convenio" className="mt-1" />
               {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
             </ChronoField>
           )}
@@ -219,11 +221,12 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
                     >
                       Placa
                     </ChronoFieldLabel>
-                    <ChronoInput
+                    <ChronoPlateInput
                       {...field}
                       id={`vehicles.${index}.licensePlate`}
-                      placeholder="QJJ15G"
-                      className="mt-1 h-12 font-semibold uppercase"
+                      value={(field.value as string) ?? ""}
+                      placeholder="Placa"
+                      className="mt-1"
                     />
                     {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
                   </ChronoField>
@@ -253,18 +256,12 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
                       )}
                     </div>
 
-                    <ChronoSelect onValueChange={field.onChange} value={field.value ?? ""}>
-                      <ChronoSelectTrigger className="mt-1 text-left">
-                        <ChronoSelectValue placeholder="Seleccionar tipo" />
-                      </ChronoSelectTrigger>
-                      <ChronoSelectContent>
-                        {vehicleTypes.map((type) => (
-                          <ChronoSelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </ChronoSelectItem>
-                        ))}
-                      </ChronoSelectContent>
-                    </ChronoSelect>
+                    <ChronoVehicleTypeSelect
+                      value={field.value ?? ""}
+                      onValueChange={field.onChange}
+                      options={vehicleTypes}
+                      className="mt-1"
+                    />
 
                     {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
                   </ChronoField>
@@ -277,11 +274,12 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
 
       <div className="flex justify-end gap-2">
         {onCancel && (
-          <ChronoButton type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+          <ChronoButton icon={<X />} type="button" variant="outline" onClick={onCancel} disabled={isSubmitting} size={"lg"}>
+
             Cancelar
           </ChronoButton>
         )}
-        <ChronoButton type="submit" loading={isSubmitting} disabled={!isValid || isSubmitting}>
+        <ChronoButton type="submit" loading={isSubmitting} icon={<Save />} disabled={!isValid || isSubmitting} size={"lg"}>
           Crear cliente
         </ChronoButton>
       </div>

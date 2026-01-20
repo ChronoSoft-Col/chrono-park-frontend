@@ -19,14 +19,20 @@ export const ChronoSelectValue = SelectValue;
 export const ChronoSelectScrollDownButton = SelectScrollDownButton;
 export const ChronoSelectScrollUpButton = SelectScrollUpButton;
 
-export function ChronoSelectTrigger({ className, ...props }: React.ComponentProps<typeof SelectTrigger>) {
+export const ChronoSelectTrigger = React.forwardRef<
+  React.ElementRef<typeof SelectTrigger>,
+  React.ComponentPropsWithoutRef<typeof SelectTrigger>
+>(function ChronoSelectTrigger({ className, ...props }, ref) {
   return (
     <SelectTrigger
+      ref={ref}
       className={cn("chrono-select__trigger border-primary/20 bg-background/90 backdrop-blur", className)}
       {...props}
     />
   );
-}
+});
+
+ChronoSelectTrigger.displayName = "ChronoSelectTrigger";
 
 export function ChronoSelectContent({ className, ...props }: React.ComponentProps<typeof SelectContent>) {
   return <SelectContent className={cn("chrono-select__content", className)} {...props} />;

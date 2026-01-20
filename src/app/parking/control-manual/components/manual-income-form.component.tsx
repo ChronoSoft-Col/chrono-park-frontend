@@ -25,6 +25,7 @@ import {
   ChronoSelectTrigger,
   ChronoSelectValue,
 } from "@chrono/chrono-select.component";
+import ChronoVehicleTypeSelect from "@chrono/chrono-vehicle-type-select.component";
 import { useCommonContext } from "@/src/shared/context/common.context";
 import {
   ManualIncomeForm,
@@ -207,24 +208,15 @@ const IncomeForm = ({
                     Tipo de vehículo
                   </ChronoFieldLabel>
 
-                  <ChronoSelect
+                  <ChronoVehicleTypeSelect
+                    value={field.value ?? ""}
                     onValueChange={(value) => {
                       field.onChange(value);
                       vehicleTypeChanged(value);
                     }}
-                    value={field.value ?? ""}
-                  >
-                    <ChronoSelectTrigger className="mt-1 text-left">
-                      <ChronoSelectValue placeholder="Seleccionar tipo" />
-                    </ChronoSelectTrigger>
-                    <ChronoSelectContent>
-                      {vehicleTypes?.map((type) => (
-                        <ChronoSelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </ChronoSelectItem>
-                      ))}
-                    </ChronoSelectContent>
-                  </ChronoSelect>
+                    options={vehicleTypes ?? []}
+                    className="mt-1"
+                  />
 
                   {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
                 </ChronoField>
