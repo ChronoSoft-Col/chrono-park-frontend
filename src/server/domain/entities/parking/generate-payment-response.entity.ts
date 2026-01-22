@@ -10,6 +10,8 @@ success: boolean;
 totalAmount: number;
 amountReceived: number;
 change: number;
+// Some backend versions return the generated payment id at top-level.
+paymentId?: string;
 session: {
     id: string;
     entryTime: string;
@@ -31,5 +33,6 @@ session: {
     finalAmount: number;
     discount: number;
     notes: string;
-    paymentId: string;
+    // Some backend versions return the generated payment id inside the session.
+    paymentId?: string;
 }}

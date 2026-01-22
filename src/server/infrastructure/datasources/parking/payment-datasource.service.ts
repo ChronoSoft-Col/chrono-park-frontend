@@ -1,5 +1,12 @@
 import { injectable } from "tsyringe";
-import { IGeneratePaymentParamsEntity, IGeneratePaymentResponseEntity, IValidateAmountParamsEntity, IValidateAmountResponseEntity, PaymentRepository } from "@/server/domain/index";
+import {
+    IGeneratePaymentParamsEntity,
+    IGeneratePaymentResponseEntity,
+    IPrintPaymentTicketResponseEntity,
+    IValidateAmountParamsEntity,
+    IValidateAmountResponseEntity,
+    PaymentRepository,
+} from "@/server/domain/index";
 import { AxiosServerInstance } from "../axios-server.intance";
 @injectable()
 export class PaymentDatasourceService extends AxiosServerInstance implements PaymentRepository {
@@ -28,5 +35,11 @@ export class PaymentDatasourceService extends AxiosServerInstance implements Pay
                 console.log(response.data);
                 return response.data;
             });
+    }
+
+    async getPaymentPrintTicket(paymentId: string): Promise<IPrintPaymentTicketResponseEntity> {
+        return this.api
+            .get<IPrintPaymentTicketResponseEntity>(`/payments/print/${paymentId}`)
+            .then((response) => response.data);
     }
 }

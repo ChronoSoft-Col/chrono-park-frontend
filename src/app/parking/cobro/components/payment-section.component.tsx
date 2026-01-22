@@ -26,7 +26,6 @@ import { generatePaymentAction } from "@/src/app/parking/cobro/actions/generate-
 import { toast } from "sonner";
 import { ChronoInput } from "@chrono/chrono-input.component";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
-import { IPrintPostPaymentInvoiceParamsEntity } from "@/server/domain";
 
 const steps = [
   { id: "method", badge: "1", title: "Método de pago", description: "" },
@@ -49,7 +48,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   const { validateRaw, clearValidateResult } = usePaymentContext();
   const { showYesNoDialog, closeDialog } = UseDialogContext();
   const { paymentMethods } = useCommonContext();
-  const { printPostPaymentInvoice } = usePrint();
+  const { printPaymentTicketByPaymentId } = usePrint();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [amountReceived, setAmountReceived] = useState("");
   const [notes, setNotes] = useState("");
@@ -86,28 +85,29 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
     setCurrentStep(0);
   };
 
-  const handlePrintPrompt = async (paymentData: IPrintPostPaymentInvoiceParamsEntity) => {
+  const handlePrintPrompt = async (paymentId: string) => {
     showYesNoDialog({
       title: "Imprimir comprobante",
       description: "¿Desea imprimir el comprobante de pago?",
       handleYes: async () => {
         const toastId = toast.loading("Enviando impresión...");
-        if (paymentData) {
-          const res = await printPostPaymentInvoice(paymentData).finally(() => {
-            clearValidateResult();
-            closeDialog();
-          });
-
-          if (!res.success) {
-            toast.error("Error al imprimir el comprobante", {
-              description: "Intenta nuevamente más tarde desde la sección de pagos.",
-              id: toastId,
-            },)
-          } else {
-            toast.success("Impresión enviada correctamente", {
+        try {
+          const printRes = await printPaymentTicketByPaymentId(paymentId);
+          if (!printRes.success) {
+            toast.error("Error al imprimir", {
+              description: printRes.error || "Intenta nuevamente más tarde.",
               id: toastId,
             });
+            return;
           }
+
+          toast.success("Impresión enviada correctamente", { id: toastId });
+        } catch (error) {
+          console.error("Error printing payment ticket:", error);
+          toast.error("Error inesperado al imprimir", { id: toastId });
+        } finally {
+          clearValidateResult();
+          closeDialog();
         }
       },
       handleNo: () => {
@@ -132,10 +132,17 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
     }
 
     toast.success("Pago registrado exitosamente");
-    const dataToPrint: IPrintPostPaymentInvoiceParamsEntity = {
-      ...res.data.data
+
+    const paymentId = res.data.data.paymentId ?? res.data.data.session?.paymentId;
+    if (!paymentId) {
+      toast.error("Pago registrado, pero no se recibió un ID de pago para imprimir", {
+        description: "Verifica el tipado/forma de la respuesta del backend.",
+      });
+      resetPaymentForm();
+      return;
     }
-    await handlePrintPrompt(dataToPrint);
+
+    await handlePrintPrompt(paymentId);
     resetPaymentForm();
   };
 

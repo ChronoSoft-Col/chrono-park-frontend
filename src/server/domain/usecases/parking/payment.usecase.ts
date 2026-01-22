@@ -1,6 +1,13 @@
 import { inject, injectable } from "tsyringe";
 
-import { IGeneratePaymentParamsEntity, IGeneratePaymentResponseEntity, IValidateAmountParamsEntity, IValidateAmountResponseEntity, PaymentRepository } from "@/server/domain/index"
+import {
+    IGeneratePaymentParamsEntity,
+    IGeneratePaymentResponseEntity,
+    IPrintPaymentTicketResponseEntity,
+    IValidateAmountParamsEntity,
+    IValidateAmountResponseEntity,
+    PaymentRepository,
+} from "@/server/domain/index";
 
 @injectable()
 export class PaymentUsecase implements PaymentRepository{
@@ -14,5 +21,9 @@ export class PaymentUsecase implements PaymentRepository{
 
     generatePayment(params: IGeneratePaymentParamsEntity): Promise<IGeneratePaymentResponseEntity> {
         return this.paymentRepository.generatePayment(params);
+    }
+
+    getPaymentPrintTicket(paymentId: string): Promise<IPrintPaymentTicketResponseEntity> {
+        return this.paymentRepository.getPaymentPrintTicket(paymentId);
     }
 }
