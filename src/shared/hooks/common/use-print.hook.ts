@@ -8,7 +8,6 @@ import IActionResponse from "../../interfaces/generic/action-response";
 import { IClosureEntity } from "@/server/domain/entities/parking/closure.entity";
 import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
 import { getPaymentPrintTicketAction } from "@/src/app/parking/cobro/actions/get-payment-print-ticket.action";
-import { PaymentTicketPrintUsecase } from "@/client/domain/usecases/printer/payment-ticket-print.usecase";
 
 export function usePrint() {
   const isUuidV4 = (value: string) =>
@@ -96,8 +95,8 @@ export function usePrint() {
           };
         }
 
-        const useCase = clientContainer.resolve(PaymentTicketPrintUsecase);
-        const printed = await useCase.printPaymentTicket(ticketRes.data.data);
+        const useCase = clientContainer.resolve(PrintUsecase);
+        const printed = await useCase.printTransactionReceipt(ticketRes.data.data);
 
         return {
           success: printed,

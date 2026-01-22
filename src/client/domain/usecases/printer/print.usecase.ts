@@ -9,6 +9,7 @@ import { ENVIRONMENT } from "@/src/shared/constants/environment";
 import { IPrintPostPaymentInvoiceParamsEntity } from "@/src/server/domain";
 import { IClosureEntity } from "@/src/server/domain/entities/parking/closure.entity";
 import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
+import type { IPrintPaymentTicketContentEntity } from "@/src/server/domain/entities/parking/print-payment-ticket-response.entity";
 import { printerOps } from "./printer-operations";
 
 @injectable()
@@ -304,6 +305,146 @@ export class PrintUsecase {
 
     if (body.informationPrinter?.footerMessage) {
       pushLine(body.informationPrinter.footerMessage);
+    }
+
+    operations.push(printerOps.feed(2));
+
+    const printRequest: IPrintRequestEntity = {
+      nombre_impresora: ENVIRONMENT.PRINTER_NAME,
+      operaciones: operations,
+    };
+
+    return this.printRepository.sendToPrinter(printRequest);
+  }
+
+  async printTransactionReceipt(ticket: IPrintPaymentTicketContentEntity): Promise<boolean> {
+    const operations: IPrinterOperationEntity[] = [];
+
+    const pushLine = (value = "") => operations.push(printerOps.text(this.sanitizeText(value)));
+    const separator = () => operations.push(printerOps.separator());
+    const strongSeparator = () => operations.push(printerOps.strongSeparator());
+
+    const wrapText = (text: string, maxWidth: number) => {
+      const words = String(text ?? "").trim().split(/\s+/).filter(Boolean);
+      if (words.length === 0) return [""];
+
+      const lines: string[] = [];
+      let currentLine = "";
+
+      for (const word of words) {
+        if ((currentLine + (currentLine ? " " : "") + word).length <= maxWidth) {
+          currentLine += (currentLine ? " " : "") + word;
+        } else {
+          if (currentLine) lines.push(currentLine);
+          currentLine = word;
+        }
+      }
+
+      if (currentLine) lines.push(currentLine);
+      return lines;
+    };
+
+    const safe = (value?: string | null) => (value && String(value).trim() ? String(value) : "-");
+
+    operations.push(printerOps.feed(1));
+    operations.push(printerOps.align("center"));
+
+    // Company / header
+    if (ticket.company?.name) {
+      operations.push(printerOps.fontSize(2));
+      pushLine(ticket.company.name);
+      operations.push(printerOps.fontSize(1));
+    }
+    if (ticket.company?.taxId) {
+      pushLine(`NIT: ${ticket.company.taxId}`);
+    }
+    if (ticket.company?.address) {
+      wrapText(`Direccion: ${ticket.company.address}`, 40).forEach(pushLine);
+    }
+
+    if (ticket.headerMessage) {
+      separator();
+      wrapText(ticket.headerMessage, 40).forEach(pushLine);
+    }
+
+    strongSeparator();
+
+    pushLine("COMPROBANTE DE TRANSACCION");
+    operations.push(printerOps.align("left"));
+    separator();
+
+    // Header info
+    pushLine(`Transaccion: ${safe(ticket.header?.transactionId)}`);
+    pushLine(`Fecha: ${safe(ticket.header?.paymentDate)}`);
+    pushLine(`Metodo: ${safe(ticket.header?.paymentMethod)}`);
+    pushLine(`Punto: ${safe(ticket.header?.paymentPoint)}`);
+    pushLine(`Estado: ${safe(ticket.header?.status)}`);
+    separator();
+
+    // Details
+    if (!ticket.details || ticket.details.length === 0) {
+      pushLine("(Sin detalle)");
+    } else {
+      for (const detail of ticket.details) {
+        strongSeparator();
+        if (detail.type) {
+          pushLine(detail.type);
+        }
+        if (detail.description) {
+          wrapText(detail.description, 40).forEach(pushLine);
+        }
+        if (detail.licensePlate) {
+          pushLine(`Placa: ${detail.licensePlate}`);
+        }
+        if (detail.entryTime) {
+          pushLine(`Ingreso: ${detail.entryTime}`);
+        }
+        if (detail.exitTime) {
+          pushLine(`Salida: ${detail.exitTime}`);
+        }
+        if (detail.duration) {
+          pushLine(`Duracion: ${detail.duration}`);
+        }
+        separator();
+        if (detail.subtotal) {
+          pushLine(`Subtotal: ${detail.subtotal}`);
+        }
+        if (detail.tax) {
+          pushLine(`Impuesto: ${detail.tax}`);
+        }
+      }
+    }
+
+    strongSeparator();
+
+    // Totals
+    if (ticket.totals) {
+      pushLine(`Subtotal: ${safe(ticket.totals.subtotal)}`);
+      const taxPercent = ticket.totals.taxPercent ? ` (${ticket.totals.taxPercent})` : "";
+      pushLine(`Impuesto${taxPercent}: ${safe(ticket.totals.taxAmount)}`);
+      operations.push(printerOps.fontSize(2));
+      pushLine(`TOTAL: ${safe(ticket.totals.total)}`);
+      operations.push(printerOps.fontSize(1));
+    }
+
+    if (ticket.bodyMessage) {
+      separator();
+      wrapText(ticket.bodyMessage, 40).forEach(pushLine);
+    }
+
+    if (ticket.insurancePolicyInfo) {
+      separator();
+      wrapText(ticket.insurancePolicyInfo, 40).forEach(pushLine);
+    }
+
+    if (ticket.notes) {
+      separator();
+      wrapText(`Notas: ${ticket.notes}`, 40).forEach(pushLine);
+    }
+
+    if (ticket.footerMessage) {
+      separator();
+      wrapText(ticket.footerMessage, 40).forEach(pushLine);
     }
 
     operations.push(printerOps.feed(2));
