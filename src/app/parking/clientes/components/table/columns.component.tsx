@@ -6,9 +6,11 @@ import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component"
 import ChronoButton from "@chrono/chrono-button.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
-import { Eye } from "lucide-react";
+import { Eye, Ban, CheckCircle2, Trash2 } from "lucide-react";
 
 type ViewDetailHandler = (item: ICustomerEntity) => void;
+type ToggleActiveHandler = (item: ICustomerEntity, nextActive: boolean) => void;
+type DeleteHandler = (item: ICustomerEntity) => void;
 
 const formatDate = (value?: Date | string) => {
   if (!value) return "-";
@@ -18,6 +20,8 @@ const formatDate = (value?: Date | string) => {
 
 export const createCustomerColumns = (
   onViewDetail?: ViewDetailHandler,
+  onToggleActive?: ToggleActiveHandler,
+  onDelete?: DeleteHandler,
 ): ChronoDataTableColumn<ICustomerEntity>[] => [
   {
     id: "full-name",
@@ -79,8 +83,7 @@ export const createCustomerColumns = (
           <TooltipTrigger asChild>
             <ChronoButton
               type="button"
-              size="icon-sm"
-              variant="secondary"
+              variant="default"
               aria-label="Ver detalle"
               onClick={() => onViewDetail?.(row)}
             >
@@ -89,6 +92,52 @@ export const createCustomerColumns = (
           </TooltipTrigger>
           <TooltipContent side="top">Ver detalle</TooltipContent>
         </Tooltip>
+
+        {row.isActive ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                variant="outline"
+                aria-label="Desactivar cliente"
+                onClick={() => onToggleActive?.(row, false)}
+              >
+                <Ban className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">Desactivar</TooltipContent>
+          </Tooltip>
+        ) : (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                variant="outline"
+                aria-label="Activar cliente"
+                onClick={() => onToggleActive?.(row, true)}
+              >
+                <CheckCircle2 className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">Activar</TooltipContent>
+          </Tooltip>
+        )}
+
+        {row.isActive ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                variant="destructive"
+                aria-label="Eliminar cliente"
+                onClick={() => onDelete?.(row)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">Eliminar</TooltipContent>
+          </Tooltip>
+        ) : null}
       </div>
     ),
   },

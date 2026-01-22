@@ -16,4 +16,16 @@ export class CustomerDatasourceService extends AxiosServerInstance implements Cu
             .post<IEmptyResponse>("/customers", params)
             .then(response => response.data);
     }
+
+    async setCustomerActive(customerId: string, isActive: boolean): Promise<IEmptyResponse | void> {
+        return this.api
+            .put<IEmptyResponse>(`/customers/${customerId}`, { isActive })
+            .then(response => response.data);
+    }
+
+    async deleteCustomer(customerId: string): Promise<IEmptyResponse | void> {
+        return this.api
+            .delete<IEmptyResponse>(`/customers/${customerId}`)
+            .then(response => response.data);
+    }
 }

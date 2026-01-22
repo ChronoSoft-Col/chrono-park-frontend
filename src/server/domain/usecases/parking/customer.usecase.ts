@@ -18,4 +18,12 @@ export class CustomerUsecase implements CustomerRepository {
     createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse> {
         return this.customerRepository.createCustomer(params);
     }
+
+    setCustomerActive(customerId: string, isActive: boolean): Promise<IEmptyResponse | void> {
+        return this.customerRepository.setCustomerActive(customerId, isActive);
+    }
+
+    deleteCustomer(customerId: string): Promise<IEmptyResponse | void> {
+        return this.customerRepository.deleteCustomer(customerId);
+    }
 }

@@ -17,4 +17,12 @@ export class CustomerRepositoryImp implements CustomerRepository {
     createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse> {
         return this.customerDatasourceService.createCustomer(params);
     }
+
+    setCustomerActive(customerId: string, isActive: boolean): Promise<IEmptyResponse | void> {
+        return this.customerDatasourceService.setCustomerActive(customerId, isActive);
+    }
+
+    deleteCustomer(customerId: string): Promise<IEmptyResponse | void> {
+        return this.customerDatasourceService.deleteCustomer(customerId);
+    }
 }

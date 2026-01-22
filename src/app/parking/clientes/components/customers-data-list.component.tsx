@@ -10,10 +10,13 @@ import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import { createCustomerColumns } from "./table/columns.component";
 import { CustomersDetailDialogContent } from "./customers-detail-dialog-content";
 import { CreateCustomerDialogContent } from "./create-customer-dialog.component";
+import { setCustomerActiveAction } from "../actions/set-customer-active.action";
+import { deleteCustomerAction } from "../actions/delete-customer.action";
 
 interface Props {
   items: ICustomerEntity[];
@@ -28,7 +31,62 @@ export default function CustomersDataListComponent({
   totalPages,
   pageSize,
 }: Props) {
-  const { openDialog, closeDialog } = UseDialogContext();
+  const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
+
+  const handleToggleActiveYes = React.useCallback(
+    async (item: ICustomerEntity, nextActive: boolean) => {
+      const toastId = toast.loading("Actualizando cliente...");
+      try {
+        const res = await setCustomerActiveAction(item.id, nextActive);
+        if (!res.success) {
+          toast.error(res.error || "No se pudo actualizar el estado", { id: toastId });
+          return;
+        }
+
+        const ok = (res.data as { success?: boolean } | undefined)?.success;
+        if (ok === false) {
+          toast.error("No se pudo actualizar el estado", { id: toastId });
+          return;
+        }
+
+        toast.success(
+          `Cliente ${nextActive ? "activado" : "desactivado"} correctamente`,
+          { id: toastId },
+        );
+        closeDialog();
+      } catch (error) {
+        console.error("Error updating customer status:", error);
+        toast.error("Error inesperado al actualizar el cliente", { id: toastId });
+      }
+    },
+    [closeDialog],
+  );
+
+  const handleDeleteYes = React.useCallback(
+    async (item: ICustomerEntity) => {
+      const toastId = toast.loading("Eliminando cliente...");
+      try {
+        const res = await deleteCustomerAction(item.id);
+        if (!res.success) {
+          toast.error(res.error || "No se pudo eliminar", { id: toastId });
+          return;
+        }
+
+        const ok = (res.data as { success?: boolean } | undefined)?.success;
+        if (ok === false) {
+          toast.error("No se pudo eliminar", { id: toastId });
+          return;
+        }
+
+        toast.success("Cliente eliminado", { id: toastId });
+        closeDialog();
+      } catch (error) {
+        console.error("Error deleting customer:", error);
+        toast.error("Error inesperado al eliminar el cliente", { id: toastId });
+      }
+    },
+    [closeDialog],
+  );
 
   const handleOpenCreateCustomer = React.useCallback(() => {
     openDialog({
@@ -60,9 +118,43 @@ export default function CustomersDataListComponent({
     [openDialog, closeDialog],
   );
 
+  const handleToggleActive = React.useCallback(
+    (item: ICustomerEntity, nextActive: boolean) => {
+      const title = nextActive ? "Activar cliente" : "Desactivar cliente";
+      const verb = nextActive ? "activar" : "desactivar";
+
+      showYesNoDialog({
+        title,
+        description: `¿Deseas ${verb} a ${item.fullName}?`,
+        requiresReloadOnYes: true,
+        handleNo: closeDialog,
+        handleYes: () => handleToggleActiveYes(item, nextActive),
+      });
+    },
+    [closeDialog, handleToggleActiveYes, showYesNoDialog],
+  );
+
+  const handleDelete = React.useCallback(
+    (item: ICustomerEntity) => {
+      if (!item.isActive) {
+        toast.message("El cliente ya está inactivo");
+        return;
+      }
+
+      showYesNoDialog({
+        title: "Eliminar cliente",
+        description: `¿Deseas eliminar a ${item.fullName}?`,
+        requiresReloadOnYes: true,
+        handleNo: closeDialog,
+        handleYes: () => handleDeleteYes(item),
+      });
+    },
+    [closeDialog, handleDeleteYes, showYesNoDialog],
+  );
+
   const columns = React.useMemo(
-    () => createCustomerColumns(handleViewDetail),
-    [handleViewDetail],
+    () => createCustomerColumns(handleViewDetail, handleToggleActive, handleDelete),
+    [handleViewDetail, handleToggleActive, handleDelete],
   );
   const safeTotalPages = Math.max(
     1,
