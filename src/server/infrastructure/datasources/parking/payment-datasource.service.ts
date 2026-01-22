@@ -2,6 +2,8 @@ import { injectable } from "tsyringe";
 import {
     IGeneratePaymentParamsEntity,
     IGeneratePaymentResponseEntity,
+    IListPaymentsParamsEntity,
+    IListPaymentsResponseEntity,
     IPrintPaymentTicketResponseEntity,
     IValidateAmountParamsEntity,
     IValidateAmountResponseEntity,
@@ -35,6 +37,12 @@ export class PaymentDatasourceService extends AxiosServerInstance implements Pay
                 console.log(response.data);
                 return response.data;
             });
+    }
+
+    async listPayments(params: IListPaymentsParamsEntity): Promise<IListPaymentsResponseEntity> {
+        return this.api
+            .get<IListPaymentsResponseEntity>(`/payments`, { params })
+            .then((response) => response.data);
     }
 
     async getPaymentPrintTicket(paymentId: string): Promise<IPrintPaymentTicketResponseEntity> {

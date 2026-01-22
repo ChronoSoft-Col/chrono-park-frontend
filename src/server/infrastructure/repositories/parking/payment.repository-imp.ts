@@ -2,6 +2,8 @@ import { inject, injectable } from "tsyringe";
 import {
     IGeneratePaymentParamsEntity,
     IGeneratePaymentResponseEntity,
+    IListPaymentsParamsEntity,
+    IListPaymentsResponseEntity,
     IPrintPaymentTicketResponseEntity,
     IValidateAmountParamsEntity,
     IValidateAmountResponseEntity,
@@ -23,6 +25,10 @@ export class PaymentRepositoryImp implements PaymentRepository {
 
     async generatePayment(params: IGeneratePaymentParamsEntity): Promise<IGeneratePaymentResponseEntity> {
         return this.paymentDatasourceService.generatePayment(params);
+    }
+
+    async listPayments(params: IListPaymentsParamsEntity): Promise<IListPaymentsResponseEntity> {
+        return this.paymentDatasourceService.listPayments(params);
     }
 
     async getPaymentPrintTicket(paymentId: string): Promise<IPrintPaymentTicketResponseEntity> {

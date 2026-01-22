@@ -28,6 +28,10 @@ export * from "./entities/parking/validate-amount-response.entity";
 export * from "./entities/parking/generate-payment-params.entity";
 export * from "./entities/parking/generate-payment-response.entity";
 
+export * from "./entities/parking/list-payments-params.entity";
+export * from "./entities/parking/list-payments-response.entity";
+export * from "./entities/parking/payment-list-item.entity";
+
 export * from "./entities/parking/print-post-payment-invoice-params.entity";
 export * from "./entities/parking/print-payment-ticket-response.entity";
 

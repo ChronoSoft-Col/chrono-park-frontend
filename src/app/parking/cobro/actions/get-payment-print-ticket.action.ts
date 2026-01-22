@@ -16,6 +16,7 @@ export async function getPaymentPrintTicketAction(
   try {
     const useCase = serverContainer.resolve(PaymentUsecase);
     const response = await useCase.getPaymentPrintTicket(paymentId);
+    console.log("getPaymentPrintTicketAction response:", response);
     return { success: true, data: response };
   } catch (error) {
     rethrowNextNavigationErrors(error);
