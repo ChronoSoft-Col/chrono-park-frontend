@@ -291,7 +291,9 @@ export class PrintUsecase {
     operations.push(printerOps.align("center"));
 
     // QR con el parkingSessionId
-    operations.push(printerOps.qr(this.sanitizeText(body.parkingSessionId)));
+    operations.push(printerOps.qrSized(10, this.sanitizeText(body.parkingSessionId)));
+
+    operations.push(printerOps.text(this.sanitizeText("Con este QR pagas y sales")));
 
     operations.push(printerOps.align("left"));
 
@@ -346,6 +348,28 @@ export class PrintUsecase {
 
     const safe = (value?: string | null) => (value && String(value).trim() ? String(value) : "-");
 
+    const lineWidth = 40;
+    const formatLeftRight = (leftText: string, rightText: string, width: number) => {
+      const left = String(leftText ?? "");
+      const right = String(rightText ?? "");
+      const spaceAvailable = width - left.length - right.length;
+      const spaces = " ".repeat(Math.max(spaceAvailable, 1));
+      return `${left}${spaces}${right}`;
+    };
+
+    const formatMoneyNoCents = (raw?: string | null) => {
+      const value = safe(raw);
+      const parsed = Number(String(value).replace(/,/g, ""));
+      if (!Number.isFinite(parsed)) return value;
+      return parsed.toLocaleString("es-CO", { maximumFractionDigits: 0 });
+    };
+
+    const parseNumber = (raw?: string | null) => {
+      if (!raw) return null;
+      const parsed = Number(String(raw).replace(/,/g, ""));
+      return Number.isFinite(parsed) ? parsed : null;
+    };
+
     operations.push(printerOps.feed(1));
     operations.push(printerOps.align("center"));
 
@@ -373,57 +397,83 @@ export class PrintUsecase {
     operations.push(printerOps.align("left"));
     separator();
 
-    // Header info
-    pushLine(`Transaccion: ${safe(ticket.header?.transactionId)}`);
-    pushLine(`Fecha: ${safe(ticket.header?.paymentDate)}`);
-    pushLine(`Metodo: ${safe(ticket.header?.paymentMethod)}`);
-    pushLine(`Punto: ${safe(ticket.header?.paymentPoint)}`);
-    pushLine(`Estado: ${safe(ticket.header?.status)}`);
+    // Header info (invoice style)
+    pushLine(formatLeftRight("Transaccion:", safe(ticket.header?.transactionId), lineWidth));
+    pushLine(formatLeftRight("Fecha:", safe(ticket.header?.paymentDate), lineWidth));
+    pushLine(formatLeftRight("Metodo:", safe(ticket.header?.paymentMethod), lineWidth));
+    pushLine(formatLeftRight("Punto:", safe(ticket.header?.paymentPoint), lineWidth));
+    pushLine(formatLeftRight("Estado:", safe(ticket.header?.status), lineWidth));
     separator();
 
-    // Details
+    // Details (invoice-like table)
     if (!ticket.details || ticket.details.length === 0) {
       pushLine("(Sin detalle)");
     } else {
-      for (const detail of ticket.details) {
-        strongSeparator();
-        if (detail.type) {
-          pushLine(detail.type);
+
+      // Text-only invoice table (works with current printer backend)
+      const colItem = 16;
+      const colBase = 7;
+      const colIva = 7;
+      const colTotal = 7;
+      const tableHeader = `${"ITEM".padEnd(colItem)} ${"BASE".padStart(colBase)} ${"IVA".padStart(colIva)} ${"TOTAL".padStart(colTotal)}`;
+
+      pushLine(tableHeader);
+
+      for (let i = 0; i < ticket.details.length; i++) {
+        const d = ticket.details[i];
+        const subtotalNum = parseNumber(d.subtotal);
+        const taxNum = parseNumber(d.tax);
+        const computedTotal = subtotalNum != null && taxNum != null ? subtotalNum + taxNum : null;
+
+        const itemLabel = safe(d.type);
+        const itemLines = wrapText(this.sanitizeText(itemLabel), colItem);
+
+        const base = this.sanitizeText(formatMoneyNoCents(d.subtotal));
+        const iva = this.sanitizeText(formatMoneyNoCents(d.tax));
+        const total = this.sanitizeText(
+          computedTotal != null ? computedTotal.toLocaleString("es-CO", { maximumFractionDigits: 0 }) : "-",
+        );
+
+        itemLines.forEach((line, index) => {
+          if (index === 0) {
+            pushLine(
+              `${line.padEnd(colItem)} ${base.padStart(colBase)} ${iva.padStart(colIva)} ${total.padStart(colTotal)}`,
+            );
+          } else {
+            pushLine(`${line.padEnd(colItem)} ${"".padStart(colBase)} ${"".padStart(colIva)} ${"".padStart(colTotal)}`);
+          }
+        });
+
+        const extraLines: string[] = [];
+        if (d.licensePlate) extraLines.push(`Placa: ${d.licensePlate}`);
+        if (d.entryTime) extraLines.push(`Entrada: ${d.entryTime}`);
+        if (d.exitTime) extraLines.push(`Salida: ${d.exitTime}`);
+        if (d.duration) extraLines.push(`Duracion: ${d.duration}`);
+
+        for (const extra of extraLines) {
+          wrapText(this.sanitizeText(`  ${extra}`), lineWidth).forEach(pushLine);
         }
-        if (detail.description) {
-          wrapText(detail.description, 40).forEach(pushLine);
-        }
-        if (detail.licensePlate) {
-          pushLine(`Placa: ${detail.licensePlate}`);
-        }
-        if (detail.entryTime) {
-          pushLine(`Ingreso: ${detail.entryTime}`);
-        }
-        if (detail.exitTime) {
-          pushLine(`Salida: ${detail.exitTime}`);
-        }
-        if (detail.duration) {
-          pushLine(`Duracion: ${detail.duration}`);
-        }
-        separator();
-        if (detail.subtotal) {
-          pushLine(`Subtotal: ${detail.subtotal}`);
-        }
-        if (detail.tax) {
-          pushLine(`Impuesto: ${detail.tax}`);
+
+        if (i < ticket.details.length - 1) {
+          separator();
         }
       }
     }
 
-    strongSeparator();
+    separator();
 
     // Totals
     if (ticket.totals) {
-      pushLine(`Subtotal: ${safe(ticket.totals.subtotal)}`);
-      const taxPercent = ticket.totals.taxPercent ? ` (${ticket.totals.taxPercent})` : "";
-      pushLine(`Impuesto${taxPercent}: ${safe(ticket.totals.taxAmount)}`);
+      pushLine("TOTALES");
+      const taxPercent = ticket.totals.taxPercent ? ` ${ticket.totals.taxPercent}` : "";
+      pushLine(formatLeftRight("Subtotal:", formatMoneyNoCents(ticket.totals.subtotal), lineWidth));
+      pushLine(formatLeftRight(`Impuesto${taxPercent}:`, formatMoneyNoCents(ticket.totals.taxAmount), lineWidth));
+      separator();
       operations.push(printerOps.fontSize(2));
-      pushLine(`TOTAL: ${safe(ticket.totals.total)}`);
+      {
+        const totalLine = `TOTAL: ${formatMoneyNoCents(ticket.totals.total)}`;
+        pushLine(totalLine.length >= lineWidth ? totalLine : totalLine.padStart(lineWidth));
+      }
       operations.push(printerOps.fontSize(1));
     }
 

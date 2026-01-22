@@ -29,7 +29,7 @@ export default function PaymentsDataListComponent({
   totalPages,
   pageSize,
 }: Props) {
-  const { openDialog, closeDialog } = UseDialogContext();
+  const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const { printPaymentTicketByPaymentId } = usePrint();
 
   const handleViewDetail = React.useCallback(
@@ -58,23 +58,31 @@ export default function PaymentsDataListComponent({
 
   const handlePrint = React.useCallback(
     async (item: IPaymentItemEntity) => {
-      const toastId = toast.loading("Enviando impresión...");
-      try {
-        const res = await printPaymentTicketByPaymentId(item.id);
-        if (!res.success) {
-          toast.error("No se pudo imprimir", {
-            id: toastId,
-            description: res.error || "Verifica el servicio de impresión",
-          });
-          return;
-        }
-        toast.success("Impresión enviada", { id: toastId });
-      } catch (error) {
-        console.error("Error printing payment:", error);
-        toast.error("Error inesperado al imprimir", { id: toastId });
-      }
+      showYesNoDialog({
+        title: "Imprimir comprobante",
+        description: `¿Desea imprimir el comprobante${item.transactionId ? ` (${item.transactionId})` : ""}?`,
+        iconVariant: "warning",
+        handleYes: async () => {
+          const toastId = toast.loading("Enviando impresión...");
+          try {
+            const res = await printPaymentTicketByPaymentId(item.id);
+            if (!res.success) {
+              toast.error("No se pudo imprimir", {
+                id: toastId,
+                description: res.error || "Verifica el servicio de impresión",
+              });
+              return;
+            }
+            toast.success("Impresión enviada", { id: toastId });
+          } catch (error) {
+            console.error("Error printing payment:", error);
+            toast.error("Error inesperado al imprimir", { id: toastId });
+          }
+        },
+        handleNo: async () => {},
+      });
     },
-    [printPaymentTicketByPaymentId],
+    [printPaymentTicketByPaymentId, showYesNoDialog],
   );
 
   const columns = React.useMemo(

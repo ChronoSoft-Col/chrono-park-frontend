@@ -46,7 +46,7 @@ type PaymentSectionProps = {
 
 export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   const { validateRaw, clearValidateResult } = usePaymentContext();
-  const { showYesNoDialog, closeDialog } = UseDialogContext();
+  const { showYesNoDialog } = UseDialogContext();
   const { paymentMethods } = useCommonContext();
   const { printPaymentTicketByPaymentId } = usePrint();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -107,12 +107,9 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
           toast.error("Error inesperado al imprimir", { id: toastId });
         } finally {
           clearValidateResult();
-          closeDialog();
         }
       },
-      handleNo: () => {
-        closeDialog();
-      },
+      handleNo: async () => {},
     });
   };
 

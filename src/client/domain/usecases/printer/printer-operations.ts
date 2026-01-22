@@ -12,6 +12,7 @@ export type PrinterAction =
   | "feed"
   | "cut"
   | "fontsize"
+  | "table"
   | "pdf417"
   | "qr"
   | "barcode_93"
@@ -30,8 +31,14 @@ export const printerOps = {
   cut: () => op("cut", ""),
   fontSize: (size: PrinterFontSize) => op("fontsize", String(size)),
 
+  table: (payload: unknown) => op("table", JSON.stringify(payload ?? {})),
+
   pdf417: (value: string) => op("pdf417", value),
   qr: (value: string) => op("qr", value),
+  // Backward-compatible format for the Java printer server:
+  // - legacy: datos = "<content>" (size defaults server-side)
+  // - new:    datos = "<size>|<content>" where size is an integer
+  qrSized: (size: number, value: string) => op("qr", `${Math.trunc(size)}|${value}`),
   barcode93: (value: string) => op("barcode_93", value),
   barcode128: (value: string) => op("barcode_128", value),
   barcodeEan13: (value: string) => op("barcode_ean13", value),

@@ -28,7 +28,7 @@ export default function InOutDataListComponent({
   totalPages,
   pageSize,
 }: Props) {
-  const { openDialog, closeDialog } = UseDialogContext();
+  const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const { printIncomeReceipt } = usePrint();
 
   const handleViewDetail = React.useCallback(
@@ -45,27 +45,35 @@ export default function InOutDataListComponent({
 
   const handlePrint = React.useCallback(
     async (item: IInOutEntity) => {
-      const body: TPrintIncomeBody = {
-        parkingSessionId: item.id,
-        vehiclePlate: item.vehicle.licensePlate,
-        vehicleType: item.vehicle.vehicleType.name,
-        entryTime: item.entryTime,
-        informationPrinter: {
-          headerMessage: "",
-          bodyMessage: "",
-          footerMessage: "",
-          insurancePolicyInfo: "",
-        },
-      };
+      showYesNoDialog({
+        title: "Imprimir ticket de ingreso",
+        description: `¿Desea imprimir el ticket de ingreso de ${item.vehicle.licensePlate}?`,
+        iconVariant: "warning",
+        handleYes: async () => {
+          const body: TPrintIncomeBody = {
+            parkingSessionId: item.id,
+            vehiclePlate: item.vehicle.licensePlate,
+            vehicleType: item.vehicle.vehicleType.name,
+            entryTime: item.entryTime,
+            informationPrinter: {
+              headerMessage: "",
+              bodyMessage: "",
+              footerMessage: "",
+              insurancePolicyInfo: "",
+            },
+          };
 
-      const res = await printIncomeReceipt(body);
-      if (!res.success) {
-        toast.error("No se pudo imprimir el ticket de ingreso");
-        return;
-      }
-      toast.success("Ticket de ingreso enviado a la impresora");
+          const res = await printIncomeReceipt(body);
+          if (!res.success) {
+            toast.error("No se pudo imprimir el ticket de ingreso");
+            return;
+          }
+          toast.success("Ticket de ingreso enviado a la impresora");
+        },
+        handleNo: async () => {},
+      });
     },
-    [printIncomeReceipt]
+    [printIncomeReceipt, showYesNoDialog]
   );
 
   const columns = React.useMemo(

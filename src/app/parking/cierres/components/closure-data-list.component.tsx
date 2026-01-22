@@ -7,7 +7,7 @@ import { ChronoPaginator } from "@/src/shared/components/chrono-soft/chrono-pagi
 import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { ClosureDetailDialog } from "./closure-detail-dialog.component";
 import { createClosureColumns } from "./table/columns.component";
 import { getClosureByIdAction } from "../actions/get-closure-by-id.action";
@@ -38,7 +38,7 @@ function ClosureDetailFooter({
     options?: { operatorName?: string }
   ) => Promise<{ success: boolean }>;
 }) {
-  const [isPrinting, setIsPrinting] = useState(false);
+  const { showYesNoDialog } = UseDialogContext();
 
   return (
     <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-end">
@@ -47,24 +47,28 @@ function ClosureDetailFooter({
       </ChronoButton>
       <ChronoButton
         variant="default"
-        loading={isPrinting}
-        disabled={isPrinting}
         onClick={async () => {
-          if (isPrinting) return;
-          setIsPrinting(true);
+          showYesNoDialog({
+            title: "Reimprimir cierre",
+            description: "¿Desea reimprimir el comprobante del cierre de caja?",
+            iconVariant: "warning",
+            handleYes: async () => {
+              const toastId = toast.loading("Enviando impresión...");
+              try {
+                const printRes = await onPrint(closure, { operatorName });
+                if (!printRes.success) {
+                  toast.error("Error al imprimir el cierre", { id: toastId });
+                  return;
+                }
 
-          const toastId = toast.loading("Enviando impresión...");
-          try {
-            const printRes = await onPrint(closure, { operatorName });
-            if (!printRes.success) {
-              toast.error("Error al imprimir el cierre", { id: toastId });
-              return;
-            }
-
-            toast.success("Impresión enviada correctamente", { id: toastId });
-          } finally {
-            setIsPrinting(false);
-          }
+                toast.success("Impresión enviada correctamente", { id: toastId });
+              } catch (error) {
+                console.error("Error printing closure:", error);
+                toast.error("Error inesperado al imprimir el cierre", { id: toastId });
+              }
+            },
+            handleNo: async () => {},
+          });
         }}
       >
         Reimprimir

@@ -8,6 +8,7 @@ import {
   useCallback,
 } from "react";
 import { AlertTriangle, CheckCircle2, Info } from "lucide-react";
+import { useRouter } from "next/navigation";
 import ChronoYesNoFormComponent from "@chrono/chrono-yes-no-form.component";
 import { Separator } from "../components/ui/separator";
 
@@ -99,6 +100,8 @@ export const DialogProvider = ({ children }: DialogProviderProps) => {
   );
   const [headerIcon, setHeaderIcon] = useState<ReactNode>(null);
 
+  const router = useRouter();
+
   const resetDialogState = useCallback(() => {
     setTitle("");
     setDescription("");
@@ -146,12 +149,34 @@ export const DialogProvider = ({ children }: DialogProviderProps) => {
       ) : null,
     );
 
+    const runSafely = async (fn: () => void | Promise<void>) => {
+      try {
+        await fn();
+      } catch (error) {
+        console.error("Yes/No dialog handler failed:", error);
+      }
+    };
+
+    const handleYesImmediateClose = () => {
+      closeDialog();
+      void (async () => {
+        await runSafely(handleYes);
+        if (requiresReloadOnYes) {
+          router.refresh();
+        }
+      })();
+    };
+
+    const handleNoImmediateClose = () => {
+      closeDialog();
+      void runSafely(handleNo);
+    };
+
     setRenderContent(
       <div className="py-2">
         <ChronoYesNoFormComponent
-          onYes={handleYes}
-          onNo={handleNo}
-          requiresReloadOnYes={requiresReloadOnYes}
+          onYes={handleYesImmediateClose}
+          onNo={handleNoImmediateClose}
         />
       </div>,
     );
