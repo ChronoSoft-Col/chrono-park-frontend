@@ -2,7 +2,7 @@ import { inject, injectable } from "tsyringe";
 import {
     CustomerDatasourceService
 } from "@/server/infrastructure/index"
-import { CustomerRepository, ICreateCustomerParamsEntity, IListCustomersParamsEntity, IListCustomersResponseEntity } from "@/src/server/domain";
+import { CustomerRepository, ICreateCustomerParamsEntity, IListCustomersParamsEntity, IListCustomersResponseEntity, IUpdateCustomerParamsEntity, IUpdateCustomerResponseEntity } from "@/src/server/domain";
 import IEmptyResponse from "@/src/shared/interfaces/generic/empty-response";
 
 @injectable()
@@ -16,6 +16,10 @@ export class CustomerRepositoryImp implements CustomerRepository {
 
     createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse> {
         return this.customerDatasourceService.createCustomer(params);
+    }
+
+    updateCustomer(customerId: string, params: IUpdateCustomerParamsEntity): Promise<IUpdateCustomerResponseEntity> {
+        return this.customerDatasourceService.updateCustomer(customerId, params);
     }
 
     setCustomerActive(customerId: string, isActive: boolean): Promise<IEmptyResponse | void> {

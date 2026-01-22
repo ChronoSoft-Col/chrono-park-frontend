@@ -44,6 +44,8 @@ export * from "./entities/parking/customer.entity"
 export * from "./entities/parking/list-customers-params.entity"
 export * from "./entities/parking/list-customers-response.enitity"
 export * from "./entities/parking/create-customer-params.entity"
+export * from "./entities/parking/update-customer-params.entity"
+export * from "./entities/parking/update-customer-response.entity"
 
 export * from "./entities/parking/close-closure-params.entity"
 export * from "./entities/parking/closure.entity"

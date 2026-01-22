@@ -4,7 +4,6 @@ import { ArrowLeft, ParkingCircle, MapPinned, TrafficCone } from "lucide-react";
 import ChronoButton from "@chrono/chrono-button.component";
 import {
   ChronoCard,
-  ChronoCardContent,
   ChronoCardDescription,
   ChronoCardFooter,
   ChronoCardHeader,

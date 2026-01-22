@@ -2,7 +2,8 @@
 
 import { useCallback } from "react";
 
-import { UseDialogContext } from "../../context/dialog.context";
+import { UseDialogContext } from "@/src/shared/context/dialog.context";
+import { cn } from "@/src/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +14,18 @@ import {
 } from "../ui/dialog";
 
 export default function ChronoCustomDialog() {
-  const { isOpen, title, renderContent, renderFooter, description, setIsOpen, closeDialog, dialogClassName, contentClassName } =
+  const {
+    isOpen,
+    title,
+    renderContent,
+    renderFooter,
+    description,
+    headerIcon,
+    setIsOpen,
+    closeDialog,
+    dialogClassName,
+    contentClassName,
+  } =
     UseDialogContext();
 
   const handleOpenChange = useCallback(
@@ -29,12 +41,13 @@ export default function ChronoCustomDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className={"w-fit sm:max-w-none " + (dialogClassName ?? "") }>
-        <DialogHeader>
+      <DialogContent className={cn("w-fit sm:max-w-none", dialogClassName)}>
+        <DialogHeader className={cn("gap-2", headerIcon ? "items-center text-center" : undefined)}>
+          {headerIcon}
           <DialogTitle>{title}</DialogTitle>
+          {description ? <DialogDescription>{description}</DialogDescription> : null}
         </DialogHeader>
-        {description ? <DialogDescription>{description}</DialogDescription> : null}
-        <div className={contentClassName ?? ""}>{renderContent}</div>
+        <div className={cn(contentClassName)}>{renderContent}</div>
         {renderFooter ? <DialogFooter>{renderFooter}</DialogFooter> : null}
       </DialogContent>
     </Dialog>

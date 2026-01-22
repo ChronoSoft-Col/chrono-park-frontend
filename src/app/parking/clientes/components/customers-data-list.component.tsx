@@ -9,7 +9,7 @@ import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout
 
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { createCustomerColumns } from "./table/columns.component";
@@ -17,6 +17,7 @@ import { CustomersDetailDialogContent } from "./customers-detail-dialog-content"
 import { CreateCustomerDialogContent } from "./create-customer-dialog.component";
 import { setCustomerActiveAction } from "../actions/set-customer-active.action";
 import { deleteCustomerAction } from "../actions/delete-customer.action";
+import { EditCustomerDialogContent } from "./edit-customer-dialog.component";
 
 interface Props {
   items: ICustomerEntity[];
@@ -88,6 +89,19 @@ export default function CustomersDataListComponent({
     [closeDialog],
   );
 
+  const handleEdit = React.useCallback(
+    (item: ICustomerEntity) => {
+      openDialog({
+        title: `Editar ${item.fullName}`,
+        description: "",
+        content: <EditCustomerDialogContent customer={item} />,
+        dialogClassName: "w-full sm:max-w-5xl",
+        contentClassName: "max-h-[75vh] overflow-y-auto pr-1",
+      });
+    },
+    [openDialog],
+  );
+
   const handleOpenCreateCustomer = React.useCallback(() => {
     openDialog({
       title: "Crear cliente",
@@ -107,8 +121,10 @@ export default function CustomersDataListComponent({
         footer: (
           <ChronoButton
             onClick={closeDialog}
-            className="w-full"
-            variant={"secondary"}
+            variant={"outline"}
+            iconPosition="left"
+            icon={<X/>}
+            size={"lg"}
           >
             Cerrar
           </ChronoButton>
@@ -153,8 +169,8 @@ export default function CustomersDataListComponent({
   );
 
   const columns = React.useMemo(
-    () => createCustomerColumns(handleViewDetail, handleToggleActive, handleDelete),
-    [handleViewDetail, handleToggleActive, handleDelete],
+    () => createCustomerColumns(handleViewDetail, handleToggleActive, handleDelete, handleEdit),
+    [handleViewDetail, handleToggleActive, handleDelete, handleEdit],
   );
   const safeTotalPages = Math.max(
     1,

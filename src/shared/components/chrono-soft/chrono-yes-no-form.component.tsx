@@ -57,8 +57,8 @@ export default function ChronoYesNoFormComponent({
 
   return (
     <form>
-      <div className="mt-6 flex items-center justify-end gap-4">
-        <ChronoButton type="button" size="lg" onClick={handleYes} disabled={pending || Boolean(isLoading)}>
+      <div className="mt-6 flex items-center justify-between gap-4 px-4">
+        <ChronoButton type="button" size="lg" onClick={handleYes} disabled={pending || Boolean(isLoading)} className="flex-1">
           <Check className="mr-2 size-4" />
           {yesText}
         </ChronoButton>
@@ -68,6 +68,7 @@ export default function ChronoYesNoFormComponent({
           size="lg"
           onClick={handleNo}
           disabled={pending || Boolean(isLoading)}
+          className="flex-1"
         >
           <X className="mr-2 size-4" />
           {noText}

@@ -3,7 +3,9 @@ import {
     IListCustomersParamsEntity,
     IListCustomersResponseEntity,
     CustomerRepository,
-    ICreateCustomerParamsEntity
+    ICreateCustomerParamsEntity,
+    IUpdateCustomerParamsEntity,
+    IUpdateCustomerResponseEntity
 } from "@/server/domain";
 import IEmptyResponse from "@/src/shared/interfaces/generic/empty-response";
 
@@ -17,6 +19,10 @@ export class CustomerUsecase implements CustomerRepository {
 
     createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse> {
         return this.customerRepository.createCustomer(params);
+    }
+
+    updateCustomer(customerId: string, params: IUpdateCustomerParamsEntity): Promise<IUpdateCustomerResponseEntity> {
+        return this.customerRepository.updateCustomer(customerId, params);
     }
 
     setCustomerActive(customerId: string, isActive: boolean): Promise<IEmptyResponse | void> {

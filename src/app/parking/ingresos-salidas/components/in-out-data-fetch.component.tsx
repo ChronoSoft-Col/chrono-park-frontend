@@ -1,6 +1,5 @@
 import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface";
 import { getInOutsAction } from "../actions/get-in-out.action";
-import { DEFAULT_LIMIT } from "@/src/shared/constants/pagination";
 import InOutDataListComponent from "./in-out-data-list.component";
 import { resolveMetaData } from "@/src/lib/utils";
 import { IInOutEntity } from "@/src/server/domain";

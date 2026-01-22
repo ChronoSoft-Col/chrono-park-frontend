@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { AxiosServerInstance } from "../axios-server.intance";
-import { IListCustomersParamsEntity, IListCustomersResponseEntity, CustomerRepository, ICreateCustomerParamsEntity } from "@/server/domain/index";
+import { IListCustomersParamsEntity, IListCustomersResponseEntity, CustomerRepository, ICreateCustomerParamsEntity, IUpdateCustomerParamsEntity, IUpdateCustomerResponseEntity } from "@/server/domain/index";
 import IEmptyResponse from "@/src/shared/interfaces/generic/empty-response";
 
 @injectable()
@@ -14,6 +14,12 @@ export class CustomerDatasourceService extends AxiosServerInstance implements Cu
     async createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse> {
         return this.api
             .post<IEmptyResponse>("/customers", params)
+            .then(response => response.data);
+    }
+
+    async updateCustomer(customerId: string, params: IUpdateCustomerParamsEntity): Promise<IUpdateCustomerResponseEntity> {
+        return this.api
+            .put<IUpdateCustomerResponseEntity>(`/customers/${customerId}`, params)
             .then(response => response.data);
     }
 

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EyeIcon, EyeOff, Loader2, LogIn } from "lucide-react";
+import { EyeIcon, EyeOff, LogIn } from "lucide-react";
 import { toast } from "sonner";
 
 import { loginAction } from "@/src/app/auth/actions/login.action";

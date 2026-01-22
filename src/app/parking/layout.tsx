@@ -3,7 +3,6 @@ import SidebarComponent from "@/src/shared/components/layout/sidebar.component";
 import { ChronoSidebarInset } from "@chrono/chrono-sidebar.component";
 import { PropsWithChildren } from "react";
 import { getSession } from "@/src/lib/session";
-import ChronoCustomDialog from "@chrono/chrono-custom-dialog.component";
 import FooterComponent from "@/src/shared/components/layout/footer.component";
 import ParkingProviders from "./providers";
 
@@ -21,7 +20,6 @@ export default async function ParkingLayout({ children }: PropsWithChildren) {
           <FooterComponent />
         </div>
       </ChronoSidebarInset>
-      <ChronoCustomDialog />
     </ParkingProviders>
   );
 }

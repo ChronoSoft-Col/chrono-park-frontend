@@ -44,6 +44,7 @@
 }
 
 :root {
+  --ui-scale: 1.01;
   --radius: 0.875rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.147 0.004 49.25);
@@ -79,6 +80,7 @@
 }
 
 .dark {
+  --ui-scale: 1.1;
   --background: oklch(0.147 0.004 49.25);
   --foreground: oklch(0.985 0.001 106.423);
   --card: oklch(0.216 0.006 56.043);
@@ -114,6 +116,7 @@
 
 @layer base {
   html {
+    font-size: calc(16px * var(--ui-scale, 1));
     scroll-behavior: smooth;
   }
 
