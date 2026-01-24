@@ -6,9 +6,9 @@ import { PrintRepository } from "@/client/domain/repositories/printer/print.repo
 import { IPrintRequestEntity } from "../../entities/printer/print-request.entity";
 import { IPrinterOperationEntity } from "../../entities/printer/printer-operation.entity";
 import { ENVIRONMENT } from "@/src/shared/constants/environment";
-import { IClosureEntity } from "@/src/server/domain/entities/parking/closure.entity";
+import { IClosureEntity } from "@/src/server/domain/entities/parking/closures/closure.entity";
 import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
-import type { IPrintPaymentTicketContentEntity } from "@/src/server/domain/entities/parking/print-payment-ticket-response.entity";
+import type { IPrintPaymentTicketContentEntity } from "@/src/server/domain/entities/parking/payments/response/print-payment-ticket-response.entity";
 import { printerOps } from "./printer-operations";
 
 @injectable()
@@ -226,7 +226,12 @@ export class PrintUsecase {
     } else {
       for (const [methodName, bucket] of Object.entries(summaryByMethod)) {
         this.blankLine(operations, 1);
-        this.pushLine(operations, methodName);
+
+        // Bloque por método: visualmente separado para que no parezca parte del método anterior.
+        this.strongSeparator(operations);
+        operations.push(printerOps.align("center"));
+        this.pushLine(operations, `METODO: ${this.sanitizeText(methodName).toUpperCase()}`);
+        operations.push(printerOps.align("left"));
         this.separator(operations);
         this.pushLine(operations, tableHeader);
 
@@ -244,10 +249,12 @@ export class PrintUsecase {
           }
         }
 
+        this.separator(operations);
         this.pushLine(
           operations,
           this.lr("Total metodo:", this.moneyNoCents(bucket?.total ?? "0"), this.LINE_WIDTH),
         );
+        this.strongSeparator(operations);
       }
     }
 
