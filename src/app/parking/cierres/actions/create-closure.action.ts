@@ -2,8 +2,8 @@
 
 import { serverContainer } from "@/server/di/container";
 import { ClosureUsecase } from "@/server/domain/usecases/parking/closure.usecase";
-import { ICloseClosureParamsEntity } from "@/server/domain/entities/parking/close-closure-params.entity";
-import { IClosureEntity } from "@/server/domain/entities/parking/closure.entity";
+import { ICloseClosureParamsEntity } from "@/server/domain/entities/parking/closures/params/close-closure-params.entity";
+import { IClosureEntity } from "@/server/domain/entities/parking/closures/closure.entity";
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";

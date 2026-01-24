@@ -1,6 +1,6 @@
 "use client";
 
-import { IClosureEntity } from "@/server/domain/entities/parking/closure.entity";
+import { IClosureEntity } from "@/server/domain/entities/parking/closures/closure.entity";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ChronoSectionLabel } from "@/src/shared/components/chrono-soft/chrono-section-label.component";

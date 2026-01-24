@@ -210,11 +210,11 @@ export class PrintUsecase {
     this.pushLine(operations, `Desde: ${this.formatDateTimeCO(closure.startedAt)}`);
     this.pushLine(operations, `Hasta: ${this.formatDateTimeCO(closure.finishedAt)}`);
 
-    this.strongSeparator(operations);
+    this.separator(operations);
     this.pushLine(operations, this.lr("TOTAL:", this.moneyNoCents(closure.totalCollected), this.LINE_WIDTH));
     this.strongSeparator(operations);
 
-    // Tablas (un solo separador por bloque)
+    // Tablas (un solo separador por bloque)  
     const col1 = 22;
     const col2 = 6;
     const col3 = 12;
@@ -232,7 +232,6 @@ export class PrintUsecase {
         operations.push(printerOps.align("center"));
         this.pushLine(operations, `METODO: ${this.sanitizeText(methodName).toUpperCase()}`);
         operations.push(printerOps.align("left"));
-        this.separator(operations);
         this.pushLine(operations, tableHeader);
 
         const rateEntries = Object.entries(bucket?.data ?? {});
@@ -254,7 +253,6 @@ export class PrintUsecase {
           operations,
           this.lr("Total metodo:", this.moneyNoCents(bucket?.total ?? "0"), this.LINE_WIDTH),
         );
-        this.strongSeparator(operations);
       }
     }
 

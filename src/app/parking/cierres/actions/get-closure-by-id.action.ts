@@ -4,7 +4,7 @@ import { serverContainer } from "@/server/di/container";
 import { ClosureUsecase } from "@/server/domain/usecases/parking/closure.usecase";
 import type IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import type IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
-import type { IClosureEntity } from "@/server/domain/entities/parking/closure.entity";
+import type { IClosureEntity } from "@/server/domain/entities/parking/closures/closure.entity";
 import { AxiosError } from "axios";
 import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
 

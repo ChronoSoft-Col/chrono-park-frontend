@@ -49,8 +49,8 @@ function ClosureDetailFooter({
         variant="default"
         onClick={async () => {
           showYesNoDialog({
-            title: "Reimprimir cierre",
-            description: "¿Desea reimprimir el comprobante del cierre de caja?",
+            title: "Imprimir cierre",
+            description: "¿Desea imprimir el comprobante del cierre de caja?",
             iconVariant: "warning",
             handleYes: async () => {
               const toastId = toast.loading("Enviando impresión...");
@@ -71,7 +71,7 @@ function ClosureDetailFooter({
           });
         }}
       >
-        Reimprimir
+        Imprimir
       </ChronoButton>
     </div>
   );
@@ -83,9 +83,10 @@ export default function ClosureDataListComponent({
   totalPages,
   pageSize,
 }: Props) {
-  const { openDialog, closeDialog } = UseDialogContext();
+  const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const { printClosureReceipt } = usePrint();
   const detailRequestInFlightRef = useRef(false);
+  const printRequestInFlightRef = useRef(false);
 
   const handleOpenCreateClosure = useCallback(() => {
     openDialog({
@@ -129,7 +130,50 @@ export default function ClosureDataListComponent({
     }
   }, [closeDialog, openDialog, printClosureReceipt]);
 
-  const columns = useMemo(() => createClosureColumns(handleViewDetail), [handleViewDetail]);
+  const handlePrint = useCallback((closure: IClosureListItemEntity) => {
+    if (printRequestInFlightRef.current) return;
+
+    showYesNoDialog({
+      title: "Imprimir cierre",
+      description: "Se consultará el detalle del cierre y se enviará a imprimir.",
+      iconVariant: "warning",
+      handleYes: async () => {
+        printRequestInFlightRef.current = true;
+        const toastId = toast.loading("Consultando detalle e imprimiendo...");
+        try {
+          const res = await getClosureByIdAction(closure.id);
+          if (!res.success || !res.data) {
+            toast.error(res.error || "No se pudo cargar el detalle del cierre", {
+              id: toastId,
+            });
+            return;
+          }
+
+          const printRes = await printClosureReceipt(res.data, {
+            operatorName: closure.operatorName,
+          });
+
+          if (!printRes.success) {
+            toast.error("Error al imprimir el cierre", { id: toastId });
+            return;
+          }
+
+          toast.success("Impresión enviada correctamente", { id: toastId });
+        } catch (error) {
+          console.error("Error printing closure:", error);
+          toast.error("Error inesperado al imprimir el cierre", { id: toastId });
+        } finally {
+          printRequestInFlightRef.current = false;
+        }
+      },
+      handleNo: async () => {},
+    });
+  }, [printClosureReceipt, showYesNoDialog]);
+
+  const columns = useMemo(
+    () => createClosureColumns(handleViewDetail, handlePrint),
+    [handlePrint, handleViewDetail]
+  );
 
   const safeTotalPages = Math.max(1, totalPages || Math.ceil(total / pageSize) || 1);
 

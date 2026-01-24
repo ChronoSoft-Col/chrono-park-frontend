@@ -2,7 +2,7 @@
 
 import { serverContainer } from "@/server/di/container";
 import { ClosureUsecase } from "@/server/domain/usecases/parking/closure.usecase";
-import { IListClosureResponseEntity } from "@/server/domain/entities/parking/list-closure-response.entity";
+import { IListClosureResponseEntity } from "@/server/domain/entities/parking/closures/response/list-closure-response.entity";
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";

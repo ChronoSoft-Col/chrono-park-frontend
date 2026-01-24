@@ -2,7 +2,7 @@ import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface
 import { listClosuresAction } from "../actions/list-closures.action";
 import ClosureDataListComponent from "./closure-data-list.component";
 import { resolveMetaData } from "@/src/lib/utils";
-import { IClosureListItemEntity } from "@/src/server/domain/entities/parking/closure-list-item.entity";
+import { IClosureListItemEntity } from "@/src/server/domain/entities/parking/closures/closure-list-item.entity";
 
 interface Props {
   searchParams?: IPageProps["searchParams"];

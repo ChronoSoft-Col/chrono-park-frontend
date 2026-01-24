@@ -16,7 +16,7 @@ import {
 } from "@chrono/chrono-card.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import { cn } from "@/src/lib/utils";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, Save } from "lucide-react";
 
 export default function CreateClosureDialogContent() {
   const [type, setType] = useState<ClosureTypeEnum>(ClosureTypeEnum.PARCIAL);
@@ -164,7 +164,7 @@ export default function CreateClosureDialogContent() {
         <ChronoButton variant="outline" onClick={closeDialog} disabled={isLoading}>
           Cancelar
         </ChronoButton>
-        <ChronoButton onClick={handleSubmit} loading={isLoading}>
+        <ChronoButton onClick={handleSubmit} loading={isLoading} icon={<Save/>}>
           Crear e Imprimir
         </ChronoButton>
       </div>
