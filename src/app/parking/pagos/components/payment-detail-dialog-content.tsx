@@ -2,11 +2,11 @@
 
 import * as React from "react";
 
-import type { IPaymentItemEntity } from "@/src/server/domain/entities/parking/payment-list-item.entity";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import { ChronoSeparator } from "@chrono/chrono-separator.component";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoValue } from "@chrono/chrono-value.component";
+import { IPaymentItemEntity } from "@/src/server/domain";
 
 interface Props {
   item: IPaymentItemEntity;

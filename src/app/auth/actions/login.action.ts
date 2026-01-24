@@ -3,8 +3,7 @@
 import { AxiosError } from "axios";
 
 import { serverContainer } from "@/server/di/container";
-import { LoginUseCase } from "@/server/domain/index";
-import type { ILoginParams } from "@/server/domain/entities/auth/login-params.entity";
+import { ILoginParams, LoginUseCase } from "@/server/domain/index";
 // company/permission types not used here; kept in todo for future mapping
 import type { TApplication } from "@/src/shared/types/auth/application.type";
 import type IActionResponse from "@/src/shared/interfaces/generic/action-response";

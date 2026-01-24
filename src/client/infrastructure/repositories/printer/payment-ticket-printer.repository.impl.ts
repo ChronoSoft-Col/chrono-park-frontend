@@ -2,7 +2,7 @@
 
 import "reflect-metadata";
 
-import type { IPrintPaymentTicketContentEntity } from "@/src/server/domain/entities/parking/print-payment-ticket-response.entity";
+import { IPrintPaymentTicketContentEntity } from "@/src/server/domain";
 import { PaymentTicketPrinterRepository } from "@/client/domain/repositories/printer/payment-ticket-printer.repository";
 import { PaymentTicketPrinterDatasourceService } from "@/client/infrastructure/datasources/printer/payment-ticket-printer.datasource.service";
 import { inject, injectable } from "tsyringe";

@@ -1,4 +1,4 @@
-import type { IPrintPaymentTicketContentEntity } from "@/src/server/domain/entities/parking/print-payment-ticket-response.entity";
+import { IPrintPaymentTicketContentEntity } from "@/src/server/domain";
 
 export abstract class PaymentTicketPrinterRepository {
   abstract printPaymentTicket(ticket: IPrintPaymentTicketContentEntity): Promise<boolean>;

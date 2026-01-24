@@ -5,6 +5,7 @@ import { usePaymentContext } from "@/src/shared/context/payment.context";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoValue } from "@chrono/chrono-value.component";
+import type { IAmountDetailEntity } from "@/server/domain";
 import LabelValueComponent from "@/src/app/parking/cobro/components/label-value.component";
 import {
     ChronoCard,
@@ -46,10 +47,25 @@ type QrDetailSectionProps = {
     className?: string;
 };
 
+type QrAmountDetail = Pick<
+    IAmountDetailEntity,
+    | "entryTime"
+    | "exitTime"
+    | "durationMinutes"
+    | "durationFormatted"
+    | "calculatedAmount"
+    | "discountPercentage"
+    | "finalAmount"
+    | "rateProfileName"
+    | "agreementName"
+    | "appliedRules"
+    | "gracePeriodMinutes"
+>;
+
 export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
     const { validateRaw } = usePaymentContext();
 
-    const detail = validateRaw?.data;
+    const detail: QrAmountDetail | null = validateRaw?.data ?? null;
 
     if (!detail) {
         return (

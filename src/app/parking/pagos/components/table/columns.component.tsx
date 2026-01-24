@@ -4,8 +4,8 @@ import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component"
 import ChronoButton from "@chrono/chrono-button.component";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
 import { Eye, Printer } from "lucide-react";
+import { IPaymentItemEntity } from "@/src/server/domain";
 
-import type { IPaymentItemEntity } from "@/src/server/domain/entities/parking/payment-list-item.entity";
 
 const formatDateTime = (value?: string) => {
   if (!value) return "-";

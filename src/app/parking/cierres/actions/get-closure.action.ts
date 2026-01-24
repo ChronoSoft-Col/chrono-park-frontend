@@ -2,11 +2,11 @@
 
 import { serverContainer } from "@/server/di/container";
 import { ClosureUsecase } from "@/server/domain/usecases/parking/closure.usecase";
-import { IClosureEntity } from "@/server/domain/entities/parking/closure.entity";
 import IActionResponse from "@/src/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";
 import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
+import { IClosureEntity } from "@/src/server/domain";
 
 export async function getClosureByIdAction(
   id: string

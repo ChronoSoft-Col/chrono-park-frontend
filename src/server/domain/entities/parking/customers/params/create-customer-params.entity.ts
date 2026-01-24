@@ -1,4 +1,4 @@
-import { ICustomerEntity, ICustomerVehicleEntity } from "./customer.entity";
+import { ICustomerEntity, ICustomerVehicleEntity } from "../customer.entity";
 
 export interface ICreateCustomerParamsEntity 
     extends Pick<ICustomerEntity, "documentNumber" | "firstName" | "lastName" | "agreementId" | "email" | "phoneNumber">

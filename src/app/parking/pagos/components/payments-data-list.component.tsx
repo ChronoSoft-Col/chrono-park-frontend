@@ -10,10 +10,10 @@ import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 
-import type { IPaymentItemEntity } from "@/src/server/domain/entities/parking/payment-list-item.entity";
 import { createPaymentColumns } from "./table/columns.component";
 import { PaymentDetailDialogContent } from "./payment-detail-dialog-content";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
+import { IPaymentItemEntity } from "@/src/server/domain";
 
 interface Props {
   items: IPaymentItemEntity[];
