@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ValidateFeeForm, ValidateFeeSchema } from "@/src/shared/schemas/parking/validate-fee.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,7 +29,7 @@ type QrSectionProps = {
 };
 
 export function QrSectionComponent({ className }: QrSectionProps) {
-  const { validateFee, clearValidateResult } = usePaymentContext();
+  const { validateFee, clearValidateResult, validateRaw } = usePaymentContext();
 
   const onValidateFee = async (data: IValidateAmountParamsEntity) => {
     clearValidateResult();
@@ -44,7 +45,11 @@ export function QrSectionComponent({ className }: QrSectionProps) {
           <ChronoCardTitle className="text-lg font-semibold">Validar tarifa</ChronoCardTitle>
           <ChronoCardDescription>Escanea el QR para validar la tarifa de parqueo</ChronoCardDescription>
         </ChronoCardHeader>
-        <QrFormComponent onValidateFee={onValidateFee} onClear={clearValidateResult} />
+        <QrFormComponent 
+          onValidateFee={onValidateFee} 
+          onClear={clearValidateResult}
+          validatedPlate={validateRaw?.data?.vehicle?.licensePlate}
+        />
       </ChronoCardContent>
     </ChronoCard>
   );
@@ -52,11 +57,15 @@ export function QrSectionComponent({ className }: QrSectionProps) {
 
 function QrFormComponent({
   onValidateFee,
-  onClear
+  onClear,
+  validatedPlate,
 }: {
   onValidateFee: (data: IValidateAmountParamsEntity) => Promise<boolean>;
   onClear: () => void;
+  validatedPlate?: string;
 }) {
+  const isUpdatingFromServerRef = useRef(false);
+
   const validateFeeForm = useForm<ValidateFeeForm>({
     resolver: zodResolver(ValidateFeeSchema),
     defaultValues: {
@@ -66,7 +75,25 @@ function QrFormComponent({
     },
   });
 
+  // Actualizar el campo de placa cuando el servidor devuelve la placa validada
+  useEffect(() => {
+    if (validatedPlate) {
+      const currentPlate = validateFeeForm.getValues("licensePlate");
+      if (currentPlate !== validatedPlate) {
+        isUpdatingFromServerRef.current = true;
+        validateFeeForm.setValue("licensePlate", validatedPlate, { shouldValidate: false });
+        // Reset del flag después de un pequeño delay para evitar el debounce
+        setTimeout(() => {
+          isUpdatingFromServerRef.current = false;
+        }, 50);
+      }
+    }
+  }, [validatedPlate, validateFeeForm]);
+
   const handleFormChange = useDebouncedCallback(async () => {
+    // Evitar revalidar si el cambio viene del servidor
+    if (isUpdatingFromServerRef.current) return;
+
     const values = validateFeeForm.getValues();
     const hasQr = Boolean(values.parkingSessionId?.trim());
     const hasPlate = Boolean(values.licensePlate?.trim());
