@@ -1,16 +1,14 @@
 "use server";
 
-import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
-import { buildSearchParams } from "@/src/lib/search-params";
-import { serverContainer } from "@/src/server/di/container";
-import {
-  CustomerUsecase,
-  IListCustomersResponseEntity,
-} from "@/src/server/domain";
-import { DEFAULT_LIMIT, DEFAULT_PAGE } from "@/src/shared/constants/pagination";
-import IActionResponse from "@/src/shared/interfaces/generic/action-response";
-import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
-import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface";
+import { rethrowNextNavigationErrors } from "@/lib/next-navigation-errors";
+import { buildSearchParams } from "@/lib/search-params";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
+import { serverContainer } from "@/server/di/container";
+import { CustomerUsecase, IListCustomersResponseEntity } from "@/server/domain";
+import { DEFAULT_LIMIT, DEFAULT_PAGE } from "@/shared/constants/pagination";
+import IActionResponse from "@/shared/interfaces/generic/action-response";
+import IErrorResponse from "@/shared/interfaces/generic/error-response.interface";
+import { IPageProps } from "@/shared/interfaces/generic/page-props.interface";
 import { AxiosError } from "axios";
 import z from "zod";
 
@@ -27,7 +25,7 @@ export default async function listCustomersAction(
 ): listCustomersActionResponse {
   try {
     const params = buildSearchParams(customerSearchParamsSchema, searchParams);
-    const useCase = serverContainer.resolve(CustomerUsecase);
+    const useCase = serverContainer.resolve<CustomerUsecase>(SERVER_TOKENS.CustomerUsecase);
     const response = await useCase.listCustomers(params);
     console.log("Customers fetched with params:", params);
     return { success: true, data: response };

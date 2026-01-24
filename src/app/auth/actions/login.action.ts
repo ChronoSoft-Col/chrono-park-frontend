@@ -5,13 +5,14 @@ import { AxiosError } from "axios";
 import { serverContainer } from "@/server/di/container";
 import { ILoginParams, LoginUseCase } from "@/server/domain/index";
 // company/permission types not used here; kept in todo for future mapping
-import type { TApplication } from "@/src/shared/types/auth/application.type";
-import type IActionResponse from "@/src/shared/interfaces/generic/action-response";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
+import type { TApplication } from "@/shared/types/auth/application.type";
+import type IActionResponse from "@/shared/interfaces/generic/action-response";
 // TUser is not used directly here
-import type { SessionTokens, SessionUser } from "@/src/shared/types/auth/session.type";
-import type IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
-import { createSession } from "@/src/lib/session";
-import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
+import type { SessionTokens, SessionUser } from "@/shared/types/auth/session.type";
+import type IErrorResponse from "@/shared/interfaces/generic/error-response.interface";
+import { createSession } from "@/lib/session";
+import { rethrowNextNavigationErrors } from "@/lib/next-navigation-errors";
 
 export type LoginActionResult = {
   user: SessionUser;
@@ -30,7 +31,7 @@ export async function loginAction(
   params: ILoginParams
 ): Promise<IActionResponse<LoginActionResult>> {
   try {
-    const useCase = serverContainer.resolve(LoginUseCase);
+    const useCase = serverContainer.resolve<LoginUseCase>(SERVER_TOKENS.LoginUseCase);
     const response = await useCase.execute(params);
 
     if (!response.success || !response.data) {

@@ -1,16 +1,17 @@
 'use server'
 
 import { IValidateAmountParamsEntity, IValidateAmountResponseEntity, PaymentUsecase } from "@/server/domain/index";
-import { serverContainer } from "@/src/server/di/container";
-import IActionResponse from "@/src/shared/interfaces/generic/action-response";
-import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
+import { serverContainer } from "@/server/di/container";
+import IActionResponse from "@/shared/interfaces/generic/action-response";
+import IErrorResponse from "@/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";
-import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
+import { rethrowNextNavigationErrors } from "@/lib/next-navigation-errors";
 
 export async function validateFeeAction(params: IValidateAmountParamsEntity): Promise<IActionResponse<IValidateAmountResponseEntity>> {
     try {
         console.log("validateFeeAction params:", params);
-        const useCase = serverContainer.resolve(PaymentUsecase);
+        const useCase = serverContainer.resolve<PaymentUsecase>(SERVER_TOKENS.PaymentUsecase);
         const response = await useCase.validateFee(params);
         return {
             data: response,

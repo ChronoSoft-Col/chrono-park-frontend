@@ -3,10 +3,11 @@
 import { useCallback } from "react";
 import { PrintUsecase } from "@/client/domain/usecases/printer/print.usecase";
 import { clientContainer } from "@/client/di/container";
+import { CLIENT_TOKENS } from "@/client/di/client-tokens";
 import IActionResponse from "../../interfaces/generic/action-response";
 import { IClosureEntity } from "@/server/domain/entities/parking/closures/closure.entity";
-import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
-import { getPaymentPrintTicketAction } from "@/src/app/parking/cobro/actions/get-payment-print-ticket.action";
+import { TPrintIncomeBody } from "@/shared/types/parking/print-income-body.type";
+import { getPaymentPrintTicketAction } from "@/app/parking/cobro/actions/get-payment-print-ticket.action";
 
 export function usePrint() {
   const isUuidV4 = (value: string) =>
@@ -18,7 +19,7 @@ export function usePrint() {
       options?: { operatorName?: string }
     ): Promise<IActionResponse<boolean>> => {
     try {
-      const useCase = clientContainer.resolve(PrintUsecase);
+      const useCase = clientContainer.resolve<PrintUsecase>(CLIENT_TOKENS.PrintUsecase);
       const result = await useCase.printClosureReceipt(closure, options);
       return {
         success: result,
@@ -35,7 +36,7 @@ export function usePrint() {
 
   const printIncomeReceipt = useCallback(async (body: TPrintIncomeBody): Promise<IActionResponse<boolean>> => {
     try {
-      const useCase = clientContainer.resolve(PrintUsecase);
+      const useCase = clientContainer.resolve<PrintUsecase>(CLIENT_TOKENS.PrintUsecase);
       const result = await useCase.printIncomeReceipt(body);
       return {
         success: result,
@@ -78,7 +79,7 @@ export function usePrint() {
           };
         }
 
-        const useCase = clientContainer.resolve(PrintUsecase);
+  const useCase = clientContainer.resolve<PrintUsecase>(CLIENT_TOKENS.PrintUsecase);
         const printed = await useCase.printTransactionReceipt(ticketRes.data.data);
 
         return {

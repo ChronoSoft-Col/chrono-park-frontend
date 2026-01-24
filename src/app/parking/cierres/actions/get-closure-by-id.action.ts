@@ -2,15 +2,16 @@
 
 import { serverContainer } from "@/server/di/container";
 import { ClosureUsecase } from "@/server/domain/usecases/parking/closure.usecase";
-import type IActionResponse from "@/src/shared/interfaces/generic/action-response";
-import type IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
+import type IActionResponse from "@/shared/interfaces/generic/action-response";
+import type IErrorResponse from "@/shared/interfaces/generic/error-response.interface";
 import type { IClosureEntity } from "@/server/domain/entities/parking/closures/closure.entity";
 import { AxiosError } from "axios";
-import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
+import { rethrowNextNavigationErrors } from "@/lib/next-navigation-errors";
 
 export async function getClosureByIdAction(id: string): Promise<IActionResponse<IClosureEntity>> {
   try {
-    const closureUsecase = serverContainer.resolve(ClosureUsecase);
+    const closureUsecase = serverContainer.resolve<ClosureUsecase>(SERVER_TOKENS.ClosureUsecase);
     const result = await closureUsecase.getClosureById(id);
 
     return {

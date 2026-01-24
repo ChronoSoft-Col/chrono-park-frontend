@@ -2,15 +2,16 @@
 
 import { serverContainer } from "@/server/di/container";
 import { IGeneratePaymentParamsEntity, IGeneratePaymentResponseEntity, PaymentUsecase } from "@/server/domain/index";
-import IActionResponse from "@/src/shared/interfaces/generic/action-response";
-import IErrorResponse from "@/src/shared/interfaces/generic/error-response.interface";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
+import IActionResponse from "@/shared/interfaces/generic/action-response";
+import IErrorResponse from "@/shared/interfaces/generic/error-response.interface";
 import { AxiosError } from "axios";
-import { rethrowNextNavigationErrors } from "@/src/lib/next-navigation-errors";
+import { rethrowNextNavigationErrors } from "@/lib/next-navigation-errors";
 
 export async function generatePaymentAction(params: IGeneratePaymentParamsEntity): Promise<IActionResponse<IGeneratePaymentResponseEntity>> {
     try {
         console.log("generatePaymentAction params:", params);
-        const useCase = serverContainer.resolve(PaymentUsecase);
+        const useCase = serverContainer.resolve<PaymentUsecase>(SERVER_TOKENS.PaymentUsecase);
         const response = await useCase.generatePayment(params);
         
         console.log("generatePaymentAction response:", response);
