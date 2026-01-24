@@ -1,4 +1,5 @@
 import { inject, injectable } from "tsyringe";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
 
 import {
     IGeneratePaymentParamsEntity,
@@ -14,7 +15,7 @@ import {
 @injectable()
 export class PaymentUsecase implements PaymentRepository{
     constructor(
-        @inject("PaymentRepository") private paymentRepository: PaymentRepository
+        @inject(SERVER_TOKENS.PaymentRepository) private paymentRepository: PaymentRepository
     ) {}
 
     validateFee(params: IValidateAmountParamsEntity): Promise<IValidateAmountResponseEntity> {

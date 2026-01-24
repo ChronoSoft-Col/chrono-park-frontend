@@ -1,14 +1,15 @@
 import { inject, injectable } from "tsyringe";
-import IGeneralResponse from "@/src/shared/interfaces/generic/general-response.interface";
-import { EServices } from "@/src/shared/enums/common/services.enum";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
+import IGeneralResponse from "@/shared/interfaces/generic/general-response.interface";
+import { EServices } from "@/shared/enums/common/services.enum";
 import { CommonDatasourceService } from "@/server/infrastructure/index";
-import { TRateProfile } from "@/src/shared/types/common/rate-profile.type";
-import { CommonRepository } from "@/src/server/domain";
+import { TRateProfile } from "@/shared/types/common/rate-profile.type";
+import { CommonRepository } from "@/server/domain";
 
 @injectable()
 export class CommonRepositoryImp implements CommonRepository {
   constructor(
-    @inject("CommonDatasourceService")
+    @inject(SERVER_TOKENS.CommonDatasourceService)
     private readonly ds: CommonDatasourceService
   ) {}
 

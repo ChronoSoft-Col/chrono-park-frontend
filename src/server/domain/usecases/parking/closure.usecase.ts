@@ -1,4 +1,5 @@
 import { injectable, inject } from "tsyringe";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
 
 import {
   ClosureRepository,
@@ -11,7 +12,7 @@ import {
 
 @injectable()
 export class ClosureUsecase {
-  constructor(@inject("ClosureRepository") private closureRepository: ClosureRepository) {}
+  constructor(@inject(SERVER_TOKENS.ClosureRepository) private closureRepository: ClosureRepository) {}
 
   async createClosure(params: ICloseClosureParamsEntity): Promise<IClosureEntity> {
     return this.closureRepository.createClosure(params);

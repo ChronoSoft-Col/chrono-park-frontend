@@ -1,4 +1,5 @@
 import { inject, injectable } from "tsyringe";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
 
 import {
   IListInOutParamsEntity,
@@ -10,7 +11,7 @@ import { InOutDatasourceService } from "@/server/infrastructure/index";
 @injectable()
 export class InOutRepositoryImp implements InOutRepository {
   constructor(
-    @inject("InOutDatasourceService")
+    @inject(SERVER_TOKENS.InOutDatasourceService)
     private readonly inOutDatasource: InOutDatasourceService
   ) {}
 

@@ -1,4 +1,5 @@
 import { inject, injectable } from "tsyringe";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
 import {
     IGeneratePaymentParamsEntity,
     IGeneratePaymentResponseEntity,
@@ -15,7 +16,7 @@ import { PaymentDatasourceService } from "@/server/infrastructure/index";
 export class PaymentRepositoryImp implements PaymentRepository {
 
     constructor(
-        @inject("PaymentDatasourceService")
+        @inject(SERVER_TOKENS.PaymentDatasourceService)
         private paymentDatasourceService: PaymentDatasourceService
     ){}
 

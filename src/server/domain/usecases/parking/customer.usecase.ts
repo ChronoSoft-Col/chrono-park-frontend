@@ -1,4 +1,5 @@
 import { inject, injectable } from "tsyringe";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
 import {
     IListCustomersParamsEntity,
     IListCustomersResponseEntity,
@@ -7,11 +8,11 @@ import {
     IUpdateCustomerParamsEntity,
     IUpdateCustomerResponseEntity
 } from "@/server/domain";
-import IEmptyResponse from "@/src/shared/interfaces/generic/empty-response";
+import IEmptyResponse from "@/shared/interfaces/generic/empty-response";
 
 @injectable()
 export class CustomerUsecase implements CustomerRepository {
-    constructor(@inject("CustomerRepository") private readonly customerRepository: CustomerRepository) {}
+    constructor(@inject(SERVER_TOKENS.CustomerRepository) private readonly customerRepository: CustomerRepository) {}
 
     listCustomers(params: IListCustomersParamsEntity): Promise<IListCustomersResponseEntity> {
         return this.customerRepository.listCustomers(params);

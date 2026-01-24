@@ -1,13 +1,14 @@
 import { inject, injectable } from "tsyringe";
-import IGeneralResponse from "@/src/shared/interfaces/generic/general-response.interface";
-import { EServices } from "@/src/shared/enums/common/services.enum";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
+import IGeneralResponse from "@/shared/interfaces/generic/general-response.interface";
+import { EServices } from "@/shared/enums/common/services.enum";
 import { CommonRepository } from "@/server/domain/index";
-import { TRateProfile } from "@/src/shared/types/common/rate-profile.type";
+import { TRateProfile } from "@/shared/types/common/rate-profile.type";
 
 @injectable()
 export class CommonUsecase implements CommonRepository {
   constructor(
-    @inject("CommonRepository")
+    @inject(SERVER_TOKENS.CommonRepository)
     private readonly commonRepository: CommonRepository
   ) {}
 

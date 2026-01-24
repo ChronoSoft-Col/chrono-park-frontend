@@ -4,11 +4,12 @@ import { PrintRepository } from "@/client/domain/repositories/printer/print.repo
 import { IPrintRequestEntity } from "@/client/domain/entities/printer/print-request.entity";
 import { PrintDatasourceService } from "@/client/infrastructure/datasources/printer/print-datasource.service";
 import { inject, injectable } from "tsyringe";
+import { CLIENT_TOKENS } from "@/client/di/client-tokens";
 
 @injectable()
 export class PrintRepositoryImpl implements PrintRepository {
   constructor(
-    @inject("PrintDatasourceService")
+    @inject(CLIENT_TOKENS.PrintDatasourceService)
     private printDatasource: PrintDatasourceService
   ) {}
 

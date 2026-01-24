@@ -2,18 +2,19 @@
 
 import "reflect-metadata";
 import { injectable, inject } from "tsyringe";
+import { CLIENT_TOKENS } from "@/client/di/client-tokens";
 import { PrintRepository } from "@/client/domain/repositories/printer/print.repository";
 import { IPrintRequestEntity } from "../../entities/printer/print-request.entity";
 import { IPrinterOperationEntity } from "../../entities/printer/printer-operation.entity";
-import { ENVIRONMENT } from "@/src/shared/constants/environment";
-import { IClosureEntity } from "@/src/server/domain/entities/parking/closures/closure.entity";
-import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
-import type { IPrintPaymentTicketContentEntity } from "@/src/server/domain/entities/parking/payments/response/print-payment-ticket-response.entity";
+import { ENVIRONMENT } from "@/shared/constants/environment";
+import { IClosureEntity } from "@/server/domain/entities/parking/closures/closure.entity";
+import { TPrintIncomeBody } from "@/shared/types/parking/print-income-body.type";
+import type { IPrintPaymentTicketContentEntity } from "@/server/domain/entities/parking/payments/response/print-payment-ticket-response.entity";
 import { printerOps } from "./printer-operations";
 
 @injectable()
 export class PrintUsecase {
-  constructor(@inject("PrintRepository") private printRepository: PrintRepository) {}
+  constructor(@inject(CLIENT_TOKENS.PrintRepository) private printRepository: PrintRepository) {}
 
   // -----------------------------
   // Constants

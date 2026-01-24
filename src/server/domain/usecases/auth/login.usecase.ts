@@ -1,11 +1,12 @@
 
 import { injectable, inject } from "tsyringe";
 
-import { ILoginParams, ILoginResponse, LoginRepository } from "@/server/domain/index";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
+import { ILoginParams, ILoginResponse, LoginRepository } from "@/server/domain";
 
 @injectable()
 export class LoginUseCase{
-    constructor(@inject("LoginRepository") private loginRepository: LoginRepository){}
+    constructor(@inject(SERVER_TOKENS.LoginRepository) private loginRepository: LoginRepository){}
 
     async execute(params: ILoginParams): Promise<ILoginResponse>{
         return this.loginRepository.login(params);

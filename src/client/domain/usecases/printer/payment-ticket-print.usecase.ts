@@ -2,14 +2,15 @@
 
 import "reflect-metadata";
 
-import { IPrintPaymentTicketContentEntity } from "@/src/server/domain";
+import { IPrintPaymentTicketContentEntity } from "@/server/domain";
 import { PaymentTicketPrinterRepository } from "@/client/domain/repositories/printer/payment-ticket-printer.repository";
 import { inject, injectable } from "tsyringe";
+import { CLIENT_TOKENS } from "@/client/di/client-tokens";
 
 @injectable()
 export class PaymentTicketPrintUsecase {
   constructor(
-    @inject("PaymentTicketPrinterRepository")
+    @inject(CLIENT_TOKENS.PaymentTicketPrinterRepository)
     private paymentTicketPrinterRepository: PaymentTicketPrinterRepository,
   ) {}
 

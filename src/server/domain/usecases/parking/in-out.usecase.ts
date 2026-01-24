@@ -1,4 +1,5 @@
 import { inject, injectable } from "tsyringe";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
 
 import {
   IListInOutParamsEntity,
@@ -9,7 +10,7 @@ import {
 @injectable()
 export class InOutUsecase implements InOutRepository {
   constructor(
-    @inject("InOutRepository")
+    @inject(SERVER_TOKENS.InOutRepository)
     private readonly inOutRepository: InOutRepository
   ) {}
 
