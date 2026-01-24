@@ -130,7 +130,7 @@ export function ChronoDateTimePicker({
   return (
     <ChronoPopover
       open={isOpen}
-      onOpenChange={(open) => !disabled && setIsOpen(open)}
+      onOpenChange={(open: boolean) => !disabled && setIsOpen(open)}
     >
       <ChronoPopoverTrigger asChild>
         <ChronoButton
