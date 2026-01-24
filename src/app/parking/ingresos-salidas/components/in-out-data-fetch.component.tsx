@@ -1,8 +1,8 @@
-import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface";
+import { IPageProps } from "@/shared/interfaces/generic/page-props.interface";
 import { getInOutsAction } from "../actions/get-in-out.action";
 import InOutDataListComponent from "./in-out-data-list.component";
-import { resolveMetaData } from "@/src/lib/utils";
-import { IInOutEntity } from "@/src/server/domain";
+import { resolveMetaData } from "@/lib/utils";
+import { IInOutEntity } from "@/server/domain";
 
 interface Props {
   searchParams?: IPageProps["searchParams"];

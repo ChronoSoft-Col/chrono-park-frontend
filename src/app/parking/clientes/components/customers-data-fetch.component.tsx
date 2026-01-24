@@ -1,8 +1,8 @@
-import { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface";
+import { IPageProps } from "@/shared/interfaces/generic/page-props.interface";
 import CustomersDataListComponent from "./customers-data-list.component";
-import { resolveMetaData } from "@/src/lib/utils";
+import { resolveMetaData } from "@/lib/utils";
 import listCustomersAction from "../actions/list-customers.action";
-import { ICustomerEntity } from "@/src/server/domain";
+import { ICustomerEntity } from "@/server/domain";
 
 interface Props {
   searchParams?: IPageProps["searchParams"];

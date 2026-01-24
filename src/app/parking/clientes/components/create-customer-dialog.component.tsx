@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { createCustomerAction } from "../actions/create-customer.action";
-import { UseDialogContext } from "@/src/shared/context/dialog.context";
-import type { ICreateCustomerParamsEntity } from "@/src/server/domain";
-import { CreateCustomerForm, CreateCustomerSchema } from "@/src/shared/schemas/parking/create-customer.schema";
+import { UseDialogContext } from "@/shared/context/dialog.context";
+import type { ICreateCustomerParamsEntity } from "@/server/domain";
+import { CreateCustomerForm, CreateCustomerSchema } from "@/shared/schemas/parking/create-customer.schema";
 
 import { CreateCustomerFormComponent } from "./create-customer-form.component";
 

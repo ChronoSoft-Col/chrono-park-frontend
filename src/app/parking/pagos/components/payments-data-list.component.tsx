@@ -5,15 +5,15 @@ import * as React from "react";
 import { ChronoDataTable } from "@chrono/chrono-data-table.component";
 import { ChronoPaginator } from "@chrono/chrono-paginator.component";
 import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout.component";
-import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
-import { UseDialogContext } from "@/src/shared/context/dialog.context";
+import ChronoButton from "@chrono/chrono-button.component";
+import { UseDialogContext } from "@/shared/context/dialog.context";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 
 import { createPaymentColumns } from "./table/columns.component";
 import { PaymentDetailDialogContent } from "./payment-detail-dialog-content";
-import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
-import { IPaymentItemEntity } from "@/src/server/domain";
+import { usePrint } from "@/shared/hooks/common/use-print.hook";
+import { IPaymentItemEntity } from "@/server/domain";
 
 interface Props {
   items: IPaymentItemEntity[];

@@ -1,9 +1,9 @@
-import type { IPageProps } from "@/src/shared/interfaces/generic/page-props.interface";
-import { resolveMetaData } from "@/src/lib/utils";
+import type { IPageProps } from "@/shared/interfaces/generic/page-props.interface";
+import { resolveMetaData } from "@/lib/utils";
 
 import { listPaymentsAction } from "../actions/list-payments.action";
 import PaymentsDataListComponent from "./payments-data-list.component";
-import { IPaymentItemEntity } from "@/src/server/domain";
+import { IPaymentItemEntity } from "@/server/domain";
 
 interface Props {
   searchParams?: IPageProps["searchParams"];

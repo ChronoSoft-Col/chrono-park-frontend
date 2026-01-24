@@ -2,9 +2,9 @@
 
 import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
 import ChronoButton from "@chrono/chrono-button.component";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip";
 import { Eye, Printer } from "lucide-react";
-import { IPaymentItemEntity } from "@/src/server/domain";
+import { IPaymentItemEntity } from "@/server/domain";
 
 
 const formatDateTime = (value?: string) => {

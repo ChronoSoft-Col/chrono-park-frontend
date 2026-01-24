@@ -1,8 +1,8 @@
 import { injectable } from "tsyringe";
 import { ClosureRepository } from "@/server/domain/repositories/parking/closure.repository";
 import { AxiosServerInstance } from "../axios-server.intance";
-import type IGeneralResponse from "@/src/shared/interfaces/generic/general-response.interface";
-import { ICloseClosureParamsEntity, IClosureEntity, IListClosureParamsEntity, IListClosureResponseEntity } from "@/src/server/domain";
+import type IGeneralResponse from "@/shared/interfaces/generic/general-response.interface";
+import { ICloseClosureParamsEntity, IClosureEntity, IListClosureParamsEntity, IListClosureResponseEntity } from "@/server/domain";
 
 @injectable()
 export class ClosureDatasourceService extends AxiosServerInstance implements ClosureRepository {

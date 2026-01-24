@@ -6,7 +6,7 @@ import { ChronoBadge } from "@chrono/chrono-badge.component";
 import { ChronoSeparator } from "@chrono/chrono-separator.component";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoValue } from "@chrono/chrono-value.component";
-import { IPaymentItemEntity } from "@/src/server/domain";
+import { IPaymentItemEntity } from "@/server/domain";
 
 interface Props {
   item: IPaymentItemEntity;

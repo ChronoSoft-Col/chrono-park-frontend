@@ -1,4 +1,4 @@
-import { ILoginParams, ILoginResponse, LoginRepository } from "@/src/server/domain";
+import { ILoginParams, ILoginResponse, LoginRepository } from "@/server/domain";
 import { AxiosServerInstance } from "../axios-server.intance";
 
 import { injectable } from "tsyringe";

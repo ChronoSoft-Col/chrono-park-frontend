@@ -1,6 +1,6 @@
 "use client";
 
-import { getRateProfileAction } from "@/src/app/global-actions/get-common.action";
+import { getRateProfileAction } from "@/app/global-actions/get-common.action";
 import { ChronoDateTimePicker } from "@chrono/chrono-date-time-picker.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import ChronoButton from "@chrono/chrono-button.component";
@@ -26,20 +26,20 @@ import {
   ChronoSelectValue,
 } from "@chrono/chrono-select.component";
 import ChronoVehicleTypeSelect from "@chrono/chrono-vehicle-type-select.component";
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonContext } from "@/shared/context/common.context";
 import {
   ManualIncomeForm,
   ManualIncomeSchema,
-} from "@/src/shared/schemas/parking/manual-income.schema";
-import { TRateProfile } from "@/src/shared/types/common/rate-profile.type";
-import { TVehicleType } from "@/src/shared/types/common/vehicle-types.type";
+} from "@/shared/schemas/parking/manual-income.schema";
+import { TRateProfile } from "@/shared/types/common/rate-profile.type";
+import { TVehicleType } from "@/shared/types/common/vehicle-types.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { generateManualIncomeAction } from "../actions/generate-manual-income.action";
-import { IGenerateManualIncomeParamsEntity } from "@/src/server/domain";
+import { IGenerateManualIncomeParamsEntity } from "@/server/domain";
 
 export default function ManualIncomeFormComponent() {
   const { vehicleTypes } = useCommonContext();
