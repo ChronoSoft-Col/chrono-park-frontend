@@ -362,7 +362,6 @@ export class PrintUsecase {
     operations.push(
       printerOps.qrSized(10, this.sanitizeText(body.parkingSessionId)),
     );
-    this.pushLine(operations, "Con este QR pagas y sales");
 
     operations.push(printerOps.align("left"));
 
