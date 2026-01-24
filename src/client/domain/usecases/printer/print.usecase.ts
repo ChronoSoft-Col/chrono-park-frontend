@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import "reflect-metadata";
 import { injectable, inject } from "tsyringe";
@@ -14,7 +14,10 @@ import { printerOps } from "./printer-operations";
 
 @injectable()
 export class PrintUsecase {
-  constructor(@inject(CLIENT_TOKENS.PrintRepository) private printRepository: PrintRepository) {}
+  constructor(
+    @inject(CLIENT_TOKENS.PrintRepository)
+    private printRepository: PrintRepository,
+  ) {}
 
   // -----------------------------
   // Constants
@@ -46,7 +49,8 @@ export class PrintUsecase {
 
     const pushChunked = (v: string) => {
       if (v.length <= maxWidth) return lines.push(v);
-      for (let i = 0; i < v.length; i += maxWidth) lines.push(v.slice(i, i + maxWidth));
+      for (let i = 0; i < v.length; i += maxWidth)
+        lines.push(v.slice(i, i + maxWidth));
     };
 
     for (const w of words) {
@@ -74,9 +78,10 @@ export class PrintUsecase {
   private formatDateTimeCO(value?: string | null): string {
     if (!value) return "-";
     try {
-      return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium", timeStyle: "short" }).format(
-        new Date(value),
-      );
+      return new Intl.DateTimeFormat("es-CO", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(new Date(value));
     } catch {
       return "-";
     }
@@ -90,7 +95,9 @@ export class PrintUsecase {
     if (typeof raw === "number") return Number.isFinite(raw) ? raw : null;
 
     // Mantener solo dígitos, coma, punto y signo
-    let s = String(raw).trim().replace(/[^\d.,-]/g, "");
+    let s = String(raw)
+      .trim()
+      .replace(/[^\d.,-]/g, "");
     if (!s) return null;
 
     const hasDot = s.includes(".");
@@ -169,11 +176,14 @@ export class PrintUsecase {
   ): Promise<boolean> {
     const operations: IPrinterOperationEntity[] = [];
 
-    type MethodBucket = { total: string; data: Record<string, { total: string; count: number }> };
+    type MethodBucket = {
+      total: string;
+      data: Record<string, { total: string; count: number }>;
+    };
     type SummaryByMethod = Record<string, MethodBucket>;
     type RateSummary = Record<string, { total: string; count: number }>;
 
-    const parseJsonMaybe = <T,>(value: unknown): T | null => {
+    const parseJsonMaybe = <T>(value: unknown): T | null => {
       if (!value) return null;
       if (typeof value === "object") return value as T;
       if (typeof value !== "string") return null;
@@ -184,8 +194,12 @@ export class PrintUsecase {
       }
     };
 
-    const summaryByMethod = parseJsonMaybe<SummaryByMethod>(closure.detail?.summary);
-    const rateSummary = parseJsonMaybe<RateSummary>(closure.detail?.rateSummary);
+    const summaryByMethod = parseJsonMaybe<SummaryByMethod>(
+      closure.detail?.summary,
+    );
+    const rateSummary = parseJsonMaybe<RateSummary>(
+      closure.detail?.rateSummary,
+    );
 
     // Layout (menos separadores)
     operations.push(printerOps.feed(2));
@@ -196,26 +210,49 @@ export class PrintUsecase {
     this.strongSeparator(operations);
 
     operations.push(printerOps.align("left"));
-    this.pushLine(operations, `Tipo: ${closure.closureType === "PARCIAL" ? "Parcial" : "Total"}`);
-    this.pushLine(operations, `Creado: ${this.formatDateTimeCO(closure.createdOn)}`);
+    this.pushLine(
+      operations,
+      `Tipo: ${closure.closureType === "PARCIAL" ? "Parcial" : "Total"}`,
+    );
+    this.pushLine(
+      operations,
+      `Creado: ${this.formatDateTimeCO(closure.createdOn)}`,
+    );
     if (options?.operatorName) {
-      this.wrapText(`Operador: ${options.operatorName}`, this.LINE_WIDTH).forEach((l) =>
-        this.pushLine(operations, l),
-      );
+      this.wrapText(
+        `Operador: ${options.operatorName}`,
+        this.LINE_WIDTH,
+      ).forEach((l) => this.pushLine(operations, l));
     }
     if (closure.detail?.recordedAt) {
-      this.pushLine(operations, `Registrado: ${this.formatDateTimeCO(closure.detail.recordedAt)}`);
+      this.pushLine(
+        operations,
+        `Registrado: ${this.formatDateTimeCO(closure.detail.recordedAt)}`,
+      );
     }
 
     this.blankLine(operations, 1);
-    this.pushLine(operations, `Desde: ${this.formatDateTimeCO(closure.startedAt)}`);
-    this.pushLine(operations, `Hasta: ${this.formatDateTimeCO(closure.finishedAt)}`);
+    this.pushLine(
+      operations,
+      `Desde: ${this.formatDateTimeCO(closure.startedAt)}`,
+    );
+    this.pushLine(
+      operations,
+      `Hasta: ${this.formatDateTimeCO(closure.finishedAt)}`,
+    );
 
     this.separator(operations);
-    this.pushLine(operations, this.lr("TOTAL:", this.moneyNoCents(closure.totalCollected), this.LINE_WIDTH));
+    this.pushLine(
+      operations,
+      this.lr(
+        "TOTAL:",
+        this.moneyNoCents(closure.totalCollected),
+        this.LINE_WIDTH,
+      ),
+    );
     this.strongSeparator(operations);
 
-    // Tablas (un solo separador por bloque)  
+    // Tablas (un solo separador por bloque)
     const col1 = 22;
     const col2 = 6;
     const col3 = 12;
@@ -231,7 +268,10 @@ export class PrintUsecase {
         // Bloque por método: visualmente separado para que no parezca parte del método anterior.
         this.strongSeparator(operations);
         operations.push(printerOps.align("center"));
-        this.pushLine(operations, `METODO: ${this.sanitizeText(methodName).toUpperCase()}`);
+        this.pushLine(
+          operations,
+          `METODO: ${this.sanitizeText(methodName).toUpperCase()}`,
+        );
         operations.push(printerOps.align("left"));
         this.pushLine(operations, tableHeader);
 
@@ -252,7 +292,11 @@ export class PrintUsecase {
         this.separator(operations);
         this.pushLine(
           operations,
-          this.lr("Total metodo:", this.moneyNoCents(bucket?.total ?? "0"), this.LINE_WIDTH),
+          this.lr(
+            "Total metodo:",
+            this.moneyNoCents(bucket?.total ?? "0"),
+            this.LINE_WIDTH,
+          ),
         );
       }
     }
@@ -295,13 +339,19 @@ export class PrintUsecase {
 
     // Header
     operations.push(printerOps.fontSize(2));
-    this.pushLine(operations, body.informationPrinter?.headerMessage ?? "TICKET DE INGRESO");
+    this.pushLine(
+      operations,
+      body.informationPrinter?.headerMessage ?? "TICKET DE INGRESO",
+    );
     operations.push(printerOps.fontSize(1));
 
     this.strongSeparator(operations);
 
     operations.push(printerOps.align("left"));
-    this.pushLine(operations, `Fecha ingreso: ${new Date(body.entryTime).toLocaleString("es-CO")}`);
+    this.pushLine(
+      operations,
+      `Fecha ingreso: ${new Date(body.entryTime).toLocaleString("es-CO")}`,
+    );
     this.pushLine(operations, `Tipo vehiculo: ${body.vehicleType}`);
     this.pushLine(operations, `Placa: ${body.vehiclePlate}`);
 
@@ -309,28 +359,35 @@ export class PrintUsecase {
     operations.push(printerOps.align("center"));
 
     // QR con el parkingSessionId (tu back soporta "<size>|<content>")
-    operations.push(printerOps.qrSized(10, this.sanitizeText(body.parkingSessionId)));
+    operations.push(
+      printerOps.qrSized(10, this.sanitizeText(body.parkingSessionId)),
+    );
     this.pushLine(operations, "Con este QR pagas y sales");
 
     operations.push(printerOps.align("left"));
 
+    console.log(body.informationPrinter);
+
     if (body.informationPrinter?.bodyMessage) {
-      this.wrapText(body.informationPrinter.bodyMessage, this.LINE_WIDTH).forEach((l) =>
-        this.pushLine(operations, l),
-      );
+      this.wrapText(
+        body.informationPrinter.bodyMessage,
+        this.LINE_WIDTH,
+      ).forEach((l) => this.pushLine(operations, l));
     }
 
     if (body.informationPrinter?.insurancePolicyInfo) {
-      this.wrapText(body.informationPrinter.insurancePolicyInfo, this.LINE_WIDTH).forEach((l) =>
-        this.pushLine(operations, l),
-      );
+      this.wrapText(
+        body.informationPrinter.insurancePolicyInfo,
+        this.LINE_WIDTH,
+      ).forEach((l) => this.pushLine(operations, l));
     }
 
     if (body.informationPrinter?.footerMessage) {
       this.blankLine(operations, 1);
-      this.wrapText(body.informationPrinter.footerMessage, this.LINE_WIDTH).forEach((l) =>
-        this.pushLine(operations, l),
-      );
+      this.wrapText(
+        body.informationPrinter.footerMessage,
+        this.LINE_WIDTH,
+      ).forEach((l) => this.pushLine(operations, l));
     }
 
     operations.push(printerOps.feed(2));
@@ -346,7 +403,9 @@ export class PrintUsecase {
   // -----------------------------
   // PRINT: Comprobante / Ticket de pago (refactor + menos separadores + money FIX)
   // -----------------------------
-  async printTransactionReceipt(ticket: IPrintPaymentTicketContentEntity): Promise<boolean> {
+  async printTransactionReceipt(
+    ticket: IPrintPaymentTicketContentEntity,
+  ): Promise<boolean> {
     const ops: IPrinterOperationEntity[] = [];
 
     // Margen superior
@@ -358,17 +417,21 @@ export class PrintUsecase {
     this.pushLine(ops, ticket.company?.name ?? "COMERCIO");
     ops.push(printerOps.fontSize(1));
 
-    if (ticket.company?.taxId) this.pushLine(ops, `NIT: ${this.sanitizeText(ticket.company.taxId)}`);
+    if (ticket.company?.taxId)
+      this.pushLine(ops, `NIT: ${this.sanitizeText(ticket.company.taxId)}`);
     if (ticket.company?.address) {
-      this.wrapText(`Direccion: ${ticket.company.address}`, this.LINE_WIDTH).forEach((l) =>
-        this.pushLine(ops, l),
-      );
+      this.wrapText(
+        `Direccion: ${ticket.company.address}`,
+        this.LINE_WIDTH,
+      ).forEach((l) => this.pushLine(ops, l));
     }
 
     // Mensaje corto (sin separador extra)
     if (ticket.headerMessage) {
       this.blankLine(ops, 1);
-      this.wrapText(ticket.headerMessage, this.LINE_WIDTH).forEach((l) => this.pushLine(ops, l));
+      this.wrapText(ticket.headerMessage, this.LINE_WIDTH).forEach((l) =>
+        this.pushLine(ops, l),
+      );
     }
 
     this.strongSeparator(ops);
@@ -379,13 +442,40 @@ export class PrintUsecase {
     this.blankLine(ops, 1);
 
     // Header info (sin líneas entre cada campo)
-    this.pushLine(ops, this.lr("Transaccion:", this.safe(ticket.header?.transactionId), this.LINE_WIDTH));
-    this.pushLine(ops, this.lr("Fecha:", this.safe(ticket.header?.paymentDate), this.LINE_WIDTH));
-    this.pushLine(ops, this.lr("Metodo:", this.safe(ticket.header?.paymentMethod), this.LINE_WIDTH));
-    this.pushLine(ops, this.lr("Punto:", this.safe(ticket.header?.paymentPoint), this.LINE_WIDTH));
+    this.pushLine(
+      ops,
+      this.lr(
+        "Transaccion:",
+        this.safe(ticket.header?.transactionId),
+        this.LINE_WIDTH,
+      ),
+    );
+    this.pushLine(
+      ops,
+      this.lr("Fecha:", this.safe(ticket.header?.paymentDate), this.LINE_WIDTH),
+    );
+    this.pushLine(
+      ops,
+      this.lr(
+        "Metodo:",
+        this.safe(ticket.header?.paymentMethod),
+        this.LINE_WIDTH,
+      ),
+    );
+    this.pushLine(
+      ops,
+      this.lr(
+        "Punto:",
+        this.safe(ticket.header?.paymentPoint),
+        this.LINE_WIDTH,
+      ),
+    );
     // Estado opcional
     if (ticket.header?.status) {
-      this.pushLine(ops, this.lr("Estado:", this.safe(ticket.header.status), this.LINE_WIDTH));
+      this.pushLine(
+        ops,
+        this.lr("Estado:", this.safe(ticket.header.status), this.LINE_WIDTH),
+      );
     }
 
     this.blankLine(ops, 1);
@@ -395,8 +485,7 @@ export class PrintUsecase {
     const colBase = 7;
     const colIva = 7;
     const colTotal = 7;
-    const tableHeader =
-      `${"ITEM".padEnd(colItem)} ${"BASE".padStart(colBase)} ${"IVA".padStart(colIva)} ${"TOTAL".padStart(colTotal)}`;
+    const tableHeader = `${"ITEM".padEnd(colItem)} ${"BASE".padStart(colBase)} ${"IVA".padStart(colIva)} ${"TOTAL".padStart(colTotal)}`;
 
     this.separator(ops);
     this.pushLine(ops, tableHeader);
@@ -407,17 +496,24 @@ export class PrintUsecase {
       for (const d of ticket.details) {
         const subtotalNum = this.parseMoney(d.subtotal);
         const taxNum = this.parseMoney(d.tax);
-        const computedTotal = subtotalNum != null && taxNum != null ? subtotalNum + taxNum : null;
+        const computedTotal =
+          subtotalNum != null && taxNum != null ? subtotalNum + taxNum : null;
 
-        const itemLines = this.wrapText(this.sanitizeText(this.safe(d.type)), colItem);
+        const itemLines = this.wrapText(
+          this.sanitizeText(this.safe(d.type)),
+          colItem,
+        );
         const base = this.moneyNoCents(d.subtotal);
         const iva = this.moneyNoCents(d.tax);
-        const total = computedTotal != null ? this.moneyNoCents(computedTotal) : this.moneyNoCents(ticket.totals?.total);
+        const total =
+          computedTotal != null
+            ? this.moneyNoCents(computedTotal)
+            : this.moneyNoCents(ticket.totals?.total);
 
         // Primera línea con valores
         this.pushLine(
           ops,
-          `${itemLines[0].padEnd(colItem)} ${base.padStart(colBase)} ${iva.padStart(colIva)} ${total.padStart(colTotal)}`
+          `${itemLines[0].padEnd(colItem)} ${base.padStart(colBase)} ${iva.padStart(colIva)} ${total.padStart(colTotal)}`,
         );
         // Resto de líneas (solo descripción)
         for (let i = 1; i < itemLines.length; i++) {
@@ -432,9 +528,10 @@ export class PrintUsecase {
         if (d.duration) extras.push(`Duracion: ${d.duration}`);
 
         for (const extra of extras) {
-          this.wrapText(this.sanitizeText(`  ${extra}`), this.LINE_WIDTH).forEach((l) =>
-            this.pushLine(ops, l),
-          );
+          this.wrapText(
+            this.sanitizeText(`  ${extra}`),
+            this.LINE_WIDTH,
+          ).forEach((l) => this.pushLine(ops, l));
         }
 
         this.blankLine(ops, 1);
@@ -442,38 +539,67 @@ export class PrintUsecase {
     }
 
     // Totales (solo separador fuerte antes del total final)
-    const taxPercent = ticket.totals?.taxPercent ? ` ${ticket.totals.taxPercent}` : "";
-    this.pushLine(ops, this.lr("Subtotal:", this.moneyNoCents(ticket.totals?.subtotal), this.LINE_WIDTH));
-    this.pushLine(ops, this.lr(`Impuesto${taxPercent}:`, this.moneyNoCents(ticket.totals?.taxAmount), this.LINE_WIDTH));
+    const taxPercent = ticket.totals?.taxPercent
+      ? ` ${ticket.totals.taxPercent}`
+      : "";
+    this.pushLine(
+      ops,
+      this.lr(
+        "Subtotal:",
+        this.moneyNoCents(ticket.totals?.subtotal),
+        this.LINE_WIDTH,
+      ),
+    );
+    this.pushLine(
+      ops,
+      this.lr(
+        `Impuesto${taxPercent}:`,
+        this.moneyNoCents(ticket.totals?.taxAmount),
+        this.LINE_WIDTH,
+      ),
+    );
 
     this.strongSeparator(ops);
 
     ops.push(printerOps.fontSize(2));
-    this.pushLine(ops, `TOTAL: ${this.moneyNoCents(ticket.totals?.total)}`.padStart(this.LINE_WIDTH));
+    this.pushLine(
+      ops,
+      `TOTAL: ${this.moneyNoCents(ticket.totals?.total)}`.padStart(
+        this.LINE_WIDTH,
+      ),
+    );
     ops.push(printerOps.fontSize(1));
 
     // Mensajes (sin separadores repetidos; solo espacios)
     if (ticket.bodyMessage) {
       this.blankLine(ops, 1);
-      this.wrapText(ticket.bodyMessage, this.LINE_WIDTH).forEach((l) => this.pushLine(ops, l));
+      this.wrapText(ticket.bodyMessage, this.LINE_WIDTH).forEach((l) =>
+        this.pushLine(ops, l),
+      );
     }
 
     if (ticket.insurancePolicyInfo) {
       this.blankLine(ops, 1);
-      this.wrapText(ticket.insurancePolicyInfo, this.LINE_WIDTH).forEach((l) => this.pushLine(ops, l));
+      this.wrapText(ticket.insurancePolicyInfo, this.LINE_WIDTH).forEach((l) =>
+        this.pushLine(ops, l),
+      );
     }
 
     if (ticket.notes) {
       const notes = String(ticket.notes ?? "").trim();
       if (notes) {
         this.blankLine(ops, 1);
-        this.wrapText(`Notas: ${notes}`, this.LINE_WIDTH).forEach((l) => this.pushLine(ops, l));
+        this.wrapText(`Notas: ${notes}`, this.LINE_WIDTH).forEach((l) =>
+          this.pushLine(ops, l),
+        );
       }
     }
 
     if (ticket.footerMessage) {
       this.blankLine(ops, 1);
-      this.wrapText(ticket.footerMessage, this.LINE_WIDTH).forEach((l) => this.pushLine(ops, l));
+      this.wrapText(ticket.footerMessage, this.LINE_WIDTH).forEach((l) =>
+        this.pushLine(ops, l),
+      );
     }
 
     ops.push(printerOps.feed(2));

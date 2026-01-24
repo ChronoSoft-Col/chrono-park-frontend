@@ -40,9 +40,12 @@ import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { generateManualIncomeAction } from "../actions/generate-manual-income.action";
 import { IGenerateManualIncomeParamsEntity } from "@/server/domain";
+import { usePrint } from "@/shared/hooks/common/use-print.hook";
+import { IGenerateManualIncomeResponse } from "@/server/domain/entities/parking/manual-income/response/generate-manual-income-response.entity";
 
 export default function ManualIncomeFormComponent() {
   const { vehicleTypes } = useCommonContext();
+  const { printIncomeReceipt } = usePrint();
 
   const onManualIncomeSubmit = async (
     params: ManualIncomeForm,
@@ -55,6 +58,14 @@ export default function ManualIncomeFormComponent() {
     if (!response.success) {
       toast.error("Error generando ingreso manual: " + response.error);
       return false;
+    }
+
+    const incomeResponse = response.data as IGenerateManualIncomeResponse;
+    if (incomeResponse.data) {
+      const printResult = await printIncomeReceipt(incomeResponse.data);
+      if (!printResult.success) {
+        toast.warning("Ingreso generado, pero no se pudo imprimir el ticket");
+      }
     }
 
     toast.success("Ingreso manual generado correctamente");
@@ -166,7 +177,10 @@ const IncomeForm = ({
                     data-invalid={fieldState.invalid}
                     className={`${fieldContainerClasses} min-w-0`}
                   >
-                    <ChronoFieldLabel htmlFor="licensePlate" className={fieldLabelClasses}>
+                    <ChronoFieldLabel
+                      htmlFor="licensePlate"
+                      className={fieldLabelClasses}
+                    >
                       Placa
                     </ChronoFieldLabel>
                     <ChronoPlateInput
@@ -190,7 +204,10 @@ const IncomeForm = ({
                     data-invalid={fieldState.invalid}
                     className={`${fieldContainerClasses} min-w-0`}
                   >
-                    <ChronoFieldLabel htmlFor="vehicleTypeId" className={fieldLabelClasses}>
+                    <ChronoFieldLabel
+                      htmlFor="vehicleTypeId"
+                      className={fieldLabelClasses}
+                    >
                       Tipo de vehículo
                     </ChronoFieldLabel>
 
