@@ -1,33 +1,16 @@
 'use client'
 
 import { useCallback } from "react";
-import { IPrintPostPaymentInvoiceParamsEntity } from "@/server/domain";
 import { PrintUsecase } from "@/client/domain/usecases/printer/print.usecase";
 import { clientContainer } from "@/client/di/container";
 import IActionResponse from "../../interfaces/generic/action-response";
-import { IClosureEntity } from "@/server/domain/entities/parking/closure.entity";
+import { IClosureEntity } from "@/server/domain/entities/parking/closures/closure.entity";
 import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
 import { getPaymentPrintTicketAction } from "@/src/app/parking/cobro/actions/get-payment-print-ticket.action";
 
 export function usePrint() {
   const isUuidV4 = (value: string) =>
     /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
-
-  const printPostPaymentInvoice = useCallback(async (paymentData: IPrintPostPaymentInvoiceParamsEntity): Promise<IActionResponse<boolean>> => {
-    try {
-      const useCase = clientContainer.resolve(PrintUsecase);
-      const result = await useCase.printPostPaymentInvoice(paymentData);
-      return {
-        success: result,
-        data: result,
-      };
-    } catch {
-      return {
-        success: false,
-        data: false,
-      };
-    }
-  }, []);
 
   const printClosureReceipt = useCallback(
     async (
@@ -118,7 +101,6 @@ export function usePrint() {
   );
 
   return {
-    printPostPaymentInvoice,
     printClosureReceipt,
     printIncomeReceipt,
     printPaymentTicketByPaymentId,

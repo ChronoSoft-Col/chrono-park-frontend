@@ -8,14 +8,15 @@ import { toast } from "sonner";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { ClosureTypeEnum } from "@/src/shared/enums/parking/closure-type.enum";
 import ChronoButton from "@chrono/chrono-button.component";
-import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/src/shared/components/ui/select";
+  ChronoCard,
+  ChronoCardDescription,
+  ChronoCardHeader,
+  ChronoCardTitle,
+} from "@chrono/chrono-card.component";
+import { UseDialogContext } from "@/src/shared/context/dialog.context";
+import { cn } from "@/src/lib/utils";
+import { CheckCircle2, Circle } from "lucide-react";
 
 export default function CreateClosureDialogContent() {
   const [type, setType] = useState<ClosureTypeEnum>(ClosureTypeEnum.PARCIAL);
@@ -23,6 +24,26 @@ export default function CreateClosureDialogContent() {
   const router = useRouter();
   const { printClosureReceipt } = usePrint();
   const { closeDialog } = UseDialogContext();
+
+  const options: Array<{
+    value: ClosureTypeEnum;
+    title: string;
+    description: string;
+    hint: string;
+  }> = [
+    {
+      value: ClosureTypeEnum.PARCIAL,
+      title: "Cierre Parcial",
+      description: "Cierre de turno",
+      hint: "Incluye solo las operaciones del período actual.",
+    },
+    {
+      value: ClosureTypeEnum.TOTAL,
+      title: "Cierre Total",
+      description: "Cierre definitivo",
+      hint: "Incluye todas las operaciones pendientes.",
+    },
+  ];
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -71,20 +92,60 @@ export default function CreateClosureDialogContent() {
   return (
     <div className="space-y-4 py-4">
       <div className="space-y-2">
-        <Label htmlFor="type">Tipo de Cierre *</Label>
-        <Select
-          value={type}
-          onValueChange={(value) => setType(value as ClosureTypeEnum)}
-          disabled={isLoading}
+        <Label id="closure-type-label">Tipo de Cierre *</Label>
+
+        <div
+          role="radiogroup"
+          aria-labelledby="closure-type-label"
+          className="grid grid-cols-1 gap-3 sm:grid-cols-2"
         >
-          <SelectTrigger id="type">
-            <SelectValue placeholder="Seleccione el tipo de cierre" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ClosureTypeEnum.PARCIAL}>Cierre Parcial</SelectItem>
-            <SelectItem value={ClosureTypeEnum.TOTAL}>Cierre Total</SelectItem>
-          </SelectContent>
-        </Select>
+          {options.map((opt) => {
+            const selected = type === opt.value;
+
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                disabled={isLoading}
+                onClick={() => setType(opt.value)}
+                className={cn(
+                  "block w-full text-left",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2",
+                  isLoading && "cursor-not-allowed opacity-70",
+                )}
+                role="radio"
+                aria-checked={selected}
+              >
+                <ChronoCard
+                  className={cn(
+                    "transition-colors",
+                    "hover:border-foreground/20",
+                    selected ? "border-primary ring-2 ring-primary/20" : "border-border",
+                  )}
+                >
+                  <ChronoCardHeader className="space-y-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-0.5">
+                        <ChronoCardTitle className="text-base">
+                          {opt.title}
+                        </ChronoCardTitle>
+                        <ChronoCardDescription className="text-sm">
+                          {opt.description}
+                        </ChronoCardDescription>
+                      </div>
+                      {selected ? (
+                        <CheckCircle2 className="h-5 w-5 text-primary" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{opt.hint}</p>
+                  </ChronoCardHeader>
+                </ChronoCard>
+              </button>
+            );
+          })}
+        </div>
         <p className="text-xs text-muted-foreground">
           {type === ClosureTypeEnum.PARCIAL
             ? "Cierre de turno: incluye solo las operaciones del período actual"

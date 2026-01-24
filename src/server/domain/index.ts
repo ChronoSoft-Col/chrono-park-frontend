@@ -17,42 +17,42 @@ export * from "./usecases/parking/customer.usecase";
 export * from "./usecases/parking/closure.usecase";
 
 //ENTITIES
-export * from "./entities/auth/get-permissions-response.entity";
-export * from "./entities/auth/get-permissions-params.entity";
-export * from "./entities/auth/login-response.entity";
-export * from "./entities/auth/login-params.entity";
+export * from "./entities/auth/response/get-permissions-response.entity";
+export * from "./entities/auth/params/get-permissions-params.entity";
+export * from "./entities/auth/response/login-response.entity";
+export * from "./entities/auth/params/login-params.entity";
 
-export * from "./entities/parking/validate-amount-params.entity";
-export * from "./entities/parking/validate-amount-response.entity";
+export * from "./entities/parking/validation/params/validate-amount-params.entity";
+export * from "./entities/parking/validation/response/validate-amount-response.entity";
 
-export * from "./entities/parking/generate-payment-params.entity";
-export * from "./entities/parking/generate-payment-response.entity";
+export * from "./entities/parking/payments/params/generate-payment-params.entity";
+export * from "./entities/parking/payments/response/generate-payment-response.entity";
 
-export * from "./entities/parking/list-payments-params.entity";
-export * from "./entities/parking/list-payments-response.entity";
-export * from "./entities/parking/payment-list-item.entity";
+export * from "./entities/parking/payments/params/list-payments-params.entity";
+export * from "./entities/parking/payments/response/list-payments-response.entity";
+export * from "./entities/parking/payments/payment-list-item.entity";
 
-export * from "./entities/parking/print-post-payment-invoice-params.entity";
-export * from "./entities/parking/print-payment-ticket-response.entity";
+export * from "./entities/parking/payments/response/print-payment-ticket-response.entity";
 
-export * from "./entities/parking/generate-manual-income-params.entity"
-export * from "./entities/parking/generate-manual-income-response.entity"
+export * from "./entities/parking/manual-income/params/generate-manual-income-params.entity"
+export * from "./entities/parking/manual-income/response/generate-manual-income-response.entity"
 
-export * from "./entities/parking/amount-detail.entity"
-export * from "./entities/parking/rule-applied.entity"
+export * from "./entities/parking/common/amount-detail.entity"
+export * from "./entities/parking/common/rule-applied.entity"
 
-export * from "./entities/parking/in-out.entity"
-export * from "./entities/parking/list-in-out-params.entitty"
-export * from "./entities/parking/list-in-out-response.entity"
+export * from "./entities/parking/in-out/in-out.entity"
+export * from "./entities/parking/in-out/params/list-in-out-params.entitty"
+export * from "./entities/parking/in-out/response/list-in-out-response.entity"
 
-export * from "./entities/parking/customer.entity"
-export * from "./entities/parking/list-customers-params.entity"
-export * from "./entities/parking/list-customers-response.enitity"
-export * from "./entities/parking/create-customer-params.entity"
-export * from "./entities/parking/update-customer-params.entity"
-export * from "./entities/parking/update-customer-response.entity"
+export * from "./entities/parking/customers/customer.entity"
+export * from "./entities/parking/customers/params/list-customers-params.entity"
+export * from "./entities/parking/customers/response/list-customers-response.enitity"
+export * from "./entities/parking/customers/params/create-customer-params.entity"
+export * from "./entities/parking/customers/params/update-customer-params.entity"
+export * from "./entities/parking/customers/response/update-customer-response.entity"
 
-export * from "./entities/parking/close-closure-params.entity"
-export * from "./entities/parking/closure.entity"
-export * from "./entities/parking/list-closure-params.entity"
-export * from "./entities/parking/list-closure-response.entity"
+export * from "./entities/parking/closures/params/close-closure-params.entity"
+export * from "./entities/parking/closures/closure.entity"
+export * from "./entities/parking/closures/closure-list-item.entity"
+export * from "./entities/parking/closures/params/list-closure-params.entity"
+export * from "./entities/parking/closures/response/list-closure-response.entity"

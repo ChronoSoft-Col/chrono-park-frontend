@@ -1,7 +1,7 @@
 "use client";
 
-import type { IClosureEntity } from "@/server/domain/entities/parking/closure.entity";
-import { IClosureListItemEntity } from "@/server/domain/entities/parking/closure-list-item.entity";
+import type { IClosureEntity } from "@/server/domain/entities/parking/closures/closure.entity";
+import { IClosureListItemEntity } from "@/server/domain/entities/parking/closures/closure-list-item.entity";
 import { ChronoDataTable } from "@/src/shared/components/chrono-soft/chrono-data-table.component";
 import { ChronoPaginator } from "@/src/shared/components/chrono-soft/chrono-paginator.component";
 import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout.component";
