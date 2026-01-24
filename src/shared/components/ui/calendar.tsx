@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { es } from "date-fns/locale"
 import {
   DayPicker,
   getDefaultClassNames,
@@ -17,6 +18,7 @@ function Calendar({
   showOutsideDays = true,
   captionLayout = "label",
   buttonVariant = "ghost",
+  locale = es,
   formatters,
   components,
   ...props
@@ -28,6 +30,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      locale={locale}
       className={cn(
         "p-3 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(6)] bg-background group/calendar [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
@@ -36,8 +39,7 @@ function Calendar({
       )}
       captionLayout={captionLayout}
       formatters={{
-        formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+        formatMonthDropdown: (date) => date.toLocaleString("es", { month: "short" }),
         ...formatters,
       }}
       classNames={{
