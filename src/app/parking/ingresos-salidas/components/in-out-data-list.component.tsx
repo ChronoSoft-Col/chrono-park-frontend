@@ -37,10 +37,18 @@ export default function InOutDataListComponent({
         title: `Detalle de ${item.vehicle.licensePlate}`,
         description: "Información detallada del movimiento seleccionado",
         content: <InOutDetailDialogContent item={item} />,
-        footer: <ChronoButton onClick={closeDialog} className="w-full" variant={"secondary"}>Cerrar</ChronoButton>,
+        footer: (
+          <ChronoButton
+            onClick={closeDialog}
+            className="w-full"
+            variant={"secondary"}
+          >
+            Cerrar
+          </ChronoButton>
+        ),
       });
     },
-    [openDialog, closeDialog]
+    [openDialog, closeDialog],
   );
 
   const handlePrint = React.useCallback(
@@ -52,7 +60,10 @@ export default function InOutDataListComponent({
         handleYes: async () => {
           const ticketResponse = await getEntryTicketAction(item.id);
           if (!ticketResponse.success || !ticketResponse.data) {
-            toast.error(ticketResponse.error || "No se pudo obtener la información del ticket");
+            toast.error(
+              ticketResponse.error ||
+                "No se pudo obtener la información del ticket",
+            );
             return;
           }
 
@@ -66,19 +77,22 @@ export default function InOutDataListComponent({
         handleNo: async () => {},
       });
     },
-    [printIncomeReceipt, showYesNoDialog]
+    [printIncomeReceipt, showYesNoDialog],
   );
 
   const columns = React.useMemo(
     () => createInOutColumns(handleViewDetail, handlePrint),
-    [handleViewDetail, handlePrint]
+    [handleViewDetail, handlePrint],
   );
-  const safeTotalPages = Math.max(1, totalPages || Math.ceil(total / pageSize) || 1);
+  const safeTotalPages = Math.max(
+    1,
+    totalPages || Math.ceil(total / pageSize) || 1,
+  );
   return (
     <ChronoViewWithTableLayout
       title="Ingresos y Salidas"
       description="Lista de ingresos y salidas de vehículos en el sistema"
-      table={(
+      table={
         <ChronoDataTable
           data={items}
           columns={columns}
@@ -86,13 +100,13 @@ export default function InOutDataListComponent({
           getRowKey={(row) => row.id}
           emptyMessage="Sin registros para mostrar"
         />
-      )}
-      paginator={(
+      }
+      paginator={
         <ChronoPaginator
           totalPages={safeTotalPages}
           className="flex-col gap-4 p-0 sm:flex-row sm:flex-nowrap sm:items-center sm:justify-between"
         />
-      )}
+      }
     />
   );
 }
