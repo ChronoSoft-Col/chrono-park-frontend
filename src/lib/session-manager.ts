@@ -10,6 +10,7 @@ import {
   createHash,
   randomBytes,
 } from "crypto";
+import { ENVIRONMENT } from "../shared/constants/environment";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
@@ -109,7 +110,7 @@ function createDefaultCookieOptions(): Partial<CookieAttributes> {
   return {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: ENVIRONMENT.COOKIE_SECURE === "true",
     path: "/",
   };
 }
