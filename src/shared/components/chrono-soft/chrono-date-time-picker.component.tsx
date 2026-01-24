@@ -76,7 +76,8 @@ function applyTimePart(current: Date, type: TimePart, value: string) {
 
   const currentHours = nextDate.getHours();
   if (value === "PM" && currentHours < 12) nextDate.setHours(currentHours + 12);
-  if (value === "AM" && currentHours >= 12) nextDate.setHours(currentHours - 12);
+  if (value === "AM" && currentHours >= 12)
+    nextDate.setHours(currentHours - 12);
   return nextDate;
 }
 
@@ -87,7 +88,10 @@ type TimeColumnProps = {
 
 function TimeColumn({ maxHeight, children }: TimeColumnProps) {
   return (
-    <ScrollArea className="w-64 sm:w-auto" style={maxHeight ? { maxHeight } : undefined}>
+    <ScrollArea
+      className="w-64 sm:w-auto"
+      style={maxHeight ? { maxHeight } : undefined}
+    >
       {children}
       <ScrollBar orientation="horizontal" className="sm:hidden" />
       <ScrollBar orientation="vertical" className="hidden sm:flex" />
@@ -95,12 +99,23 @@ function TimeColumn({ maxHeight, children }: TimeColumnProps) {
   );
 }
 
-export function ChronoDateTimePicker({ date, setDate, disabled }: ChronoDateTimePickerProps) {
+export function ChronoDateTimePicker({
+  date,
+  setDate,
+  disabled,
+}: ChronoDateTimePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
-  const { ref: calendarRef, height: calendarHeight } = useMeasuredHeight(isOpen);
+  const { ref: calendarRef, height: calendarHeight } =
+    useMeasuredHeight(isOpen);
 
-  const hours = React.useMemo(() => Array.from({ length: 12 }, (_, index) => index + 1), []);
-  const minutes = React.useMemo(() => Array.from({ length: 12 }, (_, index) => index * 5), []);
+  const hours = React.useMemo(
+    () => Array.from({ length: 12 }, (_, index) => index + 1),
+    [],
+  );
+  const minutes = React.useMemo(
+    () => Array.from({ length: 12 }, (_, index) => index * 5),
+    [],
+  );
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (!selectedDate || disabled) return;
@@ -113,7 +128,10 @@ export function ChronoDateTimePicker({ date, setDate, disabled }: ChronoDateTime
   };
 
   return (
-    <ChronoPopover open={isOpen} onOpenChange={(open) => !disabled && setIsOpen(open)}>
+    <ChronoPopover
+      open={isOpen}
+      onOpenChange={(open) => !disabled && setIsOpen(open)}
+    >
       <ChronoPopoverTrigger asChild>
         <ChronoButton
           variant="outline"
@@ -121,11 +139,15 @@ export function ChronoDateTimePicker({ date, setDate, disabled }: ChronoDateTime
           className={cn(
             "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground",
-            disabled && "opacity-50 cursor-not-allowed"
+            disabled && "opacity-50 cursor-not-allowed",
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "MM/dd/yyyy hh:mm aa") : <span>MM/DD/YYYY hh:mm aa</span>}
+          {date ? (
+            format(date, "MM/dd/yyyy hh:mm aa")
+          ) : (
+            <span>MM/DD/YYYY hh:mm aa</span>
+          )}
         </ChronoButton>
       </ChronoPopoverTrigger>
 
@@ -150,7 +172,11 @@ export function ChronoDateTimePicker({ date, setDate, disabled }: ChronoDateTime
                   <ChronoButton
                     key={hour}
                     size="icon"
-                    variant={date && date.getHours() % 12 === hour % 12 ? "default" : "ghost"}
+                    variant={
+                      date && date.getHours() % 12 === hour % 12
+                        ? "default"
+                        : "ghost"
+                    }
                     className="aspect-square shrink-0 sm:w-full"
                     onClick={() => handleTimeChange("hour", String(hour))}
                   >
@@ -166,7 +192,9 @@ export function ChronoDateTimePicker({ date, setDate, disabled }: ChronoDateTime
                   <ChronoButton
                     key={minute}
                     size="icon"
-                    variant={date && date.getMinutes() === minute ? "default" : "ghost"}
+                    variant={
+                      date && date.getMinutes() === minute ? "default" : "ghost"
+                    }
                     className="aspect-square shrink-0 sm:w-full"
                     onClick={() => handleTimeChange("minute", String(minute))}
                   >
@@ -183,7 +211,9 @@ export function ChronoDateTimePicker({ date, setDate, disabled }: ChronoDateTime
                     key={ampm}
                     size="icon"
                     variant={
-                      date && ((ampm === "AM" && date.getHours() < 12) || (ampm === "PM" && date.getHours() >= 12))
+                      date &&
+                      ((ampm === "AM" && date.getHours() < 12) ||
+                        (ampm === "PM" && date.getHours() >= 12))
                         ? "default"
                         : "ghost"
                     }
@@ -201,4 +231,3 @@ export function ChronoDateTimePicker({ date, setDate, disabled }: ChronoDateTime
     </ChronoPopover>
   );
 }
-  
