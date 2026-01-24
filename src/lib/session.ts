@@ -3,7 +3,10 @@ import "server-only";
 import type { NextRequest } from "next/server";
 
 import { ENVIRONMENT } from "@/src/shared/constants/environment";
-import type { CreateSessionInput, SessionPayload } from "@/src/shared/types/auth/session.type";
+import type {
+  CreateSessionInput,
+  SessionPayload,
+} from "@/src/shared/types/auth/session.type";
 
 import {
   createSessionManager,
@@ -16,7 +19,7 @@ const SESSION_SECRET = ENVIRONMENT.SESSION_SECRET;
 
 if (!SESSION_SECRET || SESSION_SECRET.length < 16) {
   throw new Error(
-    "SESSION_SECRET (or AUTH_SECRET) must be defined and at least 16 characters long."
+    "SESSION_SECRET (or AUTH_SECRET) must be defined and at least 16 characters long.",
   );
 }
 
@@ -31,11 +34,12 @@ const sessionManager = createSessionManager<SessionPayload>({
   cookieOptions: {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: ENVIRONMENT.COOKIE_SECURE === "true",
     path: "/",
   },
   serialize: (payload, meta) => ensureSessionPayload(payload, meta),
-  deserialize: (value, meta) => ensureSessionPayload(value as SessionPayload, meta),
+  deserialize: (value, meta) =>
+    ensureSessionPayload(value as SessionPayload, meta),
 });
 
 function createSessionMeta(maxAge: number): SessionMeta {
@@ -48,7 +52,7 @@ function createSessionMeta(maxAge: number): SessionMeta {
 }
 
 export async function createSession(
-  input: CreateSessionInput
+  input: CreateSessionInput,
 ): Promise<SessionPayload> {
   const maxAge = input.maxAge ?? DEFAULT_MAX_AGE;
   const meta = createSessionMeta(maxAge);
@@ -62,14 +66,14 @@ export function getSession(): Promise<SessionPayload | null> {
 }
 
 export function getSessionFromRequest(
-  request: NextRequest
+  request: NextRequest,
 ): SessionPayload | null {
   return sessionManager.getFromRequest(request);
 }
 
 export function updateSession(
   mutator: (session: SessionPayload) => SessionPayload,
-  options?: { maxAge?: number }
+  options?: { maxAge?: number },
 ): Promise<SessionPayload | null> {
   const maxAge = options?.maxAge ?? DEFAULT_MAX_AGE;
 
@@ -81,7 +85,7 @@ export function updateSession(
           ...current.metadata,
         },
       }),
-    { maxAge }
+    { maxAge },
   );
 }
 

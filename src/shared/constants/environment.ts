@@ -7,5 +7,6 @@ export const ENVIRONMENT = {
   PRINTER_NAME: process.env.NEXT_PUBLIC_PRINTER_NAME || "EPSON",
   PRINTER_API_URL:
     process.env.NEXT_PUBLIC_PRINTER_API_URL || "http://localhost:4000",
-  COOKIE_SECURE: process.env.NEXT_PUBLIC_COOKIE_SECURE || "false",
+  COOKIE_SECURE:
+    process.env.NEXT_PUBLIC_COOKIE_SECURE === "true" ? "true" : "false",
 };

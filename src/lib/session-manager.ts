@@ -23,7 +23,10 @@ export type SessionMeta = {
   maxAge: number;
 };
 
-export type CookieAttributes = Pick<ResponseCookie, "domain" | "path" | "httpOnly" | "sameSite" | "secure" | "priority">;
+export type CookieAttributes = Pick<
+  ResponseCookie,
+  "domain" | "path" | "httpOnly" | "sameSite" | "secure" | "priority"
+>;
 
 export type SessionManagerConfig<TSession, TSerialized = TSession> = {
   secret: string;
@@ -35,12 +38,15 @@ export type SessionManagerConfig<TSession, TSerialized = TSession> = {
 };
 
 export type SessionManager<TSession> = {
-  create: (session: TSession, options?: { maxAge?: number }) => Promise<TSession>;
+  create: (
+    session: TSession,
+    options?: { maxAge?: number },
+  ) => Promise<TSession>;
   get: () => Promise<TSession | null>;
   getFromRequest: (request: NextRequest) => TSession | null;
   update: (
     mutator: (session: TSession) => TSession,
-    options?: { maxAge?: number }
+    options?: { maxAge?: number },
   ) => Promise<TSession | null>;
   destroy: () => Promise<void>;
 };
@@ -68,7 +74,10 @@ function resolveSecretKey(secret: string): Buffer {
 function encrypt(value: string, key: Buffer): string {
   const iv = randomBytes(IV_LENGTH);
   const cipher = createCipheriv(ALGORITHM, key, iv);
-  const ciphertext = Buffer.concat([cipher.update(value, "utf8"), cipher.final()]);
+  const ciphertext = Buffer.concat([
+    cipher.update(value, "utf8"),
+    cipher.final(),
+  ]);
   const authTag = cipher.getAuthTag();
 
   return Buffer.concat([iv, authTag, ciphertext]).toString("base64url");
@@ -83,7 +92,10 @@ function decrypt(value: string, key: Buffer): string {
   const decipher = createDecipheriv(ALGORITHM, key, iv);
   decipher.setAuthTag(authTag);
 
-  const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+  const decrypted = Buffer.concat([
+    decipher.update(ciphertext),
+    decipher.final(),
+  ]);
   return decrypted.toString("utf8");
 }
 
@@ -94,7 +106,7 @@ async function getMutableCookies(): Promise<ResponseCookies> {
 
 function mergeCookieOptions(
   base: Partial<CookieAttributes>,
-  override?: Partial<CookieAttributes>
+  override?: Partial<CookieAttributes>,
 ): Partial<CookieAttributes> {
   return {
     ...base,
@@ -116,7 +128,7 @@ function createDefaultCookieOptions(): Partial<CookieAttributes> {
 }
 
 export function createSessionManager<TSession, TSerialized = TSession>(
-  config: SessionManagerConfig<TSession, TSerialized>
+  config: SessionManagerConfig<TSession, TSerialized>,
 ): SessionManager<TSession> {
   const secretKey = resolveSecretKey(config.secret);
   const cookieName = resolveCookieName(config.cookieName);
@@ -133,7 +145,10 @@ export function createSessionManager<TSession, TSerialized = TSession>(
       void meta;
       return payload as unknown as TSession;
     });
-  const cookieOptions = mergeCookieOptions(createDefaultCookieOptions(), config.cookieOptions);
+  const cookieOptions = mergeCookieOptions(
+    createDefaultCookieOptions(),
+    config.cookieOptions,
+  );
 
   const writeCookie = async (value: string, maxAge: number) => {
     const store = await getMutableCookies();
@@ -179,7 +194,9 @@ export function createSessionManager<TSession, TSerialized = TSession>(
     }
   };
 
-  const resolve = (envelope: Envelope<TSerialized>): ResolveResult<TSession, TSerialized> | null => {
+  const resolve = (
+    envelope: Envelope<TSerialized>,
+  ): ResolveResult<TSession, TSerialized> | null => {
     const lifespanMs = Math.max(0, envelope.exp - envelope.iat);
     const lifespanSeconds = Math.max(0, Math.round(lifespanMs / 1000));
     const meta: SessionMeta = {
@@ -203,7 +220,7 @@ export function createSessionManager<TSession, TSerialized = TSession>(
 
   const encodeEnvelope = (
     session: TSession,
-    meta: SessionMeta
+    meta: SessionMeta,
   ): { raw: string; serialized: TSerialized } | null => {
     try {
       const serialized = serializeFn(session, meta);

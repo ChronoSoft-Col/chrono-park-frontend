@@ -47,7 +47,7 @@ const sessionManager = createSessionManager<SessionPayload>({
   cookieOptions: {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: ENVIRONMENT.COOKIE_SECURE === "true",
     path: "/",
   },
   serialize: ensureSessionPayload,
@@ -59,24 +59,24 @@ Adjust the cookie options there if you need a different scope (e.g. `domain` for
 
 ## 3. Server-Side API (`src/lib/session.ts`)
 
-| Function | What it does | Typical call site |
-| --- | --- | --- |
-| `createSession(input)` | Builds payload, encrypts, writes cookie | Login / sign-up flow |
-| `getSession()` | Reads cookie in the current request context | Server components, server actions |
-| `getSessionFromRequest(request)` | Reads cookie from a `NextRequest` (middleware/proxy) | `src/proxy.ts` |
+| Function                           | What it does                                            | Typical call site                 |
+| ---------------------------------- | ------------------------------------------------------- | --------------------------------- |
+| `createSession(input)`             | Builds payload, encrypts, writes cookie                 | Login / sign-up flow              |
+| `getSession()`                     | Reads cookie in the current request context             | Server components, server actions |
+| `getSessionFromRequest(request)`   | Reads cookie from a `NextRequest` (middleware/proxy)    | `src/proxy.ts`                    |
 | `updateSession(mutator, options?)` | Reads current payload, lets you mutate, rewrites cookie | `setCompanyAction`, token refresh |
-| `destroySession()` | Deletes cookie | Sign-out, 401 handlers |
+| `destroySession()`                 | Deletes cookie                                          | Sign-out, 401 handlers            |
 
 All helpers run on the server (they use `cookies()` under the hood). Do not import them into Client Components.
 
 ## 4. Client-Side API (`src/lib/session-client.ts`)
 
-| Utility | Description |
-| --- | --- |
-| `getClientSession(forceRefresh = false)` | Fetches `/api/session`, caches result for 30s by default |
+| Utility                                                        | Description                                                                         |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `getClientSession(forceRefresh = false)`                       | Fetches `/api/session`, caches result for 30s by default                            |
 | `useClientSession({ refreshInterval?, forceRefreshOnMount? })` | React hook that handles loading state, cache refresh, and exposes `refresh(force?)` |
-| `signOut()` | Calls `DELETE /api/session`, clears cache |
-| `clearSessionCache()` | Resets client cache manually |
+| `signOut()`                                                    | Calls `DELETE /api/session`, clears cache                                           |
+| `clearSessionCache()`                                          | Resets client cache manually                                                        |
 
 Example usage (see `src/app/admin/page.tsx`):
 
@@ -139,7 +139,9 @@ When you mount the session module in another project, recreate this endpoint (or
 `proxyGuard` inspects requests before they reach Next.js pages:
 
 ```ts
-export async function proxyGuard(request: NextRequest): Promise<NextResponse | null> {
+export async function proxyGuard(
+  request: NextRequest,
+): Promise<NextResponse | null> {
   if (!shouldProtect(request.nextUrl.pathname)) return null;
 
   const session = await getSessionFromRequest(request);
