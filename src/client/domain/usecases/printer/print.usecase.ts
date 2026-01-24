@@ -569,6 +569,29 @@ export class PrintUsecase {
     );
     ops.push(printerOps.fontSize(1));
 
+    // Valor pagado y cambio
+    if (ticket.totals?.amountReceived) {
+      this.blankLine(ops, 1);
+      this.pushLine(
+        ops,
+        this.lr(
+          "Valor recibido:",
+          this.moneyNoCents(ticket.totals.amountReceived),
+          this.LINE_WIDTH,
+        ),
+      );
+    }
+    if (ticket.totals?.change) {
+      this.pushLine(
+        ops,
+        this.lr(
+          "Cambio:",
+          this.moneyNoCents(ticket.totals.change),
+          this.LINE_WIDTH,
+        ),
+      );
+    }
+
     // Mensajes (sin separadores repetidos; solo espacios)
     if (ticket.bodyMessage) {
       this.blankLine(ops, 1);

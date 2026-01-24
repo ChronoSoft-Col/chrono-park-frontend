@@ -24,6 +24,8 @@ export type IPaymentTicketTotalEntity = {
   taxAmount: string;
   taxPercent: string;
   total: string;
+  amountReceived?: string;
+  change?: string;
 };
 
 export type ICompanyInfoEntity = {
@@ -46,5 +48,4 @@ export type IPrintPaymentTicketContentEntity = {
 
 // Response wrapper as returned by our backend (CustomResponse)
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface IPrintPaymentTicketResponseEntity
-  extends IGeneralResponse<IPrintPaymentTicketContentEntity> {}
+export interface IPrintPaymentTicketResponseEntity extends IGeneralResponse<IPrintPaymentTicketContentEntity> {}
