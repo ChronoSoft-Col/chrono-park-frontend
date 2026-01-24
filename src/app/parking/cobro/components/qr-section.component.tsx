@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ValidateFeeForm,
@@ -20,6 +20,7 @@ import {
   ChronoCardHeader,
   ChronoCardTitle,
 } from "@chrono/chrono-card.component";
+import { ChronoSwitch } from "@chrono/chrono-switch.component";
 
 import { usePaymentContext } from "@/src/shared/context/payment.context";
 import { cn } from "@/src/lib/utils";
@@ -72,6 +73,8 @@ function QrFormComponent({
   validatedPlate?: string;
 }) {
   const isUpdatingFromServerRef = useRef(false);
+  const isUpdatingTimeRef = useRef(false);
+  const [manualExitTime, setManualExitTime] = useState(false);
 
   const validateFeeForm = useForm<ValidateFeeForm>({
     resolver: zodResolver(ValidateFeeSchema),
@@ -81,6 +84,23 @@ function QrFormComponent({
       licensePlate: "",
     },
   });
+
+  // Sincronizar hora de salida automáticamente cada segundo (si no es manual)
+  useEffect(() => {
+    if (manualExitTime) return;
+
+    const interval = setInterval(() => {
+      isUpdatingTimeRef.current = true;
+      validateFeeForm.setValue("exitTime", new Date(), {
+        shouldValidate: false,
+      });
+      setTimeout(() => {
+        isUpdatingTimeRef.current = false;
+      }, 50);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [manualExitTime, validateFeeForm]);
 
   // Actualizar el campo de placa cuando el servidor devuelve la placa validada
   useEffect(() => {
@@ -100,8 +120,8 @@ function QrFormComponent({
   }, [validatedPlate, validateFeeForm]);
 
   const handleFormChange = useDebouncedCallback(async () => {
-    // Evitar revalidar si el cambio viene del servidor
-    if (isUpdatingFromServerRef.current) return;
+    // Evitar revalidar si el cambio viene del servidor o de la sincronización automática
+    if (isUpdatingFromServerRef.current || isUpdatingTimeRef.current) return;
 
     const values = validateFeeForm.getValues();
     const hasQr = Boolean(values.parkingSessionId?.trim());
@@ -134,14 +154,23 @@ function QrFormComponent({
       onChange={handleFormChange}
     >
       <div className="flex flex-col gap-3 rounded-xl">
-        <div className="flex items-center gap-1.5">
-          <ChronoBadge
-            variant="outline"
-            className="border-primary/40 text-foreground"
-          >
-            Paso 1
-          </ChronoBadge>
-          <ChronoSectionLabel size="sm">Hora de salida</ChronoSectionLabel>
+        <div className="flex items-center justify-between gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <ChronoBadge
+              variant="outline"
+              className="border-primary/40 text-foreground"
+            >
+              Paso 1
+            </ChronoBadge>
+            <ChronoSectionLabel size="sm">Hora de salida</ChronoSectionLabel>
+          </div>
+          <ChronoSwitch
+            size="sm"
+            checked={manualExitTime}
+            onCheckedChange={setManualExitTime}
+            label="Manual"
+            labelPosition="left"
+          />
         </div>
         <Controller
           control={validateFeeForm.control}
@@ -152,6 +181,7 @@ function QrFormComponent({
                 {...field}
                 date={field.value as Date | undefined}
                 setDate={(value) => field.onChange(value)}
+                disabled={!manualExitTime}
               />
 
               {fieldState.invalid && (

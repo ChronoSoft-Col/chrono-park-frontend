@@ -17,6 +17,7 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 export type ChronoDateTimePickerProps = {
   date?: Date;
   setDate: (date: Date) => void;
+  disabled?: boolean;
 };
 
 type TimePart = "hour" | "minute" | "ampm";
@@ -94,7 +95,7 @@ function TimeColumn({ maxHeight, children }: TimeColumnProps) {
   );
 }
 
-export function ChronoDateTimePicker({ date, setDate }: ChronoDateTimePickerProps) {
+export function ChronoDateTimePicker({ date, setDate, disabled }: ChronoDateTimePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const { ref: calendarRef, height: calendarHeight } = useMeasuredHeight(isOpen);
 
@@ -102,21 +103,26 @@ export function ChronoDateTimePicker({ date, setDate }: ChronoDateTimePickerProp
   const minutes = React.useMemo(() => Array.from({ length: 12 }, (_, index) => index * 5), []);
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
-    if (!selectedDate) return;
+    if (!selectedDate || disabled) return;
     setDate(selectedDate);
   };
 
   const handleTimeChange = (type: TimePart, value: string) => {
-    if (!date) return;
+    if (!date || disabled) return;
     setDate(applyTimePart(date, type, value));
   };
 
   return (
-    <ChronoPopover open={isOpen} onOpenChange={setIsOpen}>
+    <ChronoPopover open={isOpen} onOpenChange={(open) => !disabled && setIsOpen(open)}>
       <ChronoPopoverTrigger asChild>
         <ChronoButton
           variant="outline"
-          className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
+          disabled={disabled}
+          className={cn(
+            "w-full justify-start text-left font-normal",
+            !date && "text-muted-foreground",
+            disabled && "opacity-50 cursor-not-allowed"
+          )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {date ? format(date, "MM/dd/yyyy hh:mm aa") : <span>MM/DD/YYYY hh:mm aa</span>}
