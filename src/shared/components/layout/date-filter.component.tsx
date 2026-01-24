@@ -1,7 +1,7 @@
 "use client";
 
 import { MotionProps, motion } from "framer-motion";
-import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react";
+import { ArrowLeftToLine, ArrowRightToLine, X } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import ChronoButton from "@chrono/chrono-button.component";
 import { ChronoCalendar } from "@chrono/chrono-calendar.component";
@@ -47,6 +47,12 @@ export function DateRangeComponent() {
       }
       return date;
     });
+    setIsPickerOpen(false);
+  };
+
+  const clearDate = () => {
+    setCurrentdate(null);
+    setCurrentMotion("right");
     setIsPickerOpen(false);
   };
 
@@ -130,6 +136,17 @@ export function DateRangeComponent() {
           />
         </ChronoPopoverContent>
       </ChronoPopover>
+
+      <ChronoButton
+        type="button"
+        variant="ghost"
+        className="h-9 w-9"
+        onClick={clearDate}
+        disabled={!currentDate}
+      >
+        <X className="h-4 w-4" />
+      </ChronoButton>
+
       <ChronoButton
         variant={"ghost"}
         onClick={() => {
