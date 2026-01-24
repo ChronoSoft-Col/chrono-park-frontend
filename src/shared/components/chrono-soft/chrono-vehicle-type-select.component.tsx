@@ -13,6 +13,14 @@ import {
   ChronoSelectValue,
 } from "./chrono-select.component";
 
+export enum ChronoVehicleType {
+  CAR = "CAR",
+  MOTORBIKE = "MOTORBIKE",
+  TRUCK = "TRUCK",
+  VAN = "VAN",
+  UNKNOWN = "UNKNOWN",
+}
+
 export type ChronoVehicleTypeOption = {
   value: string;
   label: string;
@@ -39,22 +47,66 @@ function normalizeText(value: string) {
     .replace(/\p{Diacritic}/gu, "");
 }
 
-function getIconForVehicleTypeLabel(label?: string) {
-  const normalized = normalizeText(label ?? "");
+function getVehicleTypeFromValueOrLabel(value?: string, label?: string): ChronoVehicleType {
+  const normalizedValue = normalizeText(value ?? "");
 
-  if (/(moto|motocicleta|motocycle|motorcycle)/.test(normalized)) {
-    return Motorbike;
+  switch (normalizedValue) {
+    case "moto":
+    case "motocicleta":
+    case "motorbike":
+    case "motorcycle":
+      return ChronoVehicleType.MOTORBIKE;
+
+    case "camion":
+    case "camioneta":
+    case "truck":
+      return ChronoVehicleType.TRUCK;
+
+    case "van":
+    case "furgon":
+    case "furgoneta":
+      return ChronoVehicleType.VAN;
+
+    case "carro":
+    case "coche":
+    case "auto":
+    case "automovil":
+    case "car":
+      return ChronoVehicleType.CAR;
+
+    default: {
+      const normalizedLabel = normalizeText(label ?? "");
+      if (/(moto|motocicleta|motocycle|motorcycle)/.test(normalizedLabel)) {
+        return ChronoVehicleType.MOTORBIKE;
+      }
+      if (/(camion|camioneta|truck)/.test(normalizedLabel)) {
+        return ChronoVehicleType.TRUCK;
+      }
+      if (/(furgon|van)/.test(normalizedLabel)) {
+        return ChronoVehicleType.VAN;
+      }
+      if (/(carro|coche|auto|automovil|car)/.test(normalizedLabel)) {
+        return ChronoVehicleType.CAR;
+      }
+
+      return ChronoVehicleType.UNKNOWN;
+    }
   }
+}
 
-  if (/(camion|camioneta|truck|furgon|van)/.test(normalized)) {
-    return Truck;
+function getIconForVehicleType(vehicleType: ChronoVehicleType) {
+  switch (vehicleType) {
+    case ChronoVehicleType.MOTORBIKE:
+      return Motorbike;
+    case ChronoVehicleType.TRUCK:
+      return Truck;
+    case ChronoVehicleType.VAN:
+      return Truck;
+    case ChronoVehicleType.CAR:
+      return CarFront;
+    default:
+      return CircleQuestionMark;
   }
-
-  if(/(carro|coche|auto|automovil|car)/.test(normalized)) {
-    return CarFront;
-  }
-
-  return CircleQuestionMark;
 }
 
 export default function ChronoVehicleTypeSelect({
@@ -78,9 +130,10 @@ export default function ChronoVehicleTypeSelect({
   );
 
   const iconNode = React.useMemo(() => {
-    const Icon = getIconForVehicleTypeLabel(selected?.label);
-    return <Icon className="h-6 w-6" />;
-  }, [selected?.label]);
+    const vehicleType = getVehicleTypeFromValueOrLabel(selected?.value, selected?.label);
+    const Icon = getIconForVehicleType(vehicleType);
+    return <Icon className="size-6" />;
+  }, [selected?.label, selected?.value]);
 
   const clear = React.useCallback(() => {
     onValueChange?.("");
@@ -128,6 +181,7 @@ export default function ChronoVehicleTypeSelect({
               "text-xl font-medium focus:ring-0 focus-visible:ring-0",
               "data-placeholder:text-sm data-placeholder:font-normal",
               "bg-transparent dark:bg-transparent dark:hover:bg-transparent backdrop-blur-0",
+              "[&_[data-slot=select-value]_svg]:hidden",
               triggerClassName,
             )}
             ref={triggerRef}
@@ -139,8 +193,21 @@ export default function ChronoVehicleTypeSelect({
 
           <ChronoSelectContent>
             {options.map((option) => (
-              <ChronoSelectItem key={option.value} value={option.value}>
-                {option.label}
+              <ChronoSelectItem
+                key={option.value}
+                value={option.value}
+                className="min-h-12 py-3 text-sm gap-3"
+              >
+                {(() => {
+                  const vehicleType = getVehicleTypeFromValueOrLabel(option.value, option.label);
+                  const Icon = getIconForVehicleType(vehicleType);
+                  return (
+                    <span className="flex items-center gap-3">
+                      <Icon className="size-5 text-primary" />
+                      <span className="font-medium">{option.label}</span>
+                    </span>
+                  );
+                })()}
               </ChronoSelectItem>
             ))}
           </ChronoSelectContent>
