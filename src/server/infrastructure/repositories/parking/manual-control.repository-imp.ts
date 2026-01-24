@@ -13,4 +13,7 @@ export class ManualControlRepositoryImp implements ManualControlRepository {
         return this.manualControlDatasourceService.generateManualIncome(params)
     }
 
+    getEntryTicket(parkingSessionId: string): Promise<IGenerateManualIncomeResponse> {
+        return this.manualControlDatasourceService.getEntryTicket(parkingSessionId)
+    }
 }

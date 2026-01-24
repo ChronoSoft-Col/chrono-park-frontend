@@ -12,8 +12,8 @@ import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import { InOutDetailDialogContent } from "./in-out-detail-dialog-content";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { toast } from "sonner";
-import { TPrintIncomeBody } from "@/src/shared/types/parking/print-income-body.type";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
+import { getEntryTicketAction } from "../actions/get-entry-ticket.action";
 
 interface Props {
   items: IInOutEntity[];
@@ -50,20 +50,13 @@ export default function InOutDataListComponent({
         description: `¿Desea imprimir el ticket de ingreso de ${item.vehicle.licensePlate}?`,
         iconVariant: "warning",
         handleYes: async () => {
-          const body: TPrintIncomeBody = {
-            parkingSessionId: item.id,
-            vehiclePlate: item.vehicle.licensePlate,
-            vehicleType: item.vehicle.vehicleType.name,
-            entryTime: item.entryTime,
-            informationPrinter: {
-              headerMessage: "",
-              bodyMessage: "",
-              footerMessage: "",
-              insurancePolicyInfo: "",
-            },
-          };
+          const ticketResponse = await getEntryTicketAction(item.id);
+          if (!ticketResponse.success || !ticketResponse.data) {
+            toast.error(ticketResponse.error || "No se pudo obtener la información del ticket");
+            return;
+          }
 
-          const res = await printIncomeReceipt(body);
+          const res = await printIncomeReceipt(ticketResponse.data);
           if (!res.success) {
             toast.error("No se pudo imprimir el ticket de ingreso");
             return;

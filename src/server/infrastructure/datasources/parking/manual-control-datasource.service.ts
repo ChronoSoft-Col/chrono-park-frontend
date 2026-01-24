@@ -10,4 +10,10 @@ export class ManualControlDatasourceService extends AxiosServerInstance implemen
             return response.data;
         });
     }
+
+    getEntryTicket(parkingSessionId: string): Promise<IGenerateManualIncomeResponse> {
+        return this.api.get<IGenerateManualIncomeResponse>(`/parking-sessions/${parkingSessionId}/entry-ticket`).then(response => {
+            return response.data;
+        });
+    }
 }

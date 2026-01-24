@@ -9,4 +9,8 @@ export class ManualControlUseCase implements ManualControlRepository {
     generateManualIncome(params: IGenerateManualIncomeParamsEntity): Promise<IGenerateManualIncomeResponse> {
         return this.manualControlRepository.generateManualIncome(params)
     }
+
+    getEntryTicket(parkingSessionId: string): Promise<IGenerateManualIncomeResponse> {
+        return this.manualControlRepository.getEntryTicket(parkingSessionId)
+    }
 }
