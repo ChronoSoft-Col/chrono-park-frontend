@@ -4,6 +4,7 @@ import {
   ChevronsUpDown,
   LogOut,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import {
   Avatar,
@@ -25,7 +26,6 @@ import {
   useSidebar,
 } from "@/src/shared/components/ui/sidebar"
 import { signOut } from "@/src/lib/session-client"
-import { redirect } from "next/navigation"
 
 export function NavUser({
   user,
@@ -37,7 +37,9 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-  const handleLogout = () => {
+  const router = useRouter()
+  
+  const handleLogout = async () => {
 
     const clearBranding = () => {
       sessionStorage.removeItem("branding:cssVars")
@@ -53,8 +55,8 @@ export function NavUser({
     }
     clearBranding()
 
-    signOut()
-    redirect("/auth/login")
+    await signOut()
+    router.push("/auth/login")
   }
 
   const getInitialLetters = (name: string) => {

@@ -19,6 +19,23 @@ export function shouldProtect(pathname: string): boolean {
   return pathname.startsWith(`${ADMIN_PREFIX}/`);
 }
 
+/**
+ * Obtiene la URL base real del request, considerando proxies y hosts alternativos
+ */
+function getBaseUrl(request: NextRequest): string {
+  // Intentar obtener el host del header (funciona cuando hay proxy o acceso por IP/dominio)
+  const host = request.headers.get("host") || request.headers.get("x-forwarded-host");
+  const protocol = request.headers.get("x-forwarded-proto") || 
+    (request.url.startsWith("https") ? "https" : "http");
+  
+  if (host) {
+    return `${protocol}://${host}`;
+  }
+  
+  // Fallback: usar la URL del request
+  return `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+}
+
 export async function proxy(request: NextRequest): Promise<NextResponse | null> {
   const { pathname } = request.nextUrl;
 
@@ -32,7 +49,8 @@ export async function proxy(request: NextRequest): Promise<NextResponse | null> 
     return null;
   }
 
-  const loginUrl = new URL(LOGIN_ROUTE, request.url);
+  const baseUrl = getBaseUrl(request);
+  const loginUrl = new URL(LOGIN_ROUTE, baseUrl);
   loginUrl.searchParams.set("from", pathname);
 
   return NextResponse.redirect(loginUrl);
