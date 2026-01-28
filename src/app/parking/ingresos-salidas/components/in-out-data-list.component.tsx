@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { IInOutEntity } from "@/server/domain";
 import { ChronoDataTable } from "@chrono/chrono-data-table.component";
@@ -14,6 +15,7 @@ import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { toast } from "sonner";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
 import { getEntryTicketAction } from "../actions/get-entry-ticket.action";
+import { InOutStatusEnum } from "@/src/shared/enums/parking/in-out-status.enum";
 
 interface Props {
   items: IInOutEntity[];
@@ -28,8 +30,42 @@ export default function InOutDataListComponent({
   totalPages,
   pageSize,
 }: Props) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [pending, startTransition] = React.useTransition();
+
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const { printIncomeReceipt } = usePrint();
+
+  const currentStatus = (searchParams.get("status") as InOutStatusEnum | null) ?? InOutStatusEnum.ACTIVE;
+  const isEntriesTab = currentStatus === InOutStatusEnum.ACTIVE;
+
+  const buildUrl = React.useCallback(
+    (nextParams: Record<string, string>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      Object.entries(nextParams).forEach(([key, value]) => params.set(key, value));
+      const queryString = params.toString();
+      return queryString ? `${pathname}?${queryString}` : pathname;
+    },
+    [pathname, searchParams],
+  );
+
+  const setStatus = React.useCallback(
+    (status: InOutStatusEnum) => {
+      if (pending) return;
+      if (status === currentStatus) return;
+      startTransition(() => {
+        router.replace(
+          buildUrl({
+            status,
+            page: "1",
+          }),
+        );
+      });
+    },
+    [buildUrl, currentStatus, pending, router],
+  );
 
   const handleViewDetail = React.useCallback(
     (item: IInOutEntity) => {
@@ -93,13 +129,35 @@ export default function InOutDataListComponent({
       title="Ingresos y Salidas"
       description="Lista de ingresos y salidas de vehículos en el sistema"
       table={
-        <ChronoDataTable
-          data={items}
-          columns={columns}
-          caption={`${total} registros`}
-          getRowKey={(row) => row.id}
-          emptyMessage="Sin registros para mostrar"
-        />
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <ChronoButton
+              type="button"
+              variant={isEntriesTab ? "default" : "secondary"}
+              disabled={pending}
+              onClick={() => setStatus(InOutStatusEnum.ACTIVE)}
+            >
+              Entradas
+            </ChronoButton>
+            <ChronoButton
+              type="button"
+              variant={!isEntriesTab ? "default" : "secondary"}
+              disabled={pending}
+              onClick={() => setStatus(InOutStatusEnum.INACTIVE)}
+            >
+              Salidas
+            </ChronoButton>
+          </div>
+
+          <ChronoDataTable
+            data={items}
+            columns={columns}
+            caption={`${total} registros`}
+            getRowKey={(row) => row.id}
+            emptyMessage="Sin registros para mostrar"
+            isLoading={pending}
+          />
+        </div>
       }
       paginator={
         <ChronoPaginator

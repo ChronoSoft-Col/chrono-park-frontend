@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { Skeleton } from "../ui/skeleton";
 
 const alignmentClassMap = {
   left: "text-left",
@@ -39,6 +40,8 @@ export type ChronoDataTableProps<T extends object> = {
   emptyMessage?: ReactNode;
   loadingMessage?: ReactNode;
   isLoading?: boolean;
+  /** Número de filas skeleton a mostrar mientras carga (default: 5) */
+  skeletonRows?: number;
   getRowKey?: (row: T, index: number) => string | number;
   className?: string;
 };
@@ -50,6 +53,7 @@ export function ChronoDataTable<T extends object>({
   emptyMessage = "Sin resultados",
   loadingMessage = "Cargando datos…",
   isLoading = false,
+  skeletonRows = 5,
   getRowKey,
   className,
 }: ChronoDataTableProps<T>) {
@@ -88,13 +92,22 @@ export function ChronoDataTable<T extends object>({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {isLoading && (
-          <TableRow>
-            <TableCell colSpan={columns.length} className="text-center text-xs text-muted-foreground">
-              {loadingMessage}
-            </TableCell>
-          </TableRow>
-        )}
+        {isLoading &&
+          Array.from({ length: skeletonRows }).map((_, rowIdx) => (
+            <TableRow key={`skeleton-row-${rowIdx}`} className="animate-pulse">
+              {columns.map((column, colIdx) => (
+                <TableCell
+                  key={`skeleton-cell-${rowIdx}-${colIdx}`}
+                  className={cn(
+                    alignmentClassMap[column.align ?? "left"],
+                    column.cellClassName
+                  )}
+                >
+                  <Skeleton className="h-4 w-full rounded" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
 
         {showEmptyState && (
           <TableRow>
