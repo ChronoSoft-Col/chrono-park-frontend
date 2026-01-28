@@ -50,26 +50,35 @@ export default function ManualIncomeFormComponent() {
   const onManualIncomeSubmit = async (
     params: ManualIncomeForm,
   ): Promise<boolean> => {
-    const data: IGenerateManualIncomeParamsEntity = {
-      ...params,
-      entryTime: params.entryTime.toISOString(),
-    };
-    const response = await generateManualIncomeAction(data);
-    if (!response.success) {
-      toast.error("Error generando ingreso manual: " + response.error);
+    const toastId = toast.loading("Generando ingreso manual...");
+    try {
+      const data: IGenerateManualIncomeParamsEntity = {
+        ...params,
+        entryTime: params.entryTime.toISOString(),
+      };
+      const response = await generateManualIncomeAction(data);
+      if (!response.success) {
+        toast.error("Error generando ingreso manual: " + response.error, { id: toastId });
+        return false;
+      }
+
+      const incomeResponse = response.data as IGenerateManualIncomeResponse;
+      if (incomeResponse.data) {
+        toast.loading("Enviando impresión...", { id: toastId });
+        const printResult = await printIncomeReceipt(incomeResponse.data);
+        if (!printResult.success) {
+          toast.warning("Ingreso generado, pero no se pudo imprimir el ticket", { id: toastId });
+          return true;
+        }
+      }
+
+      toast.success("Ingreso manual generado correctamente", { id: toastId });
+      return true;
+    } catch (error) {
+      console.error("Error generating manual income:", error);
+      toast.error("Error inesperado al generar ingreso", { id: toastId });
       return false;
     }
-
-    const incomeResponse = response.data as IGenerateManualIncomeResponse;
-    if (incomeResponse.data) {
-      const printResult = await printIncomeReceipt(incomeResponse.data);
-      if (!printResult.success) {
-        toast.warning("Ingreso generado, pero no se pudo imprimir el ticket");
-      }
-    }
-
-    toast.success("Ingreso manual generado correctamente");
-    return true;
   };
 
   return (
@@ -115,11 +124,18 @@ const IncomeForm = ({
     setRateProfiles([]);
     if (!vehicleTypeId) return;
 
-    const profiles = await getRateProfileAction(vehicleTypeId);
-    if (profiles.success) {
-      setRateProfiles(profiles.data?.data || []);
-    } else {
-      toast.error("Error cargando perfiles de tarifa: " + profiles.error);
+    const toastId = toast.loading("Cargando perfiles de tarifa...");
+    try {
+      const profiles = await getRateProfileAction(vehicleTypeId);
+      if (profiles.success) {
+        setRateProfiles(profiles.data?.data || []);
+        toast.dismiss(toastId);
+      } else {
+        toast.error("Error cargando perfiles de tarifa: " + profiles.error, { id: toastId });
+      }
+    } catch (error) {
+      console.error("Error loading rate profiles:", error);
+      toast.error("Error inesperado al cargar perfiles", { id: toastId });
     }
   };
 

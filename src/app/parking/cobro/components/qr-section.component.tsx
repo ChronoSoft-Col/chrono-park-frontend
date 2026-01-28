@@ -33,7 +33,7 @@ type QrSectionProps = {
 };
 
 export function QrSectionComponent({ className }: QrSectionProps) {
-  const { validateFee, clearValidateResult, validateRaw } = usePaymentContext();
+  const { validateFee, clearValidateResult, validateRaw, isValidating } = usePaymentContext();
 
   const onValidateFee = async (data: IValidateAmountParamsEntity) => {
     clearValidateResult();
@@ -57,6 +57,7 @@ export function QrSectionComponent({ className }: QrSectionProps) {
           onValidateFee={onValidateFee}
           onClear={clearValidateResult}
           validatedPlate={validateRaw?.data?.vehicle?.licensePlate}
+          isValidating={isValidating}
         />
       </ChronoCardContent>
     </ChronoCard>
@@ -67,10 +68,12 @@ function QrFormComponent({
   onValidateFee,
   onClear,
   validatedPlate,
+  isValidating,
 }: {
   onValidateFee: (data: IValidateAmountParamsEntity) => Promise<boolean>;
   onClear: () => void;
   validatedPlate?: string;
+  isValidating?: boolean;
 }) {
   const isUpdatingFromServerRef = useRef(false);
   const isUpdatingTimeRef = useRef(false);
@@ -153,6 +156,12 @@ function QrFormComponent({
       className="my-4 flex min-h-0 flex-col gap-4 overflow-y-auto"
       onChange={handleFormChange}
     >
+      {isValidating && (
+        <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm text-primary animate-pulse">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span>Validando tarifa...</span>
+        </div>
+      )}
       <div className="flex flex-col gap-3 rounded-xl">
         <div className="flex items-center justify-between gap-1.5">
           <div className="flex items-center gap-1.5">

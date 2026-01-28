@@ -114,33 +114,40 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   };
 
   const processPayment = async () => {
-    const res = await generatePaymentAction({
-      parkingSessionId: parkingSessionId!,
-      paymentMethodId: selectedMethod!,
-      amountReceived: Number(amountReceived),
-      notes,
-    });
-    
-    if(!res.success || !res.data){
-      toast.error("Error al registrar el pago", {
-        description: res.error || "Intenta nuevamente más tarde.",
+    const toastId = toast.loading("Registrando pago...");
+    try {
+      const res = await generatePaymentAction({
+        parkingSessionId: parkingSessionId!,
+        paymentMethodId: selectedMethod!,
+        amountReceived: Number(amountReceived),
+        notes,
       });
-      return;
-    }
+      
+      if(!res.success || !res.data){
+        toast.error("Error al registrar el pago", {
+          description: res.error || "Intenta nuevamente más tarde.",
+          id: toastId,
+        });
+        return;
+      }
 
-    toast.success("Pago registrado exitosamente");
+      toast.success("Pago registrado exitosamente", { id: toastId });
 
-    const paymentId = res.data.data.paymentId ?? res.data.data.session?.paymentId;
-    if (!paymentId) {
-      toast.error("Pago registrado, pero no se recibió un ID de pago para imprimir", {
-        description: "Verifica el tipado/forma de la respuesta del backend.",
-      });
+      const paymentId = res.data.data.paymentId ?? res.data.data.session?.paymentId;
+      if (!paymentId) {
+        toast.error("Pago registrado, pero no se recibió un ID de pago para imprimir", {
+          description: "Verifica el tipado/forma de la respuesta del backend.",
+        });
+        resetPaymentForm();
+        return;
+      }
+
+      await handlePrintPrompt(paymentId);
       resetPaymentForm();
-      return;
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      toast.error("Error inesperado al registrar el pago", { id: toastId });
     }
-
-    await handlePrintPrompt(paymentId);
-    resetPaymentForm();
   };
 
   const validatePaymentData = (): boolean => {
@@ -416,7 +423,7 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
           {currentStep < steps.length - 1 ? (
             <ChronoButton size="icon-lg" icon={<ArrowBigRight/>} onClick={handleContinue}/>
           ) : (
-            <ChronoButton size="icon-lg" onClick={handleRegisterPayment} disabled={isSubmitting} icon={<Banknote/>}/>
+            <ChronoButton size="icon-lg" onClick={handleRegisterPayment} loading={isSubmitting} icon={<Banknote/>}/>
           )}
         </div>
       </ChronoCardFooter>

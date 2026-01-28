@@ -21,23 +21,30 @@ export function CreateCustomerDialogContent() {
       return false;
     }
 
-    const payload: ICreateCustomerParamsEntity = {
-      ...parsed.data,
-      email: parsed.data.email || undefined,
-      phoneNumber: parsed.data.phoneNumber || undefined,
-      agreementId: parsed.data.agreementId || undefined,
-    };
+    const toastId = toast.loading("Creando cliente...");
+    try {
+      const payload: ICreateCustomerParamsEntity = {
+        ...parsed.data,
+        email: parsed.data.email || undefined,
+        phoneNumber: parsed.data.phoneNumber || undefined,
+        agreementId: parsed.data.agreementId || undefined,
+      };
 
-    const result = await createCustomerAction(payload);
-    if (!result.success || !result.data?.success) {
-      toast.error(result.error || result.data?.message || "Error al crear el cliente");
+      const result = await createCustomerAction(payload);
+      if (!result.success || !result.data?.success) {
+        toast.error(result.error || result.data?.message || "Error al crear el cliente", { id: toastId });
+        return false;
+      }
+
+      toast.success("Cliente creado correctamente", { id: toastId });
+      closeDialog();
+      router.refresh();
+      return true;
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      toast.error("Error inesperado al crear el cliente", { id: toastId });
       return false;
     }
-
-    toast.success("Cliente creado correctamente");
-    closeDialog();
-    router.refresh();
-    return true;
   };
 
   return <CreateCustomerFormComponent onSubmit={handleSubmit} onCancel={closeDialog} />;

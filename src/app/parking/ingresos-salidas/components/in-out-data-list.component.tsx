@@ -94,21 +94,29 @@ export default function InOutDataListComponent({
         description: `¿Desea imprimir el ticket de ingreso de ${item.vehicle.licensePlate}?`,
         iconVariant: "warning",
         handleYes: async () => {
-          const ticketResponse = await getEntryTicketAction(item.id);
-          if (!ticketResponse.success || !ticketResponse.data) {
-            toast.error(
-              ticketResponse.error ||
-                "No se pudo obtener la información del ticket",
-            );
-            return;
-          }
+          const toastId = toast.loading("Obteniendo información del ticket...");
+          try {
+            const ticketResponse = await getEntryTicketAction(item.id);
+            if (!ticketResponse.success || !ticketResponse.data) {
+              toast.error(
+                ticketResponse.error ||
+                  "No se pudo obtener la información del ticket",
+                { id: toastId },
+              );
+              return;
+            }
 
-          const res = await printIncomeReceipt(ticketResponse.data);
-          if (!res.success) {
-            toast.error("No se pudo imprimir el ticket de ingreso");
-            return;
+            toast.loading("Enviando impresión...", { id: toastId });
+            const res = await printIncomeReceipt(ticketResponse.data);
+            if (!res.success) {
+              toast.error("No se pudo imprimir el ticket de ingreso", { id: toastId });
+              return;
+            }
+            toast.success("Ticket de ingreso enviado a la impresora", { id: toastId });
+          } catch (error) {
+            console.error("Error printing entry ticket:", error);
+            toast.error("Error inesperado al imprimir", { id: toastId });
           }
-          toast.success("Ticket de ingreso enviado a la impresora");
         },
         handleNo: async () => {},
       });

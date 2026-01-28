@@ -100,13 +100,15 @@ export default function ClosureDataListComponent({
     if (detailRequestInFlightRef.current) return;
 
     detailRequestInFlightRef.current = true;
+    const toastId = toast.loading("Cargando detalle del cierre...");
     try {
       const res = await getClosureByIdAction(closure.id);
       if (!res.success || !res.data) {
-        toast.error(res.error || "No se pudo cargar el detalle del cierre");
+        toast.error(res.error || "No se pudo cargar el detalle del cierre", { id: toastId });
         return;
       }
-
+      
+      toast.dismiss(toastId);
       const closureDetail = res.data;
 
       openDialog({
@@ -124,7 +126,7 @@ export default function ClosureDataListComponent({
       });
     } catch (error) {
       console.error("Error loading closure detail:", error);
-      toast.error("Error inesperado al cargar el detalle del cierre");
+      toast.error("Error inesperado al cargar el detalle del cierre", { id: toastId });
     } finally {
       detailRequestInFlightRef.current = false;
     }

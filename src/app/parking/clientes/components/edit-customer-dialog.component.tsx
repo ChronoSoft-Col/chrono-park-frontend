@@ -24,23 +24,30 @@ export function EditCustomerDialogContent({ customer }: { customer: ICustomerEnt
       return false;
     }
 
-    const payload: IUpdateCustomerParamsEntity = {
-      ...parsed.data,
-      email: parsed.data.email || undefined,
-      phoneNumber: parsed.data.phoneNumber || undefined,
-      agreementId: parsed.data.agreementId || undefined,
-    };
+    const toastId = toast.loading("Actualizando cliente...");
+    try {
+      const payload: IUpdateCustomerParamsEntity = {
+        ...parsed.data,
+        email: parsed.data.email || undefined,
+        phoneNumber: parsed.data.phoneNumber || undefined,
+        agreementId: parsed.data.agreementId || undefined,
+      };
 
-    const result = await updateCustomerAction(customer.id, payload);
-    if (!result.success || !result.data?.success) {
-      toast.error(result.error || result.data?.message || "Error al editar el cliente");
+      const result = await updateCustomerAction(customer.id, payload);
+      if (!result.success || !result.data?.success) {
+        toast.error(result.error || result.data?.message || "Error al editar el cliente", { id: toastId });
+        return false;
+      }
+
+      toast.success("Cliente actualizado correctamente", { id: toastId });
+      closeDialog();
+      router.refresh();
+      return true;
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      toast.error("Error inesperado al actualizar el cliente", { id: toastId });
       return false;
     }
-
-    toast.success("Cliente actualizado correctamente");
-    closeDialog();
-    router.refresh();
-    return true;
   };
 
   return <EditCustomerFormComponent customer={customer} onSubmit={handleSubmit} onCancel={closeDialog} />;

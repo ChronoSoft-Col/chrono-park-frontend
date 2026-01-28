@@ -23,7 +23,7 @@ async function getBaseUrl(request: Request): Promise<string> {
   return `${url.protocol}//${url.host}`;
 }
 
-export async function GET(request: Request) {
+async function handleLogout(request: Request) {
   const { searchParams } = new URL(request.url);
   const nextParam = searchParams.get("next");
   const safeNext = nextParam && nextParam.startsWith("/") ? nextParam : "/auth/login?reason=expired";
@@ -32,4 +32,13 @@ export async function GET(request: Request) {
 
   const baseUrl = await getBaseUrl(request);
   return NextResponse.redirect(new URL(safeNext, baseUrl));
+}
+
+export async function GET(request: Request) {
+  return handleLogout(request);
+}
+
+// POST handler para cuando un redirect 307/308 mantiene el método original
+export async function POST(request: Request) {
+  return handleLogout(request);
 }
