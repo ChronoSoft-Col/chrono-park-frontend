@@ -2,8 +2,8 @@
 
 import "reflect-metadata"
 
-import { useEffect, useMemo, useState } from "react";
-import { ScanQrCode, Banknote, ArrowBigLeft, ArrowBigRight } from "lucide-react";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { ScanQrCode, Banknote, ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import ChronoButton from "@chrono/chrono-button.component";
@@ -211,6 +211,19 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
     nextStep();
   };
 
+  // Handle ENTER key to go to next step (except on last step)
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if (event.key === "Enter" && !isLastStep && validateRaw) {
+      event.preventDefault();
+      nextStep();
+    }
+  }, [isLastStep, validateRaw]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   if (!validateRaw) {
     return (
       <ChronoCard className={cn("gap-0 overflow-hidden", className)}>
@@ -416,14 +429,23 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
         </div>
       </ChronoCardContent>
       <ChronoCardFooter>
-        <div className="ml-auto flex items-center gap-2 text-xs">
+        <div className="ml-auto flex items-center gap-3">
           {currentStep > 0 && (
-            <ChronoButton variant="ghost" size="icon-lg" onClick={prevStep} icon={<ArrowBigLeft/>}/>
+            <ChronoButton variant="outline" size="lg" onClick={prevStep}>
+              <ArrowLeft className="h-4 w-4" />
+              Anterior
+            </ChronoButton>
           )}
           {currentStep < steps.length - 1 ? (
-            <ChronoButton size="icon-lg" icon={<ArrowBigRight/>} onClick={handleContinue}/>
+            <ChronoButton size="lg" onClick={handleContinue}>
+              Siguiente
+              <ArrowRight className="h-4 w-4" />
+            </ChronoButton>
           ) : (
-            <ChronoButton size="icon-lg" onClick={handleRegisterPayment} loading={isSubmitting} icon={<Banknote/>}/>
+            <ChronoButton size="lg" onClick={handleRegisterPayment} loading={isSubmitting}>
+              <Check className="h-4 w-4" />
+              Pagar
+            </ChronoButton>
           )}
         </div>
       </ChronoCardFooter>
