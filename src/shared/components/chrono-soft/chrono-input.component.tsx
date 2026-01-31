@@ -6,7 +6,7 @@ export type ChronoInputProps = ComponentProps<typeof Input> & {
 	tone?: "default" | "dark";
 };
 
-export function ChronoInput({ className, tone = "default", ...props }: ChronoInputProps) {
+export function ChronoInput({ className, tone = "default", autoComplete = "off", ...props }: ChronoInputProps) {
 	return (
 		<Input
 			className={cn(
@@ -14,6 +14,7 @@ export function ChronoInput({ className, tone = "default", ...props }: ChronoInp
 				tone === "dark" && "bg-foreground/5 text-foreground placeholder:text-foreground/60",
 				className
 			)}
+			autoComplete={autoComplete}
 			{...props}
 		/>
 	);

@@ -152,6 +152,7 @@ function QrFormComponent({
     <form
       className="my-4 flex min-h-0 flex-col gap-4 overflow-y-auto"
       onChange={handleFormChange}
+      autoComplete="off"
     >
       <div className="flex flex-col gap-3 rounded-xl">
         <div className="flex items-center justify-between gap-1.5">
