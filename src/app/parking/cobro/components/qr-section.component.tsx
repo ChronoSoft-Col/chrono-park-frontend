@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ValidateFeeForm,
@@ -21,26 +21,157 @@ import {
   ChronoCardTitle,
 } from "@chrono/chrono-card.component";
 import { ChronoSwitch } from "@chrono/chrono-switch.component";
+import {
+  ChronoSelect,
+  ChronoSelectContent,
+  ChronoSelectItem,
+  ChronoSelectTrigger,
+  ChronoSelectValue,
+} from "@chrono/chrono-select.component";
+import ChronoButton from "@chrono/chrono-button.component";
+import { Settings2, X } from "lucide-react";
 
 import { usePaymentContext } from "@/src/shared/context/payment.context";
+import { useCommonContext } from "@/src/shared/context/common.context";
 import { cn } from "@/src/lib/utils";
 import { useDebouncedCallback } from "use-debounce";
+import { getRateProfileAction } from "@/src/app/global-actions/get-common.action";
+import { TRateProfile } from "@/shared/types/common/rate-profile.type";
 
 import { IValidateAmountParamsEntity } from "@/server/domain";
+
+type RatesByVehicleType = {
+  [vehicleTypeId: string]: {
+    rates: TRateProfile[];
+    isLoading: boolean;
+    selectedRateId: string | null;
+  };
+};
 
 type QrSectionProps = {
   className?: string;
 };
 
 export function QrSectionComponent({ className }: QrSectionProps) {
-  const { validateFee, clearValidateResult, validateRaw } = usePaymentContext();
+  const { validateFee, clearValidateResult, validateRaw, isValidating } = usePaymentContext();
+  const { vehicleTypes = [] } = useCommonContext();
+  
+  // Pre-scan rate configuration state - one entry per vehicle type
+  const [showRateConfig, setShowRateConfig] = useState(false);
+  const [ratesByVehicleType, setRatesByVehicleType] = useState<RatesByVehicleType>({});
+  const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
+  const [selectedVehicleTypeId, setSelectedVehicleTypeId] = useState<string | null>(null);
+
+  // Load rates for all vehicle types when opening the config panel
+  useEffect(() => {
+    if (showRateConfig && vehicleTypes.length > 0) {
+      vehicleTypes.forEach((vt) => {
+        // Only load if not already loaded
+        if (!ratesByVehicleType[vt.value]) {
+          setRatesByVehicleType((prev) => ({
+            ...prev,
+            [vt.value]: { rates: [], isLoading: true, selectedRateId: null },
+          }));
+          
+          getRateProfileAction(vt.value).then((res) => {
+            if (res.success && res.data?.data) {
+              const rates = Array.isArray(res.data.data) ? res.data.data : [res.data.data];
+              setRatesByVehicleType((prev) => ({
+                ...prev,
+                [vt.value]: {
+                  ...prev[vt.value],
+                  rates: rates.filter((r) => r.isActive),
+                  isLoading: false,
+                },
+              }));
+            } else {
+              setRatesByVehicleType((prev) => ({
+                ...prev,
+                [vt.value]: { ...prev[vt.value], rates: [], isLoading: false },
+              }));
+            }
+          });
+        }
+      });
+    }
+  }, [showRateConfig, vehicleTypes, ratesByVehicleType]);
+
+  // Reset rate config when validation result changes (after successful scan)
+  useEffect(() => {
+    if (validateRaw?.data) {
+      queueMicrotask(() => {
+        setShowRateConfig(false);
+        setSelectedRateId(null);
+        setSelectedVehicleTypeId(null);
+        // Clear all selections but keep loaded rates
+        setRatesByVehicleType((prev) => {
+          const updated: RatesByVehicleType = {};
+          Object.keys(prev).forEach((key) => {
+            updated[key] = { ...prev[key], selectedRateId: null };
+          });
+          return updated;
+        });
+      });
+    }
+  }, [validateRaw]);
+
+  const handleRateSelect = useCallback((vehicleTypeId: string, rateId: string) => {
+    // Clear all other selections and set only this one
+    setRatesByVehicleType((prev) => {
+      const updated: RatesByVehicleType = {};
+      Object.keys(prev).forEach((key) => {
+        updated[key] = {
+          ...prev[key],
+          selectedRateId: key === vehicleTypeId ? rateId : null,
+        };
+      });
+      return updated;
+    });
+    setSelectedRateId(rateId);
+    setSelectedVehicleTypeId(vehicleTypeId);
+  }, []);
+
+  const handleClearAllSelections = useCallback(() => {
+    setRatesByVehicleType((prev) => {
+      const updated: RatesByVehicleType = {};
+      Object.keys(prev).forEach((key) => {
+        updated[key] = { ...prev[key], selectedRateId: null };
+      });
+      return updated;
+    });
+    setSelectedRateId(null);
+    setSelectedVehicleTypeId(null);
+  }, []);
+
+  const handleToggleRateConfig = useCallback(() => {
+    if (showRateConfig) {
+      setShowRateConfig(false);
+    } else {
+      setShowRateConfig(true);
+    }
+  }, [showRateConfig]);
 
   const onValidateFee = async (data: IValidateAmountParamsEntity) => {
     clearValidateResult();
     if (!data.parkingSessionId && !data.licensePlate) return false;
-    const success = await validateFee(data);
+    
+    // If there's a pre-selected rate, include it in the validation
+    const payload: IValidateAmountParamsEntity = {
+      ...data,
+      rateId: selectedRateId ?? undefined,
+    };
+    
+    const success = await validateFee(payload);
     return success;
   };
+
+  // Get the selected rate name for display
+  const selectedRateName = selectedRateId && selectedVehicleTypeId
+    ? ratesByVehicleType[selectedVehicleTypeId]?.rates.find(r => r.id === selectedRateId)?.name
+    : null;
+  const selectedVehicleTypeName = selectedVehicleTypeId
+    ? vehicleTypes.find(vt => vt.value === selectedVehicleTypeId)?.label
+    : null;
 
   return (
     <ChronoCard className={cn("min-w-0 overflow-hidden pb-0", className)}>
@@ -53,6 +184,134 @@ export function QrSectionComponent({ className }: QrSectionProps) {
             Escanea el QR para validar la tarifa de parqueo
           </ChronoCardDescription>
         </ChronoCardHeader>
+        
+        {/* Rate Configuration Section */}
+        <div className="mb-3">
+          {!validateRaw?.data && (
+            <>
+              {!showRateConfig ? (
+                <div className="flex items-center justify-between">
+                  {selectedRateId ? (
+                    <div className="flex items-center gap-2 text-sm">
+                      <ChronoBadge variant="secondary" className="text-xs">
+                        {selectedVehicleTypeName}
+                      </ChronoBadge>
+                      <span className="text-muted-foreground">→</span>
+                      <ChronoBadge variant="default" className="text-xs">
+                        {selectedRateName}
+                      </ChronoBadge>
+                      <ChronoButton
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={handleClearAllSelections}
+                        title="Limpiar selección"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </ChronoButton>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">
+                      Tarifa automática según placa
+                    </span>
+                  )}
+                  <ChronoButton
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={handleToggleRateConfig}
+                    disabled={isValidating}
+                  >
+                    <Settings2 className="h-3 w-3 mr-1" />
+                    Configurar tarifa
+                  </ChronoButton>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 p-2 rounded-md border border-primary/20 bg-primary/5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tarifa manual</span>
+                    <div className="flex items-center gap-0.5">
+                      {selectedRateId && (
+                        <ChronoButton
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-5 px-1.5 text-[10px]"
+                          onClick={handleClearAllSelections}
+                          title="Limpiar selección"
+                        >
+                          <X className="h-3 w-3 mr-0.5" />
+                          Limpiar
+                        </ChronoButton>
+                      )}
+                      <ChronoButton
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5"
+                        onClick={handleToggleRateConfig}
+                        disabled={isValidating}
+                        title="Cerrar"
+                      >
+                        <X className="h-3 w-3" />
+                      </ChronoButton>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-1.5">
+                    {vehicleTypes.map((vt) => {
+                      const vtData = ratesByVehicleType[vt.value];
+                      const isLoading = vtData?.isLoading ?? true;
+                      const rates = vtData?.rates ?? [];
+                      const currentSelection = vtData?.selectedRateId ?? null;
+                      const hasSelection = currentSelection !== null;
+                      
+                      return (
+                        <div key={vt.value} className="flex-1 min-w-0">
+                          <ChronoSelect
+                            value={currentSelection ?? ""}
+                            onValueChange={(rateId) => handleRateSelect(vt.value, rateId)}
+                            disabled={isValidating || isLoading}
+                          >
+                            <ChronoSelectTrigger className={cn(
+                              "h-7 text-xs px-2 transition-all",
+                              hasSelection 
+                                ? "ring-1 ring-primary border-primary bg-primary/10" 
+                                : "opacity-70"
+                            )}>
+                              <ChronoSelectValue 
+                                placeholder={isLoading ? "..." : vt.label}
+                              />
+                            </ChronoSelectTrigger>
+                            <ChronoSelectContent>
+                              <div className="px-2 py-1 text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
+                                {vt.label}
+                              </div>
+                              {rates.length === 0 ? (
+                                <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                                  Sin tarifas
+                                </div>
+                              ) : (
+                                rates.map((rate) => (
+                                  <ChronoSelectItem key={rate.id} value={rate.id} className="text-xs">
+                                    {rate.name}
+                                  </ChronoSelectItem>
+                                ))
+                              )}
+                            </ChronoSelectContent>
+                          </ChronoSelect>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        
         <QrFormComponent
           onValidateFee={onValidateFee}
           onClear={clearValidateResult}
