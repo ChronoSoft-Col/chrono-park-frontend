@@ -109,7 +109,9 @@ export function PaymentSectionComponent({ className }: PaymentSectionProps) {
           clearValidateResult();
         }
       },
-      handleNo: async () => {},
+      handleNo: async () => {
+        clearValidateResult();
+      },
     });
   };
 

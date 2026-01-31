@@ -77,6 +77,7 @@ function QrFormComponent({
 }) {
   const isUpdatingFromServerRef = useRef(false);
   const isUpdatingTimeRef = useRef(false);
+  const prevHasValidatedDataRef = useRef(hasValidatedData);
   const [manualExitTime, setManualExitTime] = useState(false);
 
   const validateFeeForm = useForm<ValidateFeeForm>({
@@ -87,6 +88,21 @@ function QrFormComponent({
       licensePlate: "",
     },
   });
+
+  // Resetear formulario cuando se limpia el resultado validado (ej: después de un pago exitoso)
+  useEffect(() => {
+    // Detectar cambio de true a false (datos validados fueron limpiados)
+    if (prevHasValidatedDataRef.current && !hasValidatedData) {
+      validateFeeForm.reset({
+        exitTime: new Date(),
+        parkingSessionId: "",
+        licensePlate: "",
+      });
+      // Diferir el setState para evitar renders en cascada
+      queueMicrotask(() => setManualExitTime(false));
+    }
+    prevHasValidatedDataRef.current = hasValidatedData;
+  }, [hasValidatedData, validateFeeForm]);
 
   // Sincronizar hora de salida automáticamente cada segundo (si no es manual y no hay datos validados)
   useEffect(() => {
