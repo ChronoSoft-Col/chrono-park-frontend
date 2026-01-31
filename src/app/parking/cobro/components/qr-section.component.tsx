@@ -57,6 +57,7 @@ export function QrSectionComponent({ className }: QrSectionProps) {
           onValidateFee={onValidateFee}
           onClear={clearValidateResult}
           validatedPlate={validateRaw?.data?.vehicle?.licensePlate}
+          hasValidatedData={Boolean(validateRaw?.data)}
         />
       </ChronoCardContent>
     </ChronoCard>
@@ -67,10 +68,12 @@ function QrFormComponent({
   onValidateFee,
   onClear,
   validatedPlate,
+  hasValidatedData = false,
 }: {
   onValidateFee: (data: IValidateAmountParamsEntity) => Promise<boolean>;
   onClear: () => void;
   validatedPlate?: string;
+  hasValidatedData?: boolean;
 }) {
   const isUpdatingFromServerRef = useRef(false);
   const isUpdatingTimeRef = useRef(false);
@@ -85,9 +88,9 @@ function QrFormComponent({
     },
   });
 
-  // Sincronizar hora de salida automáticamente cada segundo (si no es manual)
+  // Sincronizar hora de salida automáticamente cada segundo (si no es manual y no hay datos validados)
   useEffect(() => {
-    if (manualExitTime) return;
+    if (manualExitTime || hasValidatedData) return;
 
     const interval = setInterval(() => {
       isUpdatingTimeRef.current = true;
@@ -100,7 +103,7 @@ function QrFormComponent({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [manualExitTime, validateFeeForm]);
+  }, [manualExitTime, hasValidatedData, validateFeeForm]);
 
   // Actualizar el campo de placa cuando el servidor devuelve la placa validada
   useEffect(() => {
@@ -171,6 +174,7 @@ function QrFormComponent({
             onCheckedChange={setManualExitTime}
             label="Manual"
             labelPosition="left"
+            disabled={hasValidatedData}
           />
         </div>
         <Controller
@@ -182,7 +186,7 @@ function QrFormComponent({
                 {...field}
                 date={field.value as Date | undefined}
                 setDate={(value) => field.onChange(value)}
-                disabled={!manualExitTime}
+                disabled={hasValidatedData || !manualExitTime}
               />
 
               {fieldState.invalid && (
