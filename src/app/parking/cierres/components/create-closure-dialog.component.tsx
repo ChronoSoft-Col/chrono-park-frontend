@@ -47,6 +47,7 @@ export default function CreateClosureDialogContent() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    const toastId = toast.loading("Creando cierre...");
 
     try {
       const result = await createClosureAction({
@@ -54,19 +55,19 @@ export default function CreateClosureDialogContent() {
       });
 
       if (result.success && result.data) {
-        toast.success("Cierre creado exitosamente");
+        toast.success("Cierre creado exitosamente", { id: toastId });
         
         // Imprimir el cierre
         try {
-          const toastId = toast.loading("Enviando impresión...");
+          const printToastId = toast.loading("Enviando impresión...");
           const printResult = await printClosureReceipt(result.data);
           if (!printResult.success || !printResult.data) {
             toast.warning(
               "Cierre creado, pero no se pudo enviar la impresión. Intenta reimprimir más tarde.",
-              { id: toastId },
+              { id: printToastId },
             );
           } else {
-            toast.success("Impresión enviada correctamente", { id: toastId });
+            toast.success("Impresión enviada correctamente", { id: printToastId });
           }
         } catch (printError) {
           console.error("Error printing closure:", printError);
@@ -79,11 +80,11 @@ export default function CreateClosureDialogContent() {
         closeDialog();
         router.refresh();
       } else {
-        toast.error(result.error || "Error al crear el cierre");
+        toast.error(result.error || "Error al crear el cierre", { id: toastId });
       }
     } catch (error) {
       console.error("Error creating closure:", error);
-      toast.error("Error inesperado al crear el cierre");
+      toast.error("Error inesperado al crear el cierre", { id: toastId });
     } finally {
       setIsLoading(false);
     }

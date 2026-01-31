@@ -94,18 +94,22 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
   const loadRatesForVehicleType = useCallback(async (vehicleTypeId: string) => {
     if (!vehicleTypeId) return;
     setIsLoadingRates(true);
+    const toastId = toast.loading("Cargando tarifas...");
     try {
       const res = await getRateProfileAction(vehicleTypeId);
       if (res.success && res.data?.data) {
         // data can be array or single object depending on backend
         const rates = Array.isArray(res.data.data) ? res.data.data : [res.data.data];
         setAvailableRates(rates.filter((r) => r.isActive));
+        toast.success("Tarifas cargadas", { id: toastId });
       } else {
         setAvailableRates([]);
+        toast.warning("No se encontraron tarifas", { id: toastId });
       }
     } catch (error) {
       console.error("loadRatesForVehicleType error:", error);
       setAvailableRates([]);
+      toast.error("Error cargando tarifas", { id: toastId });
     } finally {
       setIsLoadingRates(false);
     }

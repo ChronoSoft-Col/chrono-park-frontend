@@ -129,7 +129,7 @@ const IncomeForm = ({
       const profiles = await getRateProfileAction(vehicleTypeId);
       if (profiles.success) {
         setRateProfiles(profiles.data?.data || []);
-        toast.dismiss(toastId);
+        toast.success("Perfiles cargados", { id: toastId });
       } else {
         toast.error("Error cargando perfiles de tarifa: " + profiles.error, { id: toastId });
       }

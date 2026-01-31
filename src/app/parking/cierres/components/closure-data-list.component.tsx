@@ -108,7 +108,7 @@ export default function ClosureDataListComponent({
         return;
       }
       
-      toast.dismiss(toastId);
+      toast.success("Detalle cargado", { id: toastId });
       const closureDetail = res.data;
 
       openDialog({
