@@ -1,4 +1,5 @@
 export type TPrinterInformation = {
+  plate?: string;
   headerMessage: string;
   code: string;
   bodyMessage: string;

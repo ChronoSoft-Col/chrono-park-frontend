@@ -44,6 +44,7 @@ export type IPrintPaymentTicketContentEntity = {
   insurancePolicyInfo?: string;
   footerMessage?: string;
   notes?: string | null;
+  parkingSessionId?: string;
 };
 
 // Response wrapper as returned by our backend (CustomResponse)

@@ -13,7 +13,7 @@ import { AxiosServerInstance } from "../axios-server.intance";
 @injectable()
 export class PaymentDatasourceService extends AxiosServerInstance implements PaymentRepository {
     async validateFee(params: IValidateAmountParamsEntity): Promise<IValidateAmountResponseEntity> {
-        const { parkingSessionId, licensePlate, exitTime } = params;
+        const { parkingSessionId, licensePlate, exitTime, rateId } = params;
 
         const identifier = parkingSessionId || licensePlate;
         if (!identifier) {
@@ -21,7 +21,7 @@ export class PaymentDatasourceService extends AxiosServerInstance implements Pay
         }
 
         return this.api
-            .post<IValidateAmountResponseEntity>(`/parking-sessions/${identifier}/calculate-fee`, { exitTime, licensePlate })
+            .post<IValidateAmountResponseEntity>(`/parking-sessions/${identifier}/calculate-fee`, { exitTime, licensePlate, rateId })
             .then(response => response.data);
     }
 

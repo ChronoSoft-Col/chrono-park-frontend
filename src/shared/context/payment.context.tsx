@@ -3,6 +3,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { IValidateAmountParamsEntity, IValidateAmountResponseEntity } from "@/server/domain";
 import { validateFeeAction } from "@/src/app/parking/cobro/actions/validate-fee.action";
+import { getRateProfileAction } from "@/src/app/global-actions/get-common.action";
+import { TRateProfile } from "@/shared/types/common/rate-profile.type";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
 
@@ -12,6 +14,11 @@ type TPaymentContext = {
   isValidating: boolean;
   validateFee: (params: IValidateAmountParamsEntity) => Promise<boolean>;
   clearValidateResult: () => void;
+  // Rate profile and vehicle type change
+  availableRates: TRateProfile[];
+  isLoadingRates: boolean;
+  loadRatesForVehicleType: (vehicleTypeId: string) => Promise<void>;
+  recalculateWithRate: (rateId: string) => Promise<boolean>;
 };
 
 const PaymentContext = createContext<TPaymentContext | undefined>(undefined);
@@ -25,6 +32,8 @@ export const usePaymentContext = () => {
 export const PaymentProvider = ({ children }: { children: React.ReactNode }) => {
   const [validateRaw, setValidateRaw] = useState<IValidateAmountResponseEntity | null>(null);
   const [isValidating, setIsValidating] = useState(false);
+  const [availableRates, setAvailableRates] = useState<TRateProfile[]>([]);
+  const [isLoadingRates, setIsLoadingRates] = useState(false);
   const pathname = usePathname();
 
   const validateFee = useCallback(async (params: IValidateAmountParamsEntity) => {
@@ -74,10 +83,48 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
     }
   }, []);
 
-  const clearValidateResult = useCallback(() => setValidateRaw(null), []);
+  const clearValidateResult = useCallback(() => {
+    setValidateRaw(null);
+    setAvailableRates([]);
+  }, []);
+
+  const loadRatesForVehicleType = useCallback(async (vehicleTypeId: string) => {
+    if (!vehicleTypeId) return;
+    setIsLoadingRates(true);
+    try {
+      const res = await getRateProfileAction(vehicleTypeId);
+      if (res.success && res.data?.data) {
+        // data can be array or single object depending on backend
+        const rates = Array.isArray(res.data.data) ? res.data.data : [res.data.data];
+        setAvailableRates(rates.filter((r) => r.isActive));
+      } else {
+        setAvailableRates([]);
+      }
+    } catch (error) {
+      console.error("loadRatesForVehicleType error:", error);
+      setAvailableRates([]);
+    } finally {
+      setIsLoadingRates(false);
+    }
+  }, []);
+
+  const recalculateWithRate = useCallback(async (rateId: string) => {
+    if (!validateRaw?.data) return false;
+
+    const currentData = validateRaw.data;
+    const params: IValidateAmountParamsEntity = {
+      parkingSessionId: currentData.parkingSessionId,
+      licensePlate: currentData.vehicle?.licensePlate,
+      exitTime: new Date(currentData.exitTime),
+      rateId,
+    };
+
+    return validateFee(params);
+  }, [validateRaw, validateFee]);
 
   useEffect(() => {
     setValidateRaw(null);
+    setAvailableRates([]);
   }, [pathname]);
 
   // THE IDEA IS THAT WE WILL HAVE ANOTHER PROP WITH THE PAYMENT DATA LIKE MONEY RECEIVED, CHANGE, ETC.
@@ -86,6 +133,10 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
     isValidating,
     validateFee,
     clearValidateResult,
+    availableRates,
+    isLoadingRates,
+    loadRatesForVehicleType,
+    recalculateWithRate,
   };
 
   return <PaymentContext.Provider value={value}>{children}</PaymentContext.Provider>;

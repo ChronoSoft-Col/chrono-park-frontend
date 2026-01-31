@@ -624,6 +624,16 @@ export class PrintUsecase {
       );
     }
 
+    // QR con el parkingSessionId para salida
+    if (ticket.parkingSessionId) {
+      this.blankLine(ops, 1);
+      ops.push(printerOps.align("center"));
+      ops.push(
+        printerOps.qrSized(10, this.sanitizeText(ticket.parkingSessionId)),
+      );
+      ops.push(printerOps.align("left"));
+    }
+
     ops.push(printerOps.feed(2));
 
     const printRequest: IPrintRequestEntity = {
