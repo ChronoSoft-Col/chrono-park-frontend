@@ -91,6 +91,13 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
     const currentVehicleTypeId = validateRaw?.data?.vehicle?.vehicleType?.id;
     const currentVehicleTypeName = validateRaw?.data?.vehicle?.vehicleType?.name;
 
+    // Reset rate selector when validateRaw changes (new validation)
+    useEffect(() => {
+        setShowRateSelector(false);
+        setSelectedVehicleTypeId(null);
+        setSelectedRateId(null);
+    }, [validateRaw]);
+
     // When opening selector, set the current vehicle type as selected
     useEffect(() => {
         if (showRateSelector && currentVehicleTypeId && !selectedVehicleTypeId) {

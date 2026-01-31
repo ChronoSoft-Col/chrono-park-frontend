@@ -38,12 +38,13 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
 
   const validateFee = useCallback(async (params: IValidateAmountParamsEntity) => {
     setIsValidating(true);
+    const toastId = toast.loading("Validando tarifa...");
     try {
       const res = await validateFeeAction(params);
       if (!res.success) {
         setValidateRaw(null);
         console.error("validateFee error:", res);
-        toast.error(`Error validando los datos: ${res.error}`);
+        toast.error(`Error validando los datos: ${res.error}`, { id: toastId });
         return false;
       }
 
@@ -58,10 +59,12 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
 
         if (providedQr && !providedPlate) {
           toast.warning("La sesión no tiene placa registrada", {
+            id: toastId,
             description: "Ingresa la placa para validar de nuevo y continuar.",
           });
         } else {
           toast.error("No se pudo validar el vehículo", {
+            id: toastId,
             description: "Verifica la placa y vuelve a intentar.",
           });
         }
@@ -71,12 +74,12 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
 
       // res.data is IGeneralResponse<IAmountDetailEntity>
       setValidateRaw(res.data ?? null);
-      toast.success("Datos validados correctamente");
+      toast.success("Datos validados correctamente", { id: toastId });
       return true;
     } catch (error) {
       setValidateRaw(null);
       console.error("validateFee error:", error);
-      toast.error(`Error validando los datos: ${error}`);
+      toast.error(`Error validando los datos: ${error}`, { id: toastId });
       return false;
     } finally {
       setIsValidating(false);
