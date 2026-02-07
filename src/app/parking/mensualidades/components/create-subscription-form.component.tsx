@@ -31,6 +31,7 @@ import { ChronoSeparator } from "@chrono/chrono-separator.component";
 import listCustomersAction from "@/src/app/parking/clientes/actions/list-customers.action";
 import { getMonthlyPlansByVehicleTypeAction } from "../actions/monthly-plans.action";
 import { IMonthlyPlanEntity } from "@/server/domain";
+import { ICustomerVehicleEntity } from "@/server/domain/entities/parking/customers/customer.entity";
 
 const fieldContainerClasses =
   "rounded-lg border border-border bg-card/80 p-4 shadow-sm transition-colors focus-within:border-primary data-[invalid=true]:border-destructive min-w-0";
@@ -41,6 +42,7 @@ type CustomerOption = {
   id: string;
   name: string;
   documentNumber: string;
+  vehicles: ICustomerVehicleEntity[];
 };
 
 type Props = {
@@ -56,6 +58,8 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
   const [loadingPlans, setLoadingPlans] = useState(false);
   const [customerSearch, setCustomerSearch] = useState("");
   const [selectedVehicleType, setSelectedVehicleType] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerOption | null>(null);
+  const [filteredVehicles, setFilteredVehicles] = useState<ICustomerVehicleEntity[]>([]);
 
   const form = useForm<CreateSubscriptionForm>({
     resolver: zodResolver(CreateSubscriptionSchema) as Resolver<CreateSubscriptionForm>,
@@ -93,6 +97,7 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
             id: c.id,
             name: `${c.firstName} ${c.lastName}`,
             documentNumber: c.documentNumber,
+            vehicles: c.vehicles || [],
           }))
         );
       }
@@ -132,6 +137,29 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
     // Limpiar selección de plan cuando cambia el tipo
     setValue("monthlyPlanId", "");
   }, [selectedVehicleType, setValue]);
+
+  // Filtrar vehículos del cliente por tipo de vehículo seleccionado
+  useEffect(() => {
+    if (selectedCustomer && selectedVehicleType) {
+      const vehicles = selectedCustomer.vehicles.filter(
+        (v) => v.vehicleTypeId === selectedVehicleType && v.isActive
+      );
+      setFilteredVehicles(vehicles);
+    } else if (selectedCustomer) {
+      setFilteredVehicles(selectedCustomer.vehicles.filter((v) => v.isActive));
+    } else {
+      setFilteredVehicles([]);
+    }
+    // Limpiar selección de vehículo cuando cambia el filtro
+    setValue("vehicleId", "");
+  }, [selectedCustomer, selectedVehicleType, setValue]);
+
+  // Actualizar cliente seleccionado cuando cambia customerId
+  const handleCustomerChange = (customerId: string) => {
+    setValue("customerId", customerId);
+    const customer = customers.find((c) => c.id === customerId);
+    setSelectedCustomer(customer || null);
+  };
 
   const handleFormSubmit = handleSubmit(async (data) => {
     // Limpiar vehicleId si está vacío
@@ -188,7 +216,7 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
                 </ChronoFieldLabel>
 
                 <ChronoSelect
-                  onValueChange={field.onChange}
+                  onValueChange={handleCustomerChange}
                   value={field.value ?? ""}
                   disabled={customers.length === 0}
                 >
@@ -294,21 +322,39 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
             render={({ field, fieldState }) => (
               <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
                 <ChronoFieldLabel htmlFor="vehicleId" className={fieldLabelClasses}>
-                  ID del Vehículo
+                  Vehículo del cliente
                 </ChronoFieldLabel>
-                <ChronoInput
-                  {...field}
-                  id="vehicleId"
-                  placeholder="Dejar vacío si no aplica"
-                  className="mt-1"
-                />
+                <ChronoSelect
+                  onValueChange={field.onChange}
+                  value={field.value ?? ""}
+                  disabled={!selectedCustomer || filteredVehicles.length === 0}
+                >
+                  <ChronoSelectTrigger className="mt-1 text-left">
+                    <ChronoSelectValue
+                      placeholder={
+                        !selectedCustomer
+                          ? "Seleccione un cliente primero"
+                          : filteredVehicles.length === 0
+                          ? "No hay vehículos disponibles"
+                          : "Seleccionar vehículo (opcional)"
+                      }
+                    />
+                  </ChronoSelectTrigger>
+                  <ChronoSelectContent>
+                    {filteredVehicles.map((vehicle) => (
+                      <ChronoSelectItem key={vehicle.id} value={vehicle.id}>
+                        {vehicle.licensePlate} - {vehicle.vehicleTypeName}
+                      </ChronoSelectItem>
+                    ))}
+                  </ChronoSelectContent>
+                </ChronoSelect>
                 {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
               </ChronoField>
             )}
           />
         </div>
         <p className="text-xs text-muted-foreground">
-          El vehículo es opcional. Puede asociarse posteriormente o dejarse sin vehículo específico.
+          El vehículo es opcional. Solo se muestran vehículos activos del cliente{selectedVehicleType ? " que coinciden con el tipo de vehículo seleccionado" : ""}.
         </p>
       </div>
 

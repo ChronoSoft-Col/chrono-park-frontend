@@ -73,7 +73,7 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
   return (
     <form onSubmit={handleFormSubmit} className="space-y-4 py-4">
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        <Controller
+          <Controller
           control={control}
           name="documentTypeId"
           render={({ field, fieldState }) => (
@@ -82,9 +82,13 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
                 Tipo de documento
               </ChronoFieldLabel>
 
-              <ChronoSelect onValueChange={field.onChange} value={field.value ?? ""}>
+              <ChronoSelect
+                onValueChange={field.onChange}
+                value={field.value ?? ""}
+                disabled={documentTypes.length === 0}
+              >
                 <ChronoSelectTrigger className="mt-1 text-left">
-                  <ChronoSelectValue placeholder="Seleccionar tipo" />
+                  <ChronoSelectValue placeholder={documentTypes.length === 0 ? "Cargando..." : "Seleccionar tipo"} />
                 </ChronoSelectTrigger>
                 <ChronoSelectContent>
                   {documentTypes.map((type) => (

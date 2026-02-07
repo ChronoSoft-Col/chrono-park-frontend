@@ -12,17 +12,29 @@ export default function UseCommon() {
   );
 
   const getData = async () => {
-    await Promise.all([
-      getCommonAction<TVehicleType[]>(EServices.VEHICLE_TYPES),
-      getCommonAction<TPaymentMethods[]>(EServices.PAYMENT_METHODS),
-      getCommonAction<TDocumentType[]>(EServices.DOCUMENT_TYPES),
-    ]).then(([vehicleTypes, paymentMethods, documentTypes]) => {
+    try {
+      const [vehicleTypes, paymentMethods, documentTypes] = await Promise.all([
+        getCommonAction<TVehicleType[]>(EServices.VEHICLE_TYPES),
+        getCommonAction<TPaymentMethods[]>(EServices.PAYMENT_METHODS),
+        getCommonAction<TDocumentType[]>(EServices.DOCUMENT_TYPES),
+      ]);
+      
+      console.log("Common data loaded:", { vehicleTypes, paymentMethods, documentTypes });
+      
       setCommonData({
         vehicleTypes: vehicleTypes.data?.data || [],
         paymentMethods: paymentMethods.data?.data || [],
         documentTypes: documentTypes.data?.data || [],
       });
-    })
+    } catch (error) {
+      console.error("Error loading common data:", error);
+      // Set empty arrays to prevent indefinite loading
+      setCommonData({
+        vehicleTypes: [],
+        paymentMethods: [],
+        documentTypes: [],
+      });
+    }
   };
 
   useEffect(() => {
