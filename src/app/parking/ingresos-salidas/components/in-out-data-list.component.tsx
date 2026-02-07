@@ -130,6 +130,7 @@ export default function InOutDataListComponent({
       openDialog({
         title: `Cambiar tarifa - ${item.vehicle.licensePlate}`,
         description: "Seleccione la nueva tarifa a aplicar",
+        dialogClassName: "w-full sm:max-w-lg",
         content: (
           <ChangeRateDialogContent
             item={item}

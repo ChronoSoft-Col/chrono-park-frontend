@@ -6,13 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { IInOutEntity } from "@/server/domain";
+import { ChronoBadge } from "@chrono/chrono-badge.component";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoValue } from "@chrono/chrono-value.component";
 import { ChronoSeparator } from "@chrono/chrono-separator.component";
 import {
   ChronoField,
   ChronoFieldError,
-  ChronoFieldLabel,
 } from "@chrono/chrono-field.component";
 import {
   ChronoSelect,
@@ -40,11 +40,6 @@ interface ChangeRateDialogContentProps {
   onSuccess?: () => void;
 }
 
-const fieldContainerClasses =
-  "rounded-lg border border-border bg-card/80 p-4 shadow-sm transition-colors focus-within:border-primary data-[invalid=true]:border-destructive min-w-0";
-
-const fieldLabelClasses = "text-xs font-medium text-muted-foreground";
-
 const formatDateTime = (value?: string) => {
   if (!value) return "-";
   return new Intl.DateTimeFormat("es-CO", {
@@ -52,6 +47,17 @@ const formatDateTime = (value?: string) => {
     timeStyle: "short",
   }).format(new Date(value));
 };
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-card/70 px-4 py-3 shadow-sm">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="text-base font-semibold text-foreground">{value}</p>
+    </div>
+  );
+}
 
 export function ChangeRateDialogContent({
   item,
@@ -75,7 +81,6 @@ export function ChangeRateDialogContent({
     formState: { isSubmitting, isValid },
   } = form;
 
-  // Cargar perfiles de tarifa al montar el componente
   React.useEffect(() => {
     const vehicleTypeId = item.vehicle.vehicleType.id;
     if (vehicleTypeId) {
@@ -116,7 +121,6 @@ export function ChangeRateDialogContent({
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-5">
-      {/* Info actual del vehículo */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <ChronoSectionLabel size="base" className="tracking-[0.25em]">
@@ -124,81 +128,61 @@ export function ChangeRateDialogContent({
           </ChronoSectionLabel>
           <ChronoValue size="xl">{item.vehicle.licensePlate}</ChronoValue>
         </div>
-        <div className="text-right">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Tipo de vehículo
-          </p>
-          <p className="text-base font-semibold text-foreground">
-            {item.vehicle.vehicleType.name}
-          </p>
-        </div>
+        <ChronoBadge variant="outline" className="text-xs font-semibold">
+          {item.vehicle.vehicleType.name}
+        </ChronoBadge>
       </div>
 
       <ChronoSeparator />
 
-      {/* Info de la sesión */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border border-border/60 bg-card/70 px-4 py-3 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Ingreso
-          </p>
-          <p className="text-base font-semibold text-foreground">
-            {formatDateTime(item.entryTime)}
-          </p>
-        </div>
-        <div className="rounded-xl border border-border/60 bg-card/70 px-4 py-3 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Tarifa actual
-          </p>
-          <p className="text-base font-semibold text-foreground">
-            {item.rateProfile.name}
-          </p>
-        </div>
-      </div>
+      <dl className="grid gap-4 sm:grid-cols-2">
+        <InfoRow label="Ingreso" value={formatDateTime(item.entryTime)} />
+        <InfoRow label="Tarifa actual" value={item.rateProfile.name} />
+      </dl>
 
       <ChronoSeparator />
 
-      {/* Select de nueva tarifa */}
-      <Controller
-        control={control}
-        name="rateProfileId"
-        render={({ field, fieldState }) => (
-          <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-            <ChronoFieldLabel htmlFor="rateProfileId" className={fieldLabelClasses}>
-              Nueva tarifa
-            </ChronoFieldLabel>
+      <div className="space-y-3">
+        <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+          Nueva tarifa
+        </ChronoSectionLabel>
 
-            <ChronoSelect
-              onValueChange={field.onChange}
-              value={field.value ?? ""}
-              disabled={loadingProfiles || rateProfiles.length === 0}
-            >
-              <ChronoSelectTrigger className="mt-1 text-left">
-                <ChronoSelectValue
-                  placeholder={
-                    loadingProfiles
-                      ? "Cargando tarifas..."
-                      : rateProfiles.length === 0
-                        ? "No hay tarifas disponibles"
-                        : "Seleccionar tarifa"
-                  }
-                />
-              </ChronoSelectTrigger>
-              <ChronoSelectContent>
-                {rateProfiles.map((profile) => (
-                  <ChronoSelectItem key={profile.id} value={profile.id}>
-                    {profile.name}
-                  </ChronoSelectItem>
-                ))}
-              </ChronoSelectContent>
-            </ChronoSelect>
+        <Controller
+          control={control}
+          name="rateProfileId"
+          render={({ field, fieldState }) => (
+            <ChronoField data-invalid={fieldState.invalid}>
+              <ChronoSelect
+                onValueChange={field.onChange}
+                value={field.value ?? ""}
+                disabled={loadingProfiles || rateProfiles.length === 0}
+              >
+                <ChronoSelectTrigger className="w-full text-left">
+                  <ChronoSelectValue
+                    placeholder={
+                      loadingProfiles
+                        ? "Cargando tarifas..."
+                        : rateProfiles.length === 0
+                          ? "No hay tarifas disponibles"
+                          : "Seleccionar tarifa"
+                    }
+                  />
+                </ChronoSelectTrigger>
+                <ChronoSelectContent>
+                  {rateProfiles.map((profile) => (
+                    <ChronoSelectItem key={profile.id} value={profile.id}>
+                      {profile.name}
+                    </ChronoSelectItem>
+                  ))}
+                </ChronoSelectContent>
+              </ChronoSelect>
 
-            {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-          </ChronoField>
-        )}
-      />
+              {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
+            </ChronoField>
+          )}
+        />
+      </div>
 
-      {/* Botones de acción */}
       <div className="flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end">
         <ChronoButton
           type="button"
