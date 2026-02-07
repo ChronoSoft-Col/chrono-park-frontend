@@ -12,7 +12,7 @@ export default async function InOutPage({
 
   return (
     <div className="space-y-6">
-      <SetupHeaderFilters showDatePicker={false} showSearch={true} />
+      <SetupHeaderFilters showDateRangePicker={true} showSearch={true} />
       <InOutDataFetchComponent searchParams={resolvedSearchParams} />
     </div>
   );

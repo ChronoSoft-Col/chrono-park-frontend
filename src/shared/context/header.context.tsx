@@ -5,6 +5,8 @@ interface HeaderContextType {
   setShowSearch: React.Dispatch<React.SetStateAction<boolean>>;
   showDatePicker: boolean;
   setShowDatePicker: React.Dispatch<React.SetStateAction<boolean>>;
+  showDateRangePicker: boolean;
+  setShowDateRangePicker: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
@@ -23,13 +25,16 @@ export const HeaderProvider = ({children}: PropsWithChildren) => {
 
     const [showSearch, setShowSearch] = useState<boolean>(false);
     const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+    const [showDateRangePicker, setShowDateRangePicker] = useState<boolean>(false);
 
 
     return <HeaderContext.Provider value={{
         showSearch,
         setShowSearch,
         showDatePicker,
-        setShowDatePicker
+        setShowDatePicker,
+        showDateRangePicker,
+        setShowDateRangePicker
     }}>{children}</HeaderContext.Provider>
 
 }

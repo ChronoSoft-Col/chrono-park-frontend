@@ -5,15 +5,17 @@ import { useEffect } from "react";
 import { UseHeaderContext } from "../../context/header.context";
 
 interface SetupHeaderFiltersProps {
-    showDatePicker: boolean;
-    showSearch: boolean;
+    showDatePicker?: boolean;
+    showSearch?: boolean;
+    showDateRangePicker?: boolean;
 }
 
 export const SetupHeaderFilters = ({
-    showDatePicker,
-    showSearch,
+    showDatePicker = false,
+    showSearch = false,
+    showDateRangePicker = false,
 }: SetupHeaderFiltersProps) => {
-    const { setShowDatePicker, setShowSearch } = UseHeaderContext();
+    const { setShowDatePicker, setShowSearch, setShowDateRangePicker } = UseHeaderContext();
 
     useEffect(() => {
         setShowDatePicker(showDatePicker);
@@ -22,6 +24,10 @@ export const SetupHeaderFilters = ({
     useEffect(() => {
         setShowSearch(showSearch);
     }, [setShowSearch, showSearch]);
+
+    useEffect(() => {
+        setShowDateRangePicker(showDateRangePicker);
+    }, [setShowDateRangePicker, showDateRangePicker]);
 
     return null;
 };

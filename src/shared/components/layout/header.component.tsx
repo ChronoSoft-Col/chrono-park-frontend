@@ -6,11 +6,12 @@ import {
 import BreadcrumbComponent from "./breadcrumb.component";
 import SearchComponent from "./search.component";
 import { DateRangeComponent } from "./date-filter.component";
+import { DateRangePickerComponent } from "./date-range-picker.component";
 import { UseHeaderContext } from "../../context/header.context";
 
 export default function HeaderComponent() {
   const { open, isMobile } = useChronoSidebar();
-  const {showDatePicker, showSearch} = UseHeaderContext();
+  const { showDatePicker, showSearch, showDateRangePicker } = UseHeaderContext();
   return (
     <header
       className="fixed z-10 top-0 transition-all duration-200 ease-linear"
@@ -39,6 +40,7 @@ export default function HeaderComponent() {
           <BreadcrumbComponent hideRoot />
         </div>
         {showDatePicker && <DateRangeComponent />}
+        {showDateRangePicker && <DateRangePickerComponent />}
         {showSearch && <SearchComponent />}
       </div>
     </header>

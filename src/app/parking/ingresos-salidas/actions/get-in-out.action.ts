@@ -20,6 +20,8 @@ const inOutSearchParamsSchema = z.object({
     status: z.enum(Object.values(InOutStatusEnum)).default(InOutStatusEnum.ACTIVE),
     vehicleTypeId: z.string().optional(),
     search: z.string().optional(),
+    dateFrom: z.string().optional(),
+    dateTo: z.string().optional(),
 });
 
 export async function getInOutsAction(
