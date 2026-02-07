@@ -1,7 +1,7 @@
-import { ISubscriptionHistoryEntity } from "../subscription.entity";
+import { ISubscriptionEntity } from "../subscription.entity";
 
 export interface IGetSubscriptionHistoryResponseEntity {
   success: boolean;
-  data: ISubscriptionHistoryEntity[];
+  data: ISubscriptionEntity[];
   message?: string;
 }

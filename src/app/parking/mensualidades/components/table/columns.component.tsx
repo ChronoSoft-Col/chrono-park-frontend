@@ -23,6 +23,8 @@ const formatDate = (value?: Date | string) => {
 
 const getStatusBadgeStyles = (status: SubscriptionStatus) => {
   switch (status) {
+    case "PENDIENTE":
+      return "border-yellow-500/40 bg-yellow-50 text-yellow-700";
     case "ACTIVA":
       return "border-emerald-500/40 bg-emerald-50 text-emerald-700";
     case "PERIODO_GRACIA":
@@ -38,6 +40,8 @@ const getStatusBadgeStyles = (status: SubscriptionStatus) => {
 
 const getStatusLabel = (status: SubscriptionStatus) => {
   switch (status) {
+    case "PENDIENTE":
+      return "Pendiente";
     case "ACTIVA":
       return "Activa";
     case "PERIODO_GRACIA":
@@ -58,7 +62,10 @@ export const createSubscriptionColumns = (
   {
     id: "customer",
     header: "Cliente",
-    accessorFn: (row) => row.customer?.fullName || "-",
+    accessorFn: (row) => {
+      if (!row.customer) return "-";
+      return `${row.customer.firstName} ${row.customer.lastName}`.trim() || "-";
+    },
   },
   {
     id: "document",
@@ -70,15 +77,15 @@ export const createSubscriptionColumns = (
     header: "Vehículo",
     cell: (row) => (
       <div>
-        <p className="font-medium">{row.vehicle?.licensePlate || "-"}</p>
-        <p className="text-xs text-muted-foreground">{row.vehicle?.type || "-"}</p>
+        <p className="font-medium">{row.vehicle?.plateNumber || "-"}</p>
+        <p className="text-xs text-muted-foreground">{row.vehicle?.vehicleTypeName || "-"}</p>
       </div>
     ),
   },
   {
-    id: "rate-profile",
-    header: "Tarifa",
-    accessorFn: (row) => row.rateProfile?.name || "-",
+    id: "monthly-plan",
+    header: "Plan",
+    accessorFn: (row) => row.monthlyPlan?.name || "-",
   },
   {
     id: "start-date",

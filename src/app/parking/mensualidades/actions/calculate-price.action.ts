@@ -3,31 +3,34 @@
 import { rethrowNextNavigationErrors } from "@/lib/next-navigation-errors";
 import { SERVER_TOKENS } from "@/server/di/server-tokens";
 import { serverContainer } from "@/server/di/container";
-import { SubscriptionUsecase, ICreateSubscriptionParamsEntity, ISubscriptionEntity } from "@/server/domain";
+import { SubscriptionUsecase, IPriceCalculation } from "@/server/domain";
 import IActionResponse from "@/shared/interfaces/generic/action-response";
 import IErrorResponse from "@/shared/interfaces/generic/error-response.interface";
 import IGeneralResponse from "@/shared/interfaces/generic/general-response.interface";
 import { AxiosError } from "axios";
 
-type CreateSubscriptionActionResponse = Promise<IActionResponse<IGeneralResponse<ISubscriptionEntity>>>;
+type CalculatePriceActionResponse = Promise<
+  IActionResponse<IGeneralResponse<IPriceCalculation>>
+>;
 
-export async function createSubscriptionAction(
-  params: ICreateSubscriptionParamsEntity
-): CreateSubscriptionActionResponse {
+export async function calculatePriceAction(
+  subscriptionId: string,
+  monthsCount?: number
+): CalculatePriceActionResponse {
   try {
     const useCase = serverContainer.resolve<SubscriptionUsecase>(
       SERVER_TOKENS.SubscriptionUsecase
     );
-    const response = await useCase.createSubscription(params);
+    const response = await useCase.calculatePrice(subscriptionId, monthsCount);
     return { success: true, data: response };
   } catch (error) {
     rethrowNextNavigationErrors(error);
-    console.error("Error in createSubscriptionAction:", error);
+    console.error("Error in calculatePriceAction:", error);
     return {
       success: false,
       error:
         (error as AxiosError<IErrorResponse>).response?.data.message ??
-        "Error al crear la mensualidad",
+        "Error al calcular el precio",
     };
   }
 }

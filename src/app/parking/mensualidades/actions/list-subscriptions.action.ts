@@ -16,9 +16,10 @@ const subscriptionSearchParamsSchema = z.object({
   page: z.coerce.number().int().positive().default(DEFAULT_PAGE),
   limit: z.coerce.number().int().positive().default(DEFAULT_LIMIT),
   search: z.string().optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  status: z.enum(["ACTIVA", "PERIODO_GRACIA", "INACTIVA", "CANCELADA"]).optional(),
+  customerId: z.string().optional(),
+  vehicleTypeId: z.string().optional(),
+  monthlyPlanId: z.string().optional(),
+  status: z.enum(["PENDIENTE", "ACTIVA", "PERIODO_GRACIA", "INACTIVA", "CANCELADA"]).optional(),
 });
 
 type ListSubscriptionsActionResponse = Promise<IActionResponse<IListSubscriptionsResponseEntity>>;

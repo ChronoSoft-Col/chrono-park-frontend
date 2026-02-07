@@ -1,23 +1,25 @@
-export interface ICreateSubscriptionCustomerData {
-  id?: string;
-  documentTypeId: string;
-  documentNumber: string;
-  firstName: string;
-  lastName: string;
-  email?: string;
-  phoneNumber?: string;
-}
-
-export interface ICreateSubscriptionVehicleData {
-  id?: string;
-  licensePlate: string;
-  vehicleTypeId: string;
-}
-
+// Nuevo formato simplificado para crear suscripción
 export interface ICreateSubscriptionParamsEntity {
-  startDate: string;
-  endDate: string;
-  rateProfileId: string;
-  customer: ICreateSubscriptionCustomerData;
-  vehicle?: ICreateSubscriptionVehicleData;
+  customerId: string;
+  monthlyPlanId: string;
+  vehicleId?: string;
+}
+
+// Parámetros para pagar una suscripción
+export interface IPaySubscriptionParamsEntity {
+  monthsCount?: number;
+  paymentMethodId: string;
+  paymentPointId?: string;
+  amountReceived?: number;
+}
+
+// Parámetros para cancelar una suscripción
+export interface ICancelSubscriptionParamsEntity {
+  reason?: string;
+}
+
+// Parámetros para actualizar configuración de facturación
+export interface IUpdateBillingConfigParamsEntity {
+  cutoffDay?: number | null;
+  graceDays?: number;
 }

@@ -2,7 +2,8 @@
 
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Save, X } from "lucide-react";
+import { Save, X, Search, Loader2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 
 import ChronoButton from "@chrono/chrono-button.component";
 import {
@@ -18,7 +19,6 @@ import {
   ChronoSelectTrigger,
   ChronoSelectValue,
 } from "@chrono/chrono-select.component";
-import ChronoPlateInput from "@chrono/chrono-plate-input.component";
 import ChronoVehicleTypeSelect from "@chrono/chrono-vehicle-type-select.component";
 
 import { useCommonContext } from "@/src/shared/context/common.context";
@@ -26,16 +26,22 @@ import {
   CreateSubscriptionForm,
   CreateSubscriptionSchema,
 } from "@/src/shared/schemas/parking/create-subscription.schema";
-import { useState, useEffect } from "react";
-import { getRateProfileAction } from "@/src/app/global-actions/get-common.action";
-import { TRateProfile } from "@/src/shared/types/common/rate-profile.type";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoSeparator } from "@chrono/chrono-separator.component";
+import listCustomersAction from "@/src/app/parking/clientes/actions/list-customers.action";
+import { getMonthlyPlansByVehicleTypeAction } from "../actions/monthly-plans.action";
+import { IMonthlyPlanEntity } from "@/server/domain";
 
 const fieldContainerClasses =
   "rounded-lg border border-border bg-card/80 p-4 shadow-sm transition-colors focus-within:border-primary data-[invalid=true]:border-destructive min-w-0";
 
 const fieldLabelClasses = "text-xs font-medium text-muted-foreground";
+
+type CustomerOption = {
+  id: string;
+  name: string;
+  documentNumber: string;
+};
 
 type Props = {
   onSubmit: (data: CreateSubscriptionForm) => Promise<boolean>;
@@ -43,277 +49,162 @@ type Props = {
 };
 
 export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
-  const { vehicleTypes = [], documentTypes = [] } = useCommonContext();
-  const [rateProfiles, setRateProfiles] = useState<TRateProfile[]>([]);
-  const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const { vehicleTypes = [] } = useCommonContext();
+  const [customers, setCustomers] = useState<CustomerOption[]>([]);
+  const [monthlyPlans, setMonthlyPlans] = useState<IMonthlyPlanEntity[]>([]);
+  const [loadingCustomers, setLoadingCustomers] = useState(false);
+  const [loadingPlans, setLoadingPlans] = useState(false);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [selectedVehicleType, setSelectedVehicleType] = useState("");
 
   const form = useForm<CreateSubscriptionForm>({
     resolver: zodResolver(CreateSubscriptionSchema) as Resolver<CreateSubscriptionForm>,
     mode: "onChange",
     defaultValues: {
-      startDate: "",
-      endDate: "",
-      rateProfileId: "",
-      customer: {
-        id: undefined,
-        documentTypeId: "",
-        documentNumber: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-      },
-      vehicle: {
-        id: undefined,
-        licensePlate: "",
-        vehicleTypeId: "",
-      },
+      customerId: "",
+      monthlyPlanId: "",
+      vehicleId: "",
     },
   });
 
   const {
     control,
     handleSubmit,
-    watch,
+    setValue,
     formState: { isSubmitting, isValid },
   } = form;
 
-  const vehicleTypeId = watch("vehicle.vehicleTypeId");
+  // Buscar clientes
+  const searchCustomers = useCallback(async (search: string) => {
+    if (search.length < 2) {
+      setCustomers([]);
+      return;
+    }
 
+    setLoadingCustomers(true);
+    try {
+      const response = await listCustomersAction({ search, limit: "10" });
+      if (response.success && response.data?.data) {
+        const customerList = Array.isArray(response.data.data)
+          ? response.data.data
+          : [];
+        setCustomers(
+          customerList.map((c) => ({
+            id: c.id,
+            name: `${c.firstName} ${c.lastName}`,
+            documentNumber: c.documentNumber,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("Error searching customers:", error);
+    } finally {
+      setLoadingCustomers(false);
+    }
+  }, []);
+
+  // Debounce para búsqueda de clientes
   useEffect(() => {
-    if (vehicleTypeId) {
-      setLoadingProfiles(true);
-      getRateProfileAction(vehicleTypeId)
+    const timer = setTimeout(() => {
+      searchCustomers(customerSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [customerSearch, searchCustomers]);
+
+  // Cargar planes cuando cambia el tipo de vehículo
+  useEffect(() => {
+    if (selectedVehicleType) {
+      setLoadingPlans(true);
+      getMonthlyPlansByVehicleTypeAction(selectedVehicleType)
         .then((response) => {
           if (response.success && response.data?.data) {
-            setRateProfiles(
-              Array.isArray(response.data.data)
-                ? response.data.data
-                : [response.data.data]
+            setMonthlyPlans(
+              Array.isArray(response.data.data) ? response.data.data : []
             );
+          } else {
+            setMonthlyPlans([]);
           }
         })
-        .finally(() => setLoadingProfiles(false));
+        .finally(() => setLoadingPlans(false));
     } else {
-      setRateProfiles([]);
+      setMonthlyPlans([]);
     }
-  }, [vehicleTypeId]);
+    // Limpiar selección de plan cuando cambia el tipo
+    setValue("monthlyPlanId", "");
+  }, [selectedVehicleType, setValue]);
 
   const handleFormSubmit = handleSubmit(async (data) => {
-    await onSubmit(data);
+    // Limpiar vehicleId si está vacío
+    const cleanData = {
+      ...data,
+      vehicleId: data.vehicleId || undefined,
+    };
+    await onSubmit(cleanData);
   });
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6 py-4">
       {/* Customer Section */}
       <div className="space-y-4">
         <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
-          Datos del Cliente
+          Seleccionar Cliente
         </ChronoSectionLabel>
 
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          <Controller
-            control={control}
-            name="customer.documentTypeId"
-            render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="documentTypeId" className={fieldLabelClasses}>
-                  Tipo de documento
-                </ChronoFieldLabel>
-
-                <ChronoSelect onValueChange={field.onChange} value={field.value ?? ""}>
-                  <ChronoSelectTrigger className="mt-1 text-left">
-                    <ChronoSelectValue placeholder="Seleccionar tipo" />
-                  </ChronoSelectTrigger>
-                  <ChronoSelectContent>
-                    {documentTypes.map((type) => (
-                      <ChronoSelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </ChronoSelectItem>
-                    ))}
-                  </ChronoSelectContent>
-                </ChronoSelect>
-
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-              </ChronoField>
-            )}
-          />
+        <div className="grid gap-3 md:grid-cols-2">
+          <ChronoField className={fieldContainerClasses}>
+            <ChronoFieldLabel htmlFor="customerSearch" className={fieldLabelClasses}>
+              Buscar cliente
+            </ChronoFieldLabel>
+            <div className="relative mt-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <ChronoInput
+                id="customerSearch"
+                value={customerSearch}
+                onChange={(e) => setCustomerSearch(e.target.value)}
+                placeholder="Buscar por nombre o documento..."
+                className="pl-10"
+              />
+              {loadingCustomers && (
+                <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+              )}
+            </div>
+          </ChronoField>
 
           <Controller
             control={control}
-            name="customer.documentNumber"
+            name="customerId"
             render={({ field, fieldState }) => (
               <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="documentNumber" className={fieldLabelClasses}>
-                  Número de documento
-                </ChronoFieldLabel>
-                <ChronoInput
-                  {...field}
-                  id="documentNumber"
-                  placeholder="123456789"
-                  className="mt-1"
-                />
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-              </ChronoField>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="customer.firstName"
-            render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="firstName" className={fieldLabelClasses}>
-                  Nombre
-                </ChronoFieldLabel>
-                <ChronoInput {...field} id="firstName" placeholder="Juan" className="mt-1" />
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-              </ChronoField>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="customer.lastName"
-            render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="lastName" className={fieldLabelClasses}>
-                  Apellido
-                </ChronoFieldLabel>
-                <ChronoInput {...field} id="lastName" placeholder="Pérez" className="mt-1" />
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-              </ChronoField>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="customer.email"
-            render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="email" className={fieldLabelClasses}>
-                  Email (opcional)
-                </ChronoFieldLabel>
-                <ChronoInput
-                  {...field}
-                  id="email"
-                  type="email"
-                  placeholder="juan@email.com"
-                  className="mt-1"
-                />
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-              </ChronoField>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="customer.phoneNumber"
-            render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="phoneNumber" className={fieldLabelClasses}>
-                  Teléfono (opcional)
-                </ChronoFieldLabel>
-                <ChronoInput
-                  {...field}
-                  id="phoneNumber"
-                  placeholder="3001234567"
-                  className="mt-1"
-                />
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-              </ChronoField>
-            )}
-          />
-        </div>
-      </div>
-
-      <ChronoSeparator />
-
-      {/* Vehicle Section */}
-      <div className="space-y-4">
-        <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
-          Datos del Vehículo
-        </ChronoSectionLabel>
-
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          <Controller
-            control={control}
-            name="vehicle.licensePlate"
-            render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="licensePlate" className={fieldLabelClasses}>
-                  Placa
-                </ChronoFieldLabel>
-                <ChronoPlateInput
-                  {...field}
-                  id="licensePlate"
-                  placeholder="ABC123"
-                  className="mt-1"
-                />
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-              </ChronoField>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="vehicle.vehicleTypeId"
-            render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="vehicleTypeId" className={fieldLabelClasses}>
-                  Tipo de vehículo
-                </ChronoFieldLabel>
-                <ChronoVehicleTypeSelect
-                  value={field.value ?? ""}
-                  onValueChange={field.onChange}
-                  options={vehicleTypes.map((vt) => ({ value: vt.value, label: vt.label }))}
-                  className="mt-1"
-                />
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-              </ChronoField>
-            )}
-          />
-        </div>
-      </div>
-
-      <ChronoSeparator />
-
-      {/* Subscription Section */}
-      <div className="space-y-4">
-        <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
-          Datos de la Mensualidad
-        </ChronoSectionLabel>
-
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          <Controller
-            control={control}
-            name="rateProfileId"
-            render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="rateProfileId" className={fieldLabelClasses}>
-                  Perfil de tarifa
+                <ChronoFieldLabel htmlFor="customerId" className={fieldLabelClasses}>
+                  Cliente seleccionado
                 </ChronoFieldLabel>
 
                 <ChronoSelect
                   onValueChange={field.onChange}
                   value={field.value ?? ""}
-                  disabled={loadingProfiles || rateProfiles.length === 0}
+                  disabled={customers.length === 0}
                 >
                   <ChronoSelectTrigger className="mt-1 text-left">
                     <ChronoSelectValue
                       placeholder={
-                        loadingProfiles
-                          ? "Cargando..."
-                          : rateProfiles.length === 0
-                          ? "Seleccione tipo de vehículo primero"
-                          : "Seleccionar tarifa"
+                        customers.length === 0
+                          ? "Busque un cliente primero"
+                          : "Seleccionar cliente"
                       }
                     />
                   </ChronoSelectTrigger>
                   <ChronoSelectContent>
-                    {rateProfiles.map((profile) => (
-                      <ChronoSelectItem key={profile.id} value={profile.id}>
-                        {profile.name}
+                    {customers.map((customer) => (
+                      <ChronoSelectItem key={customer.id} value={customer.id}>
+                        {customer.name} - {customer.documentNumber}
                       </ChronoSelectItem>
                     ))}
                   </ChronoSelectContent>
@@ -323,38 +214,92 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
               </ChronoField>
             )}
           />
+        </div>
+      </div>
+
+      <ChronoSeparator />
+
+      {/* Plan Section */}
+      <div className="space-y-4">
+        <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+          Plan Mensual
+        </ChronoSectionLabel>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <ChronoField className={fieldContainerClasses}>
+            <ChronoFieldLabel htmlFor="vehicleTypeFilter" className={fieldLabelClasses}>
+              Tipo de vehículo
+            </ChronoFieldLabel>
+            <ChronoVehicleTypeSelect
+              value={selectedVehicleType}
+              onValueChange={setSelectedVehicleType}
+              options={vehicleTypes.map((vt) => ({ value: vt.value, label: vt.label }))}
+              className="mt-1"
+            />
+          </ChronoField>
 
           <Controller
             control={control}
-            name="startDate"
+            name="monthlyPlanId"
             render={({ field, fieldState }) => (
               <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="startDate" className={fieldLabelClasses}>
-                  Fecha de inicio
+                <ChronoFieldLabel htmlFor="monthlyPlanId" className={fieldLabelClasses}>
+                  Plan mensual
                 </ChronoFieldLabel>
-                <ChronoInput
-                  {...field}
-                  id="startDate"
-                  type="date"
-                  className="mt-1"
-                />
+
+                <ChronoSelect
+                  onValueChange={field.onChange}
+                  value={field.value ?? ""}
+                  disabled={loadingPlans || monthlyPlans.length === 0}
+                >
+                  <ChronoSelectTrigger className="mt-1 text-left">
+                    <ChronoSelectValue
+                      placeholder={
+                        loadingPlans
+                          ? "Cargando..."
+                          : monthlyPlans.length === 0
+                          ? "Seleccione tipo de vehículo primero"
+                          : "Seleccionar plan"
+                      }
+                    />
+                  </ChronoSelectTrigger>
+                  <ChronoSelectContent>
+                    {monthlyPlans.map((plan) => (
+                      <ChronoSelectItem key={plan.id} value={plan.id}>
+                        {plan.name} - {formatPrice(plan.price)}
+                      </ChronoSelectItem>
+                    ))}
+                  </ChronoSelectContent>
+                </ChronoSelect>
+
                 {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
               </ChronoField>
             )}
           />
+        </div>
+      </div>
 
+      <ChronoSeparator />
+
+      {/* Vehicle Section (Optional) */}
+      <div className="space-y-4">
+        <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+          Vehículo (Opcional)
+        </ChronoSectionLabel>
+
+        <div className="grid gap-3 md:grid-cols-2">
           <Controller
             control={control}
-            name="endDate"
+            name="vehicleId"
             render={({ field, fieldState }) => (
               <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="endDate" className={fieldLabelClasses}>
-                  Fecha de vencimiento
+                <ChronoFieldLabel htmlFor="vehicleId" className={fieldLabelClasses}>
+                  ID del Vehículo
                 </ChronoFieldLabel>
                 <ChronoInput
                   {...field}
-                  id="endDate"
-                  type="date"
+                  id="vehicleId"
+                  placeholder="Dejar vacío si no aplica"
                   className="mt-1"
                 />
                 {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
@@ -362,6 +307,9 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
             )}
           />
         </div>
+        <p className="text-xs text-muted-foreground">
+          El vehículo es opcional. Puede asociarse posteriormente o dejarse sin vehículo específico.
+        </p>
       </div>
 
       {/* Actions */}
@@ -387,7 +335,7 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
           iconPosition="left"
           size="lg"
         >
-          Guardar Mensualidad
+          Crear Suscripción
         </ChronoButton>
       </div>
     </form>

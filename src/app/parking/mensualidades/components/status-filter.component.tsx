@@ -14,6 +14,7 @@ import type { SubscriptionStatus } from "@/server/domain";
 
 const STATUS_OPTIONS: { value: SubscriptionStatus | "ALL"; label: string }[] = [
   { value: "ALL", label: "Todos los estados" },
+  { value: "PENDIENTE", label: "Pendiente" },
   { value: "ACTIVA", label: "Activa" },
   { value: "PERIODO_GRACIA", label: "Período de Gracia" },
   { value: "INACTIVA", label: "Inactiva" },

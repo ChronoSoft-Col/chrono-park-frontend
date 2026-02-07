@@ -1,25 +1,27 @@
 import { z } from "zod";
 
+/**
+ * Schema para crear una nueva suscripción mensual.
+ * La nueva API requiere:
+ * - customerId: ID del cliente existente
+ * - monthlyPlanId: ID del plan mensual
+ * - vehicleId: ID del vehículo (opcional)
+ */
 export const CreateSubscriptionSchema = z.object({
-  startDate: z.string().min(1, "La fecha de inicio es requerida"),
-  endDate: z.string().min(1, "La fecha de vencimiento es requerida"),
-  rateProfileId: z.string().min(1, "El perfil de tarifa es requerido"),
-  customer: z.object({
-    id: z.string().optional(),
-    documentTypeId: z.string().min(1, "El tipo de documento es requerido"),
-    documentNumber: z.string().min(1, "El número de documento es requerido"),
-    firstName: z.string().min(1, "El nombre es requerido"),
-    lastName: z.string().min(1, "El apellido es requerido"),
-    email: z.string().email("Email inválido").optional().or(z.literal("")),
-    phoneNumber: z.string().optional(),
-  }),
-  vehicle: z
-    .object({
-      id: z.string().optional(),
-      licensePlate: z.string().min(1, "La placa es requerida"),
-      vehicleTypeId: z.string().min(1, "El tipo de vehículo es requerido"),
-    })
-    .optional(),
+  customerId: z.string().min(1, "El cliente es requerido"),
+  monthlyPlanId: z.string().min(1, "El plan mensual es requerido"),
+  vehicleId: z.string().optional(),
 });
 
 export type CreateSubscriptionForm = z.infer<typeof CreateSubscriptionSchema>;
+
+/**
+ * Schema para pagar una suscripción pendiente.
+ * El paymentPointId se obtiene de la sesión del usuario activa.
+ */
+export const PaySubscriptionSchema = z.object({
+  paymentMethodId: z.string().min(1, "El método de pago es requerido"),
+  monthsCount: z.number().min(1, "Debe pagar al menos 1 mes").default(1),
+});
+
+export type PaySubscriptionForm = z.infer<typeof PaySubscriptionSchema>;

@@ -70,13 +70,16 @@ export default function SubscriptionsDataListComponent({
 
   const handleViewHistory = React.useCallback(
     (item: ISubscriptionEntity) => {
+      const customerName = item.customer
+        ? `${item.customer.firstName} ${item.customer.lastName}`.trim()
+        : "-";
       openDialog({
         title: `Historial de Pagos`,
         description: "Historial de suscripciones y pagos del cliente",
         content: (
           <SubscriptionHistoryDialogContent
-            customerId={item.customer.id}
-            customerName={item.customer.fullName}
+            customerId={item.customer?.id ?? ""}
+            customerName={customerName}
           />
         ),
         dialogClassName: "w-full sm:max-w-3xl",

@@ -65,3 +65,5 @@ export * from "./entities/parking/subscriptions/params/list-subscriptions-params
 export * from "./entities/parking/subscriptions/response/list-subscriptions-response.entity"
 export * from "./entities/parking/subscriptions/params/create-subscription-params.entity"
 export * from "./entities/parking/subscriptions/response/get-subscription-history-response.entity"
+export * from "./entities/parking/subscriptions/response/monthly-plan-response.entity"
+export * from "./entities/parking/subscriptions/response/billing-response.entity"

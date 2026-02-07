@@ -24,40 +24,30 @@ export function CreateSubscriptionDialogContent() {
       return false;
     }
 
-    const toastId = toast.loading("Creando mensualidad...");
+    const toastId = toast.loading("Creando suscripción...");
     try {
       const payload: ICreateSubscriptionParamsEntity = {
-        startDate: parsed.data.startDate,
-        endDate: parsed.data.endDate,
-        rateProfileId: parsed.data.rateProfileId,
-        customer: {
-          ...parsed.data.customer,
-          email: parsed.data.customer.email || undefined,
-          phoneNumber: parsed.data.customer.phoneNumber || undefined,
-        },
-        vehicle: parsed.data.vehicle
-          ? {
-              ...parsed.data.vehicle,
-            }
-          : undefined,
+        customerId: parsed.data.customerId,
+        monthlyPlanId: parsed.data.monthlyPlanId,
+        vehicleId: parsed.data.vehicleId || undefined,
       };
 
       const result = await createSubscriptionAction(payload);
       if (!result.success || !result.data?.success) {
         toast.error(
-          result.error || result.data?.message || "Error al crear la mensualidad",
+          result.error || result.data?.message || "Error al crear la suscripción",
           { id: toastId }
         );
         return false;
       }
 
-      toast.success("Mensualidad creada correctamente", { id: toastId });
+      toast.success("Suscripción creada correctamente. Proceda al pago.", { id: toastId });
       closeDialog();
       router.refresh();
       return true;
     } catch (error) {
       console.error("Error creating subscription:", error);
-      toast.error("Error inesperado al crear la mensualidad", { id: toastId });
+      toast.error("Error inesperado al crear la suscripción", { id: toastId });
       return false;
     }
   };

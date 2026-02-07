@@ -4,7 +4,8 @@ export interface IListSubscriptionsParamsEntity {
   page?: number;
   limit?: number;
   search?: string;
-  startDate?: string;
-  endDate?: string;
+  customerId?: string;
+  vehicleTypeId?: string;
+  monthlyPlanId?: string;
   status?: SubscriptionStatus;
 }
