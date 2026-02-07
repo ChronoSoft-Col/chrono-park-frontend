@@ -21,6 +21,7 @@ export async function addSessionServiceAction(
       SERVER_TOKENS.SessionServiceUsecase
     );
     const response = await useCase.addServiceToSession(sessionId, params);
+    console.log("addSessionServiceAction response:", response);
     return {
       data: response.data,
       success: true,

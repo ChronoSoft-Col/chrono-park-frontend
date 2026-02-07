@@ -1,3 +1,5 @@
+import { inject, injectable } from "tsyringe";
+import { SERVER_TOKENS } from "@/server/di/server-tokens";
 import IGeneralResponse from "@/shared/interfaces/generic/general-response.interface";
 import { 
   ISessionServiceEntity, 
@@ -6,8 +8,12 @@ import {
 } from "../../entities/parking/session-services";
 import { SessionServiceRepository } from "../../repositories/parking/session-service.repository";
 
+@injectable()
 export class SessionServiceUsecase {
-  constructor(private readonly repository: SessionServiceRepository) {}
+  constructor(
+    @inject(SERVER_TOKENS.SessionServiceRepository)
+    private readonly repository: SessionServiceRepository
+  ) {}
 
   addServiceToSession(
     sessionId: string, 
