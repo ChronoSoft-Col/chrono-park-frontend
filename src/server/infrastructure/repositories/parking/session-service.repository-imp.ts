@@ -1,5 +1,5 @@
 import { injectable, inject } from "tsyringe";
-import { IGeneralResponse } from "@/shared/interfaces/generic/general-response";
+import IGeneralResponse from "@/shared/interfaces/generic/general-response.interface";
 import { 
   SessionServiceRepository, 
   ISessionServiceEntity, 
@@ -21,20 +21,20 @@ export class SessionServiceRepositoryImp extends SessionServiceRepository {
   addServiceToSession(
     sessionId: string, 
     params: IAddSessionServiceParams
-  ): Promise<IGeneralResponse<ISessionServiceEntity, false>> {
+  ): Promise<IGeneralResponse<ISessionServiceEntity>> {
     return this.datasource.addServiceToSession(sessionId, params);
   }
 
   listSessionServices(
     sessionId: string
-  ): Promise<IGeneralResponse<ISessionServicesResponseEntity, false>> {
+  ): Promise<IGeneralResponse<ISessionServicesResponseEntity>> {
     return this.datasource.listSessionServices(sessionId);
   }
 
   removeSessionService(
     sessionId: string, 
     serviceId: string
-  ): Promise<IGeneralResponse<void, false>> {
+  ): Promise<IGeneralResponse<void>> {
     return this.datasource.removeSessionService(sessionId, serviceId);
   }
 }

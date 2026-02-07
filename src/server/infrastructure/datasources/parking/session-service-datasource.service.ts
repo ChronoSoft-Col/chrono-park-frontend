@@ -1,5 +1,5 @@
 import { injectable } from "tsyringe";
-import { IGeneralResponse } from "@/shared/interfaces/generic/general-response";
+import IGeneralResponse from "@/shared/interfaces/generic/general-response.interface";
 import { 
   SessionServiceRepository, 
   ISessionServiceEntity, 
@@ -13,9 +13,9 @@ export class SessionServiceDatasourceService extends AxiosServerInstance impleme
   async addServiceToSession(
     sessionId: string, 
     params: IAddSessionServiceParams
-  ): Promise<IGeneralResponse<ISessionServiceEntity, false>> {
+  ): Promise<IGeneralResponse<ISessionServiceEntity>> {
     return this.api
-      .post<IGeneralResponse<ISessionServiceEntity, false>>(
+      .post<IGeneralResponse<ISessionServiceEntity>>(
         `/parking-sessions/${sessionId}/services`,
         params
       )
@@ -24,9 +24,9 @@ export class SessionServiceDatasourceService extends AxiosServerInstance impleme
 
   async listSessionServices(
     sessionId: string
-  ): Promise<IGeneralResponse<ISessionServicesResponseEntity, false>> {
+  ): Promise<IGeneralResponse<ISessionServicesResponseEntity>> {
     return this.api
-      .get<IGeneralResponse<ISessionServicesResponseEntity, false>>(
+      .get<IGeneralResponse<ISessionServicesResponseEntity>>(
         `/parking-sessions/${sessionId}/services`
       )
       .then((response) => response.data);
@@ -35,9 +35,9 @@ export class SessionServiceDatasourceService extends AxiosServerInstance impleme
   async removeSessionService(
     sessionId: string, 
     serviceId: string
-  ): Promise<IGeneralResponse<void, false>> {
+  ): Promise<IGeneralResponse<void>> {
     return this.api
-      .delete<IGeneralResponse<void, false>>(
+      .delete<IGeneralResponse<void>>(
         `/parking-sessions/${sessionId}/services/${serviceId}`
       )
       .then((response) => response.data);
