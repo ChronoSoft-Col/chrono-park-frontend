@@ -33,11 +33,9 @@ export default async function listSubscriptionsAction(
       SERVER_TOKENS.SubscriptionUsecase
     );
     const response = await useCase.listSubscriptions(params);
-    console.log("Subscriptions fetched with params:", params);
     return { success: true, data: response };
   } catch (error) {
     rethrowNextNavigationErrors(error);
-    console.error("Error in listSubscriptionsAction:", error);
     return {
       success: false,
       error:
