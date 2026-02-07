@@ -11,7 +11,7 @@ export default async function SubscriptionsPage({
 
   return (
     <div className="space-y-6">
-      <SetupHeaderFilters showDatePicker={true} showSearch={true} />
+      <SetupHeaderFilters showDatePicker={false} showSearch={true} />
       <SubscriptionsDataFetchComponent searchParams={resolvedSearchParams} />
     </div>
   );

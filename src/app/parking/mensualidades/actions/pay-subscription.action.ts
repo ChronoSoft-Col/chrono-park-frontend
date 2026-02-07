@@ -31,7 +31,7 @@ export async function paySubscriptionAction(
     return { success: true, data: response };
   } catch (error) {
     rethrowNextNavigationErrors(error);
-    console.error("Error in paySubscriptionAction:", error);
+    console.error("Error in paySubscriptionAction:", JSON.stringify((error as AxiosError<IErrorResponse>).response?.data));
     return {
       success: false,
       error:
