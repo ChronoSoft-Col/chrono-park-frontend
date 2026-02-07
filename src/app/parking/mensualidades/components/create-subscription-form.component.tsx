@@ -88,10 +88,8 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
     setLoadingCustomers(true);
     try {
       const response = await listCustomersAction({ search, limit: "10" });
-      if (response.success && response.data?.data) {
-        const customerList = Array.isArray(response.data.data)
-          ? response.data.data
-          : [];
+      if (response.success && response.data?.data?.items) {
+        const customerList = response.data.data.items;
         setCustomers(
           customerList.map((c) => ({
             id: c.id,
