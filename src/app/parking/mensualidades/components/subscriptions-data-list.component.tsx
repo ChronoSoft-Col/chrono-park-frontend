@@ -10,6 +10,7 @@ import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
 import { Plus, X } from "lucide-react";
+import { StatusFilterComponent } from "./status-filter.component";
 
 import { toast } from "sonner";
 
@@ -120,6 +121,7 @@ export default function SubscriptionsDataListComponent({
     <ChronoViewWithTableLayout
       title="Mensualidades"
       description="Lista de suscripciones mensuales registradas en el sistema"
+      filters={<StatusFilterComponent />}
       action={{
         label: "Crear mensualidad",
         icon: <Plus className="h-4 w-4" />,

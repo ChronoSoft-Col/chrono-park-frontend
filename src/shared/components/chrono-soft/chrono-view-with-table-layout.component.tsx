@@ -15,6 +15,7 @@ export type ChronoViewWithTableLayoutProps = {
     disabled?: boolean;
     loading?: boolean;
   };
+  filters?: ReactNode;
   table: ReactNode;
   paginator?: ReactNode;
   className?: string;
@@ -27,6 +28,7 @@ export function ChronoViewWithTableLayout({
   title,
   description,
   action,
+  filters,
   table,
   paginator,
   className,
@@ -43,8 +45,10 @@ export function ChronoViewWithTableLayout({
             {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>
 
-          {action && (
-            <div className="flex justify-start sm:justify-end">
+          <div className="flex flex-wrap items-center gap-3">
+            {filters}
+
+            {action && (
               <ChronoButton
                 type="button"
                 onClick={action.onClick}
@@ -55,8 +59,8 @@ export function ChronoViewWithTableLayout({
               >
                 {action.label}
               </ChronoButton>
-            </div>
-          )}
+            )}
+          </div>
         </header>
       )}
 
