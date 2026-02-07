@@ -1,0 +1,148 @@
+"use client";
+
+import * as React from "react";
+
+import type { ISubscriptionEntity, SubscriptionStatus } from "@/server/domain";
+import { ChronoBadge } from "@chrono/chrono-badge.component";
+import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
+import { ChronoSeparator } from "@chrono/chrono-separator.component";
+import { ChronoValue } from "@chrono/chrono-value.component";
+
+interface SubscriptionDetailDialogContentProps {
+  item: ISubscriptionEntity;
+}
+
+const formatDate = (value?: Date | string) => {
+  if (!value) return "-";
+  const date = value instanceof Date ? value : new Date(value);
+  return new Intl.DateTimeFormat("es-CO", { dateStyle: "long" }).format(date);
+};
+
+const getStatusBadgeStyles = (status: SubscriptionStatus) => {
+  switch (status) {
+    case "ACTIVA":
+      return "border-emerald-500/40 bg-emerald-50 text-emerald-700";
+    case "PERIODO_GRACIA":
+      return "border-amber-500/40 bg-amber-50 text-amber-700";
+    case "INACTIVA":
+      return "border-red-500/40 bg-red-50 text-red-700";
+    case "CANCELADA":
+      return "border-gray-500/40 bg-gray-50 text-gray-700";
+    default:
+      return "border-border/60 bg-muted/40 text-muted-foreground";
+  }
+};
+
+const getStatusLabel = (status: SubscriptionStatus) => {
+  switch (status) {
+    case "ACTIVA":
+      return "Activa";
+    case "PERIODO_GRACIA":
+      return "Período de Gracia";
+    case "INACTIVA":
+      return "Inactiva";
+    case "CANCELADA":
+      return "Cancelada";
+    default:
+      return status;
+  }
+};
+
+export function SubscriptionDetailDialogContent({
+  item,
+}: SubscriptionDetailDialogContentProps) {
+  const headerRows = [
+    {
+      label: "Documento",
+      value: item.customer?.documentNumber || "-",
+    },
+    {
+      label: "Email",
+      value: item.customer?.email || "-",
+    },
+    {
+      label: "Tarifa",
+      value: item.rateProfile?.name || "-",
+    },
+  ];
+
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <ChronoSectionLabel size="base" className="tracking-[0.25em]">
+            Mensualidad
+          </ChronoSectionLabel>
+          <ChronoValue size="xl">{item.customer?.fullName || "-"}</ChronoValue>
+        </div>
+
+        <ChronoBadge variant="outline" className={getStatusBadgeStyles(item.status)}>
+          {getStatusLabel(item.status)}
+        </ChronoBadge>
+      </div>
+
+      <ChronoSeparator />
+
+      <dl className="grid gap-4 sm:grid-cols-2">
+        {headerRows.map((row) => (
+          <InfoRow key={row.label} label={row.label} value={row.value} />
+        ))}
+      </dl>
+
+      <div className="space-y-3">
+        <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+          Vehículo
+        </ChronoSectionLabel>
+
+        {item.vehicle ? (
+          <div className="rounded-xl border border-border/60 bg-card/70 px-4 py-3 shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Placa
+            </p>
+            <p className="text-base font-semibold text-foreground">
+              {item.vehicle.licensePlate || "-"}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {item.vehicle.type || "-"}
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-border/60 bg-muted/30 px-4 py-4 text-center text-xs text-muted-foreground">
+            Sin vehículo asociado.
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+          Vigencia
+        </ChronoSectionLabel>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <InfoRow label="Fecha de inicio" value={formatDate(item.startDate)} />
+          <InfoRow label="Fecha de vencimiento" value={formatDate(item.endDate)} />
+        </div>
+      </div>
+
+      {item.agreementCode && (
+        <div className="space-y-3">
+          <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+            Convenio
+          </ChronoSectionLabel>
+          <InfoRow label="Código" value={item.agreementCode} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-card/70 px-4 py-3 shadow-sm">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="text-base font-semibold text-foreground">{value}</p>
+    </div>
+  );
+}

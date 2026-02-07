@@ -10,6 +10,7 @@ import {
   LoginUseCase,
   ManualControlUseCase,
   PaymentUsecase,
+  SubscriptionUsecase,
 } from "@/server/domain";
 import {
   CommonDatasourceService,
@@ -27,6 +28,8 @@ import {
 } from "@/server/infrastructure";
 import { ClosureDatasourceService } from "@/server/infrastructure/datasources/parking/closure-datasource.service";
 import { ClosureRepositoryImpl } from "@/server/infrastructure/repositories/parking/closure.repository-imp";
+import { SubscriptionDatasourceService } from "@/server/infrastructure/datasources/parking/subscription-datasource.service";
+import { SubscriptionRepositoryImp } from "@/server/infrastructure/repositories/parking/subscription.repository-imp";
 
 if (!container.isRegistered(SERVER_TOKENS.LoginRepository)) {
   container.register(SERVER_TOKENS.LoginRepository, {
@@ -128,6 +131,22 @@ if (!container.isRegistered(SERVER_TOKENS.CustomerUsecase)) {
 
 if (!container.isRegistered(SERVER_TOKENS.ClosureUsecase)) {
   container.register(SERVER_TOKENS.ClosureUsecase, { useClass: ClosureUsecase });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.SubscriptionDatasourceService)) {
+  container.register(SERVER_TOKENS.SubscriptionDatasourceService, {
+    useClass: SubscriptionDatasourceService,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.SubscriptionRepository)) {
+  container.register(SERVER_TOKENS.SubscriptionRepository, {
+    useClass: SubscriptionRepositoryImp,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.SubscriptionUsecase)) {
+  container.register(SERVER_TOKENS.SubscriptionUsecase, { useClass: SubscriptionUsecase });
 }
 
 // set-company bindings removed (companies flow deprecated)

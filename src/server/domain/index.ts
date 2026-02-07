@@ -6,6 +6,7 @@ export * from "./repositories/parking/payment.repository"
 export * from "./repositories/parking/in-out.repository"
 export * from "./repositories/parking/customer.repository"
 export * from "./repositories/parking/closure.repository"
+export * from "./repositories/parking/subscription.repository"
 
 //USE CASES
 export * from "./usecases/auth/login.usecase";
@@ -15,6 +16,7 @@ export * from "./usecases/parking/payment.usecase";
 export * from "./usecases/parking/in-out.usecase";
 export * from "./usecases/parking/customer.usecase";
 export * from "./usecases/parking/closure.usecase";
+export * from "./usecases/parking/subscription.usecase";
 
 //ENTITIES
 export * from "./entities/auth/response/get-permissions-response.entity";
@@ -56,3 +58,9 @@ export * from "./entities/parking/closures/closure.entity"
 export * from "./entities/parking/closures/closure-list-item.entity"
 export * from "./entities/parking/closures/params/list-closure-params.entity"
 export * from "./entities/parking/closures/response/list-closure-response.entity"
+
+export * from "./entities/parking/subscriptions/subscription.entity"
+export * from "./entities/parking/subscriptions/params/list-subscriptions-params.entity"
+export * from "./entities/parking/subscriptions/response/list-subscriptions-response.entity"
+export * from "./entities/parking/subscriptions/params/create-subscription-params.entity"
+export * from "./entities/parking/subscriptions/response/get-subscription-history-response.entity"

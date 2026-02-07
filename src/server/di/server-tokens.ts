@@ -7,6 +7,7 @@ export const SERVER_TOKENS = {
   InOutUsecase: Symbol.for("server:InOutUsecase"),
   CustomerUsecase: Symbol.for("server:CustomerUsecase"),
   ClosureUsecase: Symbol.for("server:ClosureUsecase"),
+  SubscriptionUsecase: Symbol.for("server:SubscriptionUsecase"),
 
   // Repositories
   LoginRepository: Symbol.for("server:LoginRepository"),
@@ -16,6 +17,7 @@ export const SERVER_TOKENS = {
   InOutRepository: Symbol.for("server:InOutRepository"),
   CustomerRepository: Symbol.for("server:CustomerRepository"),
   ClosureRepository: Symbol.for("server:ClosureRepository"),
+  SubscriptionRepository: Symbol.for("server:SubscriptionRepository"),
 
   // Datasources
   LoginDatasourceService: Symbol.for("server:LoginDatasourceService"),
@@ -25,4 +27,5 @@ export const SERVER_TOKENS = {
   InOutDatasourceService: Symbol.for("server:InOutDatasourceService"),
   CustomerDatasourceService: Symbol.for("server:CustomerDatasourceService"),
   ClosureDatasourceService: Symbol.for("server:ClosureDatasourceService"),
+  SubscriptionDatasourceService: Symbol.for("server:SubscriptionDatasourceService"),
 } as const;

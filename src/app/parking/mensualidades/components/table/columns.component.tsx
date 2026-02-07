@@ -1,0 +1,143 @@
+"use client";
+
+import type { ISubscriptionEntity, SubscriptionStatus } from "@/server/domain";
+import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
+
+import ChronoButton from "@chrono/chrono-button.component";
+import { ChronoBadge } from "@chrono/chrono-badge.component";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/src/shared/components/ui/tooltip";
+import { Eye, History } from "lucide-react";
+
+type ViewDetailHandler = (item: ISubscriptionEntity) => void;
+type ViewHistoryHandler = (item: ISubscriptionEntity) => void;
+
+const formatDate = (value?: Date | string) => {
+  if (!value) return "-";
+  const date = value instanceof Date ? value : new Date(value);
+  return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(date);
+};
+
+const getStatusBadgeStyles = (status: SubscriptionStatus) => {
+  switch (status) {
+    case "ACTIVA":
+      return "border-emerald-500/40 bg-emerald-50 text-emerald-700";
+    case "PERIODO_GRACIA":
+      return "border-amber-500/40 bg-amber-50 text-amber-700";
+    case "INACTIVA":
+      return "border-red-500/40 bg-red-50 text-red-700";
+    case "CANCELADA":
+      return "border-gray-500/40 bg-gray-50 text-gray-700";
+    default:
+      return "border-border/60 bg-muted/40 text-muted-foreground";
+  }
+};
+
+const getStatusLabel = (status: SubscriptionStatus) => {
+  switch (status) {
+    case "ACTIVA":
+      return "Activa";
+    case "PERIODO_GRACIA":
+      return "Período de Gracia";
+    case "INACTIVA":
+      return "Inactiva";
+    case "CANCELADA":
+      return "Cancelada";
+    default:
+      return status;
+  }
+};
+
+export const createSubscriptionColumns = (
+  onViewDetail?: ViewDetailHandler,
+  onViewHistory?: ViewHistoryHandler
+): ChronoDataTableColumn<ISubscriptionEntity>[] => [
+  {
+    id: "customer",
+    header: "Cliente",
+    accessorFn: (row) => row.customer?.fullName || "-",
+  },
+  {
+    id: "document",
+    header: "Documento",
+    accessorFn: (row) => row.customer?.documentNumber || "-",
+  },
+  {
+    id: "vehicle",
+    header: "Vehículo",
+    cell: (row) => (
+      <div>
+        <p className="font-medium">{row.vehicle?.licensePlate || "-"}</p>
+        <p className="text-xs text-muted-foreground">{row.vehicle?.type || "-"}</p>
+      </div>
+    ),
+  },
+  {
+    id: "rate-profile",
+    header: "Tarifa",
+    accessorFn: (row) => row.rateProfile?.name || "-",
+  },
+  {
+    id: "start-date",
+    header: "Inicio",
+    accessorFn: (row) => formatDate(row.startDate),
+  },
+  {
+    id: "end-date",
+    header: "Vencimiento",
+    accessorFn: (row) => formatDate(row.endDate),
+  },
+  {
+    id: "status",
+    header: "Estado",
+    align: "center",
+    headerClassName: "text-center",
+    cellClassName: "text-center",
+    cell: (row) => (
+      <ChronoBadge variant="outline" className={getStatusBadgeStyles(row.status)}>
+        {getStatusLabel(row.status)}
+      </ChronoBadge>
+    ),
+  },
+  {
+    id: "actions",
+    header: "Acciones",
+    align: "right",
+    headerClassName: "text-right",
+    cellClassName: "text-right",
+    cell: (row) => (
+      <div className="flex justify-end gap-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <ChronoButton
+              type="button"
+              variant="default"
+              aria-label="Ver detalle"
+              onClick={() => onViewDetail?.(row)}
+            >
+              <Eye className="h-4 w-4" />
+            </ChronoButton>
+          </TooltipTrigger>
+          <TooltipContent side="top">Ver detalle</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <ChronoButton
+              type="button"
+              variant="outline"
+              aria-label="Ver historial"
+              onClick={() => onViewHistory?.(row)}
+            >
+              <History className="h-4 w-4" />
+            </ChronoButton>
+          </TooltipTrigger>
+          <TooltipContent side="top">Ver historial de pagos</TooltipContent>
+        </Tooltip>
+      </div>
+    ),
+  },
+];
