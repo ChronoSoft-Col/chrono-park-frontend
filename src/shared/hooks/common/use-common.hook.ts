@@ -5,6 +5,7 @@ import { EServices } from "../../enums/common/services.enum";
 import { TVehicleType } from "../../types/common/vehicle-types.type";
 import { TPaymentMethods } from "../../types/common/payment-methods.type";
 import { TDocumentType } from "../../types/common/document-types.type";
+import { TAdditionalService } from "../../types/common/additional-service.type";
 
 export default function UseCommon() {
   const [commonData, setCommonData] = useState<TCommonContextType | undefined>(
@@ -13,18 +14,20 @@ export default function UseCommon() {
 
   const getData = async () => {
     try {
-      const [vehicleTypes, paymentMethods, documentTypes] = await Promise.all([
+      const [vehicleTypes, paymentMethods, documentTypes, additionalServices] = await Promise.all([
         getCommonAction<TVehicleType[]>(EServices.VEHICLE_TYPES),
         getCommonAction<TPaymentMethods[]>(EServices.PAYMENT_METHODS),
         getCommonAction<TDocumentType[]>(EServices.DOCUMENT_TYPES),
+        getCommonAction<TAdditionalService[]>(EServices.ADDITIONAL_SERVICES),
       ]);
       
-      console.log("Common data loaded:", { vehicleTypes, paymentMethods, documentTypes });
+      console.log("Common data loaded:", { vehicleTypes, paymentMethods, documentTypes, additionalServices });
       
       setCommonData({
         vehicleTypes: vehicleTypes.data?.data || [],
         paymentMethods: paymentMethods.data?.data || [],
         documentTypes: documentTypes.data?.data || [],
+        additionalServices: additionalServices.data?.data || [],
       });
     } catch (error) {
       console.error("Error loading common data:", error);
@@ -33,6 +36,7 @@ export default function UseCommon() {
         vehicleTypes: [],
         paymentMethods: [],
         documentTypes: [],
+        additionalServices: [],
       });
     }
   };
