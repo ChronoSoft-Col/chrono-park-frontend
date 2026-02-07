@@ -59,6 +59,7 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
   // Form state for adding new service
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
   const [quantity, setQuantity] = useState("1");
+  const [unitPrice, setUnitPrice] = useState("");
   const [notes, setNotes] = useState("");
 
   const sessionId = validateRaw?.data?.parkingSessionId;
@@ -93,9 +94,20 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
     if (!isOpen) {
       setSelectedServiceId("");
       setQuantity("1");
+      setUnitPrice("");
       setNotes("");
     }
   }, [isOpen]);
+
+  // Set default price when service is selected
+  useEffect(() => {
+    if (selectedServiceId) {
+      const selectedService = additionalServices.find(s => s.value === selectedServiceId);
+      if (selectedService) {
+        setUnitPrice(selectedService.price.toString());
+      }
+    }
+  }, [selectedServiceId, additionalServices]);
 
   const handleAddService = async () => {
     if (!sessionId || !selectedServiceId) return;
@@ -110,7 +122,7 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
       const res = await addSessionServiceAction(sessionId, {
         additionalServiceId: selectedServiceId,
         quantity: parseInt(quantity) || 1,
-        unitPrice: selectedService.price,
+        unitPrice: parseInt(unitPrice) || selectedService.price,
         notes: notes.trim() || undefined,
       });
 
@@ -124,6 +136,7 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
       // Reset form
       setSelectedServiceId("");
       setQuantity("1");
+      setUnitPrice("");
       setNotes("");
       
       // Reload services list
@@ -180,7 +193,8 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
   };
 
   const selectedServicePrice = additionalServices.find(s => s.value === selectedServiceId)?.price ?? 0;
-  const estimatedTotal = selectedServicePrice * (parseInt(quantity) || 1);
+  const currentUnitPrice = unitPrice ? parseInt(unitPrice) : selectedServicePrice;
+  const estimatedTotal = currentUnitPrice * (parseInt(quantity) || 1);
 
   return (
     <Drawer direction="right" open={isOpen} onOpenChange={setIsOpen}>
@@ -264,10 +278,23 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
                   />
                 </div>
                 <div className="space-y-1">
-                  <ChronoLabel className="text-xs">Total estimado</ChronoLabel>
-                  <div className="flex h-9 items-center rounded-md border bg-muted/50 px-3 text-sm font-medium">
-                    {formatCurrency(estimatedTotal)}
-                  </div>
+                  <ChronoLabel className="text-xs">Precio unitario</ChronoLabel>
+                  <ChronoInput
+                    type="number"
+                    min="0"
+                    value={unitPrice}
+                    onChange={(e) => setUnitPrice(e.target.value)}
+                    disabled={isAdding || !selectedServiceId}
+                    placeholder="0"
+                    className="h-9"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <ChronoLabel className="text-xs">Total estimado</ChronoLabel>
+                <div className="flex h-9 items-center rounded-md border bg-muted/50 px-3 text-sm font-medium">
+                  {formatCurrency(estimatedTotal)}
                 </div>
               </div>
 
