@@ -23,7 +23,7 @@ import {
     ChronoSelectValue,
 } from "@chrono/chrono-select.component";
 import { ChronoLabel } from "@chrono/chrono-label.component";
-import { CalendarClock, Clock8, TimerReset, Wallet2, X, RefreshCw } from "lucide-react";
+import { CalendarClock, Clock8, TimerReset, Wallet2, X, RefreshCw, Package } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import ChronoButton from "@chrono/chrono-button.component";
 
@@ -80,7 +80,9 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
         isLoadingRates, 
         loadRatesForVehicleType, 
         recalculateWithRate,
-        isValidating 
+        isValidating,
+        sessionServices,
+        sessionServicesTotal
     } = usePaymentContext();
     const { vehicleTypes } = useCommonContext();
     const [showRateSelector, setShowRateSelector] = useState(false);
@@ -359,43 +361,85 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
 
             <ChronoCard className="bg-card/95 h-min">
                 <ChronoCardHeader className="gap-1.5">
-                    <ChronoCardTitle className="text-sm font-semibold">Reglas aplicadas</ChronoCardTitle>
+                    <ChronoCardTitle className="text-sm font-semibold">Desglose de cobro</ChronoCardTitle>
                 </ChronoCardHeader>
 
-                <ChronoCardContent className="space-y-1">
-                    {visibleRules.length ? (
-                        <div className="grid gap-1.5 sm:grid-cols-2">
-                            {visibleRules.map((rule, idx) => (
-                                <div
-                                    key={`${rule.ruleType}-${idx}`}
-                                    className="rounded-2xl border border-border/60 px-3 py-1.5"
-                                >
-                                    <div className="flex items-center justify-between gap-1.5">
-                                        <span className="text-[12px] font-semibold text-foreground">
-                                            {rule.ruleType}
-                                        </span>
-                                        <ChronoBadge variant="outline" className="border-primary/40 px-2 py-0.5 text-[10px] text-foreground">
-                                            {formatCurrency(rule.amount ?? 0)}
-                                        </ChronoBadge>
+                <ChronoCardContent className="space-y-3">
+                    {/* Reglas aplicadas */}
+                    {visibleRules.length > 0 && (
+                        <div className="space-y-1.5">
+                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Reglas aplicadas</p>
+                            <div className="grid gap-1.5 sm:grid-cols-2">
+                                {visibleRules.map((rule, idx) => (
+                                    <div
+                                        key={`${rule.ruleType}-${idx}`}
+                                        className="rounded-2xl border border-border/60 px-3 py-1.5"
+                                    >
+                                        <div className="flex items-center justify-between gap-1.5">
+                                            <span className="text-[12px] font-semibold text-foreground">
+                                                {rule.ruleType}
+                                            </span>
+                                            <ChronoBadge variant="outline" className="border-primary/40 px-2 py-0.5 text-[10px] text-foreground">
+                                                {formatCurrency(rule.amount ?? 0)}
+                                            </ChronoBadge>
+                                        </div>
+                                        {rule.description && (
+                                            <p className="mt-1 text-[10px] text-muted-foreground line-clamp-2">
+                                                {rule.description}
+                                            </p>
+                                        )}
                                     </div>
-                                    {rule.description && (
-                                        <p className="mt-1 text-[10px] text-muted-foreground line-clamp-2">
-                                            {rule.description}
-                                        </p>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="rounded-2xl border border-dashed px-3 py-4 text-center text-sm text-muted-foreground">
-                            Sin reglas aplicadas para este cálculo.
+                                ))}
+                            </div>
+                            {hiddenRules > 0 && (
+                                <p className="text-center text-[10px] text-muted-foreground">
+                                    + {hiddenRules} reglas adicionales no mostradas.
+                                </p>
+                            )}
                         </div>
                     )}
 
-                    {hiddenRules > 0 && (
-                        <p className="text-center text-[10px] text-muted-foreground">
-                            + {hiddenRules} reglas adicionales no mostradas para mantener el resumen compacto.
-                        </p>
+                    {/* Servicios adicionales */}
+                    {sessionServices.length > 0 && (
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                                    <Package className="h-3 w-3" />
+                                    Servicios adicionales
+                                </p>
+                                <ChronoBadge variant="secondary" className="px-2 py-0.5 text-[10px]">
+                                    {formatCurrency(sessionServicesTotal)}
+                                </ChronoBadge>
+                            </div>
+                            <div className="grid gap-1.5 sm:grid-cols-2">
+                                {sessionServices.map((service) => (
+                                    <div
+                                        key={service.id}
+                                        className="rounded-2xl border border-border/60 px-3 py-1.5"
+                                    >
+                                        <div className="flex items-center justify-between gap-1.5">
+                                            <span className="text-[12px] font-semibold text-foreground">
+                                                {service.serviceName}
+                                            </span>
+                                            <ChronoBadge variant="outline" className="border-primary/40 px-2 py-0.5 text-[10px] text-foreground">
+                                                {formatCurrency(service.totalAmount)}
+                                            </ChronoBadge>
+                                        </div>
+                                        <p className="mt-1 text-[10px] text-muted-foreground">
+                                            {service.quantity} x {formatCurrency(service.unitPrice)}
+                                            {service.notes && ` • ${service.notes}`}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Estado vacío cuando no hay ni reglas ni servicios */}
+                    {visibleRules.length === 0 && sessionServices.length === 0 && (
+                        <div className="rounded-2xl border border-dashed px-3 py-4 text-center text-sm text-muted-foreground">
+                            Sin reglas ni servicios aplicados para este cálculo.
+                        </div>
                     )}
                 </ChronoCardContent>
             </ChronoCard>

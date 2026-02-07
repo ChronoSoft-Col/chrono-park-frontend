@@ -28,9 +28,7 @@ import {
 } from "@/shared/components/ui/drawer";
 import { usePaymentContext } from "@/src/shared/context/payment.context";
 import { useCommonContext } from "@/src/shared/context/common.context";
-import { ISessionServiceEntity } from "@/server/domain";
 import { addSessionServiceAction } from "../actions/add-session-service.action";
-import { listSessionServicesAction } from "../actions/list-session-services.action";
 import { removeSessionServiceAction } from "../actions/remove-session-service.action";
 import { toast } from "sonner";
 
@@ -45,17 +43,17 @@ type ServicesCartDrawerProps = {
   className?: string;
 };
 
-export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerProps) {
-  const { validateRaw, validateFee } = usePaymentContext();
+export function ServicesCartDrawerComponent({
+  className,
+}: ServicesCartDrawerProps) {
+  const { validateRaw, validateFee, sessionServices, sessionServicesTotal, loadSessionServices } = usePaymentContext();
   const { additionalServices } = useCommonContext();
-  
+
   const [isOpen, setIsOpen] = useState(false);
-  const [services, setServices] = useState<ISessionServiceEntity[]>([]);
-  const [servicesTotal, setServicesTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
-  
+
   // Form state for adding new service
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
   const [quantity, setQuantity] = useState("1");
@@ -67,20 +65,16 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
 
   const loadServices = useCallback(async () => {
     if (!sessionId) return;
-    
+
     setIsLoading(true);
     try {
-      const res = await listSessionServicesAction(sessionId);
-      if (res.success && res.data) {
-        setServices(res.data.services ?? []);
-        setServicesTotal(res.data.total ?? 0);
-      }
+      await loadSessionServices();
     } catch (error) {
       console.error("Error loading services:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, loadSessionServices]);
 
   // Load services when drawer opens or session changes
   useEffect(() => {
@@ -102,7 +96,9 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
   // Set default price when service is selected
   useEffect(() => {
     if (selectedServiceId) {
-      const selectedService = additionalServices.find(s => s.value === selectedServiceId);
+      const selectedService = additionalServices.find(
+        (s) => s.value === selectedServiceId,
+      );
       if (selectedService) {
         setUnitPrice(selectedService.price.toString());
       }
@@ -112,12 +108,14 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
   const handleAddService = async () => {
     if (!sessionId || !selectedServiceId) return;
 
-    const selectedService = additionalServices.find(s => s.value === selectedServiceId);
+    const selectedService = additionalServices.find(
+      (s) => s.value === selectedServiceId,
+    );
     if (!selectedService) return;
 
     setIsAdding(true);
     const toastId = toast.loading("Agregando servicio...");
-    
+
     try {
       const res = await addSessionServiceAction(sessionId, {
         additionalServiceId: selectedServiceId,
@@ -127,21 +125,23 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
       });
 
       if (!res.success) {
-        toast.error(res.error || "Error al agregar el servicio", { id: toastId });
+        toast.error(res.error || "Error al agregar el servicio", {
+          id: toastId,
+        });
         return;
       }
 
       toast.success("Servicio agregado", { id: toastId });
-      
+
       // Reset form
       setSelectedServiceId("");
       setQuantity("1");
       setUnitPrice("");
       setNotes("");
-      
+
       // Reload services list
       await loadServices();
-      
+
       // Revalidate session to update totals
       if (validateRaw?.data?.vehicle?.licensePlate) {
         await validateFee({
@@ -162,20 +162,22 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
 
     setRemovingId(serviceId);
     const toastId = toast.loading("Eliminando servicio...");
-    
+
     try {
       const res = await removeSessionServiceAction(sessionId, serviceId);
 
       if (!res.success) {
-        toast.error(res.error || "Error al eliminar el servicio", { id: toastId });
+        toast.error(res.error || "Error al eliminar el servicio", {
+          id: toastId,
+        });
         return;
       }
 
       toast.success("Servicio eliminado", { id: toastId });
-      
+
       // Reload services list
       await loadServices();
-      
+
       // Revalidate session to update totals
       if (validateRaw?.data?.vehicle?.licensePlate) {
         await validateFee({
@@ -192,8 +194,11 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
     }
   };
 
-  const selectedServicePrice = additionalServices.find(s => s.value === selectedServiceId)?.price ?? 0;
-  const currentUnitPrice = unitPrice ? parseInt(unitPrice) : selectedServicePrice;
+  const selectedServicePrice =
+    additionalServices.find((s) => s.value === selectedServiceId)?.price ?? 0;
+  const currentUnitPrice = unitPrice
+    ? parseInt(unitPrice)
+    : selectedServicePrice;
   const estimatedTotal = currentUnitPrice * (parseInt(quantity) || 1);
 
   return (
@@ -204,13 +209,15 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
           size="default"
           className={cn("relative gap-2", className)}
           disabled={!hasSession}
-          title={hasSession ? "Servicios adicionales" : "Valida una sesión primero"}
+          title={
+            hasSession ? "Servicios adicionales" : "Valida una sesión primero"
+          }
         >
           <ShoppingCart className="h-4 w-4" />
           Servicios adicionales
-          {services.length > 0 && (
+          {sessionServices.length > 0 && (
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-              {services.length}
+              {sessionServices.length}
             </span>
           )}
         </ChronoButton>
@@ -252,7 +259,10 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
                   </ChronoSelectTrigger>
                   <ChronoSelectContent>
                     {additionalServices.map((service) => (
-                      <ChronoSelectItem key={service.value} value={service.value}>
+                      <ChronoSelectItem
+                        key={service.value}
+                        value={service.value}
+                      >
                         <div className="flex items-center justify-between gap-2">
                           <span>{service.label}</span>
                           <span className="text-xs text-muted-foreground">
@@ -329,20 +339,20 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
           <div className="flex-1 space-y-2">
             <ChronoSectionLabel size="sm" className="flex items-center gap-1.5">
               <Package className="h-3.5 w-3.5" />
-              Servicios agregados ({services.length})
+              Servicios agregados ({sessionServices.length})
             </ChronoSectionLabel>
 
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
-            ) : services.length === 0 ? (
+            ) : sessionServices.length === 0 ? (
               <div className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
                 No hay servicios agregados
               </div>
             ) : (
               <div className="space-y-2">
-                {services.map((service) => (
+                {sessionServices.map((service) => (
                   <div
                     key={service.id}
                     className="flex items-center justify-between gap-2 rounded-lg border bg-card p-3"
@@ -389,9 +399,11 @@ export function ServicesCartDrawerComponent({ className }: ServicesCartDrawerPro
 
         <DrawerFooter className="border-t">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Total servicios:</span>
+            <span className="text-sm text-muted-foreground">
+              Total servicios:
+            </span>
             <ChronoValue size="md" weight="bold" className="text-primary">
-              {formatCurrency(servicesTotal)}
+              {formatCurrency(sessionServicesTotal)}
             </ChronoValue>
           </div>
           <DrawerClose asChild>

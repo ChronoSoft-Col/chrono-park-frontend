@@ -6,7 +6,9 @@ import { ServicesCartDrawerComponent } from "./components/services-cart-drawer.c
 export default function Page() {
   return (
     <section className="relative h-full max-h-full min-h-0">
-      <ServicesCartDrawerComponent className="absolute right-0 top-0 z-10" />
+      <div className="absolute right-0 -top-12 z-10">
+        <ServicesCartDrawerComponent />
+      </div>
       
       <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
         <div className="flex h-full min-h-0 min-w-0 flex-col justify-center gap-4">
