@@ -23,6 +23,7 @@ interface Props {
   total: number;
   totalPages: number;
   pageSize: number;
+  error?: string;
 }
 
 export default function InOutDataListComponent({
@@ -30,6 +31,7 @@ export default function InOutDataListComponent({
   total,
   totalPages,
   pageSize,
+  error,
 }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -38,6 +40,14 @@ export default function InOutDataListComponent({
 
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const { printIncomeReceipt } = usePrint();
+
+  React.useEffect(() => {
+    if (error) {
+      toast.error("Error al cargar datos", {
+        description: error,
+      });
+    }
+  }, [error]);
 
   const currentStatus = (searchParams.get("status") as InOutStatusEnum | null) ?? InOutStatusEnum.ACTIVE;
   const isEntriesTab = currentStatus === InOutStatusEnum.ACTIVE;

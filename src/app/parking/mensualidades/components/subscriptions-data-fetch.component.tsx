@@ -12,7 +12,16 @@ export default async function SubscriptionsDataFetchComponent({ searchParams }: 
   const response = await listSubscriptionsAction(searchParams);
 
   if (!response.success || !response.data || !response.data.success) {
-    return <div>Error cargando mensualidades</div>;
+    const errorMessage = response.error ?? "Error desconocido al cargar mensualidades";
+    return (
+      <SubscriptionsDataListComponent
+        items={[]}
+        total={0}
+        totalPages={1}
+        pageSize={10}
+        error={errorMessage}
+      />
+    );
   }
 
   const { items, total, totalPages, pageSize } = resolveMetaData<ISubscriptionEntity>(response.data.data);

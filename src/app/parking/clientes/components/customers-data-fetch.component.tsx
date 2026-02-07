@@ -10,8 +10,18 @@ interface Props {
 
 export default async function CustomersDataFetchComponent({ searchParams }: Props) {
   const response = await listCustomersAction(searchParams);
+  
   if (!response.success || !response.data || !response.data.success) {
-    return <div>Error cargando clientes</div>;
+    const errorMessage = response.error ?? "Error desconocido al cargar clientes";
+    return (
+      <CustomersDataListComponent
+        items={[]}
+        total={0}
+        totalPages={1}
+        pageSize={10}
+        error={errorMessage}
+      />
+    );
   }
 
   const { items, total, totalPages, pageSize } = resolveMetaData<ICustomerEntity>(response.data.data);

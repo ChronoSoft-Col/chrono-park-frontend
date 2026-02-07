@@ -13,7 +13,17 @@ export default async function PaymentsDataFetchComponent({ searchParams }: Props
   const res = await listPaymentsAction(searchParams);
 
   if (!res.success || !res.data || !res.data.success) {
-    return <div>Error cargando pagos</div>;
+    const errorMessage = res.error ?? "Error desconocido al cargar pagos";
+    return (
+      <PaymentsDataListComponent
+        items={[]}
+        total={0}
+        totalPages={1}
+        pageSize={10}
+        currentPage={1}
+        error={errorMessage}
+      />
+    );
   }
 
   const { items, total, totalPages, pageSize, page } = resolveMetaData<IPaymentItemEntity>(res.data.data);

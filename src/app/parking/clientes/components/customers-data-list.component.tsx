@@ -24,6 +24,7 @@ interface Props {
   total: number;
   totalPages: number;
   pageSize: number;
+  error?: string;
 }
 
 export default function CustomersDataListComponent({
@@ -31,8 +32,17 @@ export default function CustomersDataListComponent({
   total,
   totalPages,
   pageSize,
+  error,
 }: Props) {
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
+
+  React.useEffect(() => {
+    if (error) {
+      toast.error("Error al cargar datos", {
+        description: error,
+      });
+    }
+  }, [error]);
 
   const handleToggleActiveYes = React.useCallback(
     async (item: ICustomerEntity, nextActive: boolean) => {

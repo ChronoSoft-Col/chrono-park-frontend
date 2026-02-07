@@ -7,7 +7,7 @@ import { ChronoPaginator } from "@/src/shared/components/chrono-soft/chrono-pagi
 import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { ClosureDetailDialog } from "./closure-detail-dialog.component";
 import { createClosureColumns } from "./table/columns.component";
 import { getClosureByIdAction } from "../actions/get-closure-by-id.action";
@@ -22,6 +22,7 @@ interface Props {
   totalPages: number;
   pageSize: number;
   currentPage: number;
+  error?: string;
 }
 
 function ClosureDetailFooter({
@@ -82,11 +83,20 @@ export default function ClosureDataListComponent({
   total,
   totalPages,
   pageSize,
+  error,
 }: Props) {
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const { printClosureReceipt } = usePrint();
   const detailRequestInFlightRef = useRef(false);
   const printRequestInFlightRef = useRef(false);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Error al cargar datos", {
+        description: error,
+      });
+    }
+  }, [error]);
 
   const handleOpenCreateClosure = useCallback(() => {
     openDialog({

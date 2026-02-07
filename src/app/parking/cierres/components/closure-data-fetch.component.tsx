@@ -9,13 +9,22 @@ interface Props {
 }
 
 export default async function ClosureDataFetchComponent({ searchParams }: Props) {
-
   const res = await listClosuresAction(searchParams);
 
   if (!res.success || !res.data) {
-    console.error("Error details:", res.error);
-    return <div>Error cargando cierres</div>;
+    const errorMessage = res.error ?? "Error desconocido al cargar cierres";
+    return (
+      <ClosureDataListComponent
+        items={[]}
+        total={0}
+        totalPages={1}
+        pageSize={10}
+        currentPage={1}
+        error={errorMessage}
+      />
+    );
   }
+  
   const { items, total, totalPages, pageSize, page } = resolveMetaData<IClosureListItemEntity>(res.data.data);
 
   return (

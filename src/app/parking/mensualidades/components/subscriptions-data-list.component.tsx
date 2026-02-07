@@ -11,6 +11,8 @@ import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
 import { Plus, X } from "lucide-react";
 
+import { toast } from "sonner";
+
 import { createSubscriptionColumns } from "./table/columns.component";
 import { SubscriptionDetailDialogContent } from "./subscription-detail-dialog-content";
 import { SubscriptionHistoryDialogContent } from "./subscription-history-dialog-content";
@@ -21,6 +23,7 @@ interface Props {
   total: number;
   totalPages: number;
   pageSize: number;
+  error?: string;
 }
 
 export default function SubscriptionsDataListComponent({
@@ -28,8 +31,17 @@ export default function SubscriptionsDataListComponent({
   total,
   totalPages,
   pageSize,
+  error,
 }: Props) {
   const { openDialog, closeDialog } = UseDialogContext();
+
+  React.useEffect(() => {
+    if (error) {
+      toast.error("Error al cargar datos", {
+        description: error,
+      });
+    }
+  }, [error]);
 
   const handleViewDetail = React.useCallback(
     (item: ISubscriptionEntity) => {

@@ -10,8 +10,18 @@ interface Props {
 
 export default async function InOutDataFetchComponent({ searchParams }: Props) {
   const response = await getInOutsAction(searchParams);
+  
   if (!response.success || !response.data || !response.data.success) {
-    return <div>Error cargando ingresos/salidas</div>;
+    const errorMessage = response.error ?? "Error desconocido al cargar ingresos/salidas";
+    return (
+      <InOutDataListComponent
+        items={[]}
+        total={0}
+        totalPages={1}
+        pageSize={10}
+        error={errorMessage}
+      />
+    );
   }
 
   const { items, total, totalPages, pageSize } = resolveMetaData<IInOutEntity>(response.data.data);

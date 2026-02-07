@@ -21,6 +21,7 @@ interface Props {
   totalPages: number;
   pageSize: number;
   currentPage: number;
+  error?: string;
 }
 
 export default function PaymentsDataListComponent({
@@ -28,9 +29,18 @@ export default function PaymentsDataListComponent({
   total,
   totalPages,
   pageSize,
+  error,
 }: Props) {
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const { printPaymentTicketByPaymentId } = usePrint();
+
+  React.useEffect(() => {
+    if (error) {
+      toast.error("Error al cargar datos", {
+        description: error,
+      });
+    }
+  }, [error]);
 
   const handleViewDetail = React.useCallback(
     (item: IPaymentItemEntity) => {
