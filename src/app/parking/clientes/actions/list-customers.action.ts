@@ -27,7 +27,6 @@ export default async function listCustomersAction(
     const params = buildSearchParams(customerSearchParamsSchema, searchParams);
     const useCase = serverContainer.resolve<CustomerUsecase>(SERVER_TOKENS.CustomerUsecase);
     const response = await useCase.listCustomers(params);
-    console.log("Customers fetched with params:", params);
     return { success: true, data: response };
   } catch (error) {
     rethrowNextNavigationErrors(error);

@@ -44,6 +44,7 @@ export * from "./entities/parking/common/rule-applied.entity"
 
 export * from "./entities/parking/in-out/in-out.entity"
 export * from "./entities/parking/in-out/params/list-in-out-params.entitty"
+export * from "./entities/parking/in-out/params/edit-parking-session-params.entity"
 export * from "./entities/parking/in-out/response/list-in-out-response.entity"
 
 export * from "./entities/parking/customers/customer.entity"

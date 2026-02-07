@@ -3,7 +3,7 @@ import { IInOutEntity } from "@/server/domain";
 import { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
 import ChronoButton from "@chrono/chrono-button.component";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
-import { Eye, Printer } from "lucide-react";
+import { Eye, Printer, RefreshCcw } from "lucide-react";
 
 const formatDateTime = (value?: string) => {
   if (!value) return "-";
@@ -15,10 +15,19 @@ const formatDateTime = (value?: string) => {
 
 type ViewDetailHandler = (item: IInOutEntity) => void;
 type PrintHandler = (item: IInOutEntity) => void;
+type ChangeRateHandler = (item: IInOutEntity) => void;
+
+interface CreateInOutColumnsOptions {
+  onViewDetail?: ViewDetailHandler;
+  onPrint?: PrintHandler;
+  onChangeRate?: ChangeRateHandler;
+  showChangeRate?: boolean;
+}
 
 export const createInOutColumns = (
   onViewDetail?: ViewDetailHandler,
   onPrint?: PrintHandler,
+  options?: { onChangeRate?: ChangeRateHandler; showChangeRate?: boolean },
 ): ChronoDataTableColumn<IInOutEntity>[] => [
   {
     id: "license-plate",
@@ -28,10 +37,7 @@ export const createInOutColumns = (
   {
     id: "vehicle-type",
     header: "Tipo de vehículo",
-    accessorFn: (row: IInOutEntity) => {
-      console.log(row);
-      return row.vehicle.vehicleType.name;
-    },
+    accessorFn: (row: IInOutEntity) => row.vehicle.vehicleType.name,
   },
   {
     id: "rate-profile",
@@ -56,6 +62,23 @@ export const createInOutColumns = (
     cellClassName: "text-right",
     cell: (row: IInOutEntity) => (
       <div className="flex justify-end gap-2">
+        {options?.showChangeRate && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                size="icon-sm"
+                variant="outline"
+                aria-label="Cambiar tarifa"
+                onClick={() => options.onChangeRate?.(row)}
+              >
+                <RefreshCcw className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">Cambiar tarifa</TooltipContent>
+          </Tooltip>
+        )}
+
         <Tooltip>
           <TooltipTrigger asChild>
             <ChronoButton

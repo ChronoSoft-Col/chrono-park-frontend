@@ -30,10 +30,8 @@ export async function getRateProfileAction(vehicleTypeId: string): Promise<IActi
   try {
     const usecase = serverContainer.resolve<CommonUsecase>(SERVER_TOKENS.CommonUsecase);
     const response = await usecase.getRateProfiles(vehicleTypeId);
-    console.log("getRateProfileAction response:", response);
     return { success: true, data: response };
   } catch (error) {
-    console.error("getRateProfileAction error:", error);
     rethrowNextNavigationErrors(error);
     return { success: false, error: (error as AxiosError<IErrorResponse>).response?.data.message || "Error inesperado"};
   }

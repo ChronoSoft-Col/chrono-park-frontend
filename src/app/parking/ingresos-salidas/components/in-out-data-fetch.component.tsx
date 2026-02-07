@@ -10,7 +10,7 @@ interface Props {
 
 export default async function InOutDataFetchComponent({ searchParams }: Props) {
   const response = await getInOutsAction(searchParams);
-
+  console.log("Response from getInOutsAction:", response);
   if (!response.success || !response.data || !response.data.success) {
     return <div>Error cargando ingresos/salidas</div>;
   }

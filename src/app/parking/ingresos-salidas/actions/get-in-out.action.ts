@@ -25,11 +25,11 @@ const inOutSearchParamsSchema = z.object({
 export async function getInOutsAction(
     searchParams?: IPageProps["searchParams"]
 ): Promise<IActionResponse<IListInOutResponseEntity>> {
+    console.log("getInOutsAction called with searchParams:", searchParams);
     try {
         const params = buildSearchParams(inOutSearchParamsSchema, searchParams);
         const useCase = serverContainer.resolve<InOutUsecase>(SERVER_TOKENS.InOutUsecase);
         const response = await useCase.listInOuts(params);
-        console.log("InOuts fetched with params:", params);
         return { success: true, data: response };
     } catch (error) {
         rethrowNextNavigationErrors(error);

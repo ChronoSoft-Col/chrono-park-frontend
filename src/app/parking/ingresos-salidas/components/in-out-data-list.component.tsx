@@ -11,6 +11,7 @@ import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout
 import { createInOutColumns } from "./table/columns.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import { InOutDetailDialogContent } from "./in-out-detail-dialog-content";
+import { ChangeRateDialogContent } from "./change-rate-dialog-content";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { toast } from "sonner";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
@@ -124,9 +125,31 @@ export default function InOutDataListComponent({
     [printIncomeReceipt, showYesNoDialog],
   );
 
+  const handleChangeRate = React.useCallback(
+    (item: IInOutEntity) => {
+      openDialog({
+        title: `Cambiar tarifa - ${item.vehicle.licensePlate}`,
+        description: "Seleccione la nueva tarifa a aplicar",
+        content: (
+          <ChangeRateDialogContent
+            item={item}
+            onClose={closeDialog}
+            onSuccess={() => {
+              router.refresh();
+            }}
+          />
+        ),
+      });
+    },
+    [openDialog, closeDialog, router],
+  );
+
   const columns = React.useMemo(
-    () => createInOutColumns(handleViewDetail, handlePrint),
-    [handleViewDetail, handlePrint],
+    () => createInOutColumns(handleViewDetail, handlePrint, {
+      onChangeRate: handleChangeRate,
+      showChangeRate: isEntriesTab,
+    }),
+    [handleViewDetail, handlePrint, handleChangeRate, isEntriesTab],
   );
   const safeTotalPages = Math.max(
     1,

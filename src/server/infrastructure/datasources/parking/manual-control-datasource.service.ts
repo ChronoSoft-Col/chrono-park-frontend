@@ -1,6 +1,7 @@
 import {
   IGenerateManualIncomeParamsEntity,
   IGenerateManualIncomeResponse,
+  IEditParkingSessionParamsEntity,
   ManualControlRepository,
 } from "@/server/domain/index";
 import { AxiosServerInstance } from "../axios-server.intance";
@@ -35,5 +36,14 @@ export class ManualControlDatasourceService
       .then((response) => {
         return response.data;
       });
+  }
+
+  editParkingSession(
+    parkingSessionId: string,
+    params: IEditParkingSessionParamsEntity,
+  ): Promise<void> {
+    return this.api
+      .post(`/parking-sessions/edit-parking-session/${parkingSessionId}`, params)
+      .then(() => undefined);
   }
 }

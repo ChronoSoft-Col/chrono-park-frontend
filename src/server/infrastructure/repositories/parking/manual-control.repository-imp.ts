@@ -4,6 +4,7 @@ import { SERVER_TOKENS } from "@/server/di/server-tokens";
 import {
   IGenerateManualIncomeParamsEntity,
   IGenerateManualIncomeResponse,
+  IEditParkingSessionParamsEntity,
   ManualControlRepository,
 } from "@/server/domain/index";
 import { ManualControlDatasourceService } from "@/server/infrastructure/index";
@@ -25,5 +26,12 @@ export class ManualControlRepositoryImp implements ManualControlRepository {
     parkingSessionId: string,
   ): Promise<IGenerateManualIncomeResponse> {
     return this.manualControlDatasourceService.getEntryTicket(parkingSessionId);
+  }
+
+  editParkingSession(
+    parkingSessionId: string,
+    params: IEditParkingSessionParamsEntity,
+  ): Promise<void> {
+    return this.manualControlDatasourceService.editParkingSession(parkingSessionId, params);
   }
 }
