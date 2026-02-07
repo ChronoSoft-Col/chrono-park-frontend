@@ -33,9 +33,11 @@ export default function PaymentsDataListComponent({
 }: Props) {
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const { printPaymentTicketByPaymentId } = usePrint();
+  const errorShownRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (error) {
+    if (error && !errorShownRef.current) {
+      errorShownRef.current = true;
       toast.error("Error al cargar datos", {
         description: error,
       });

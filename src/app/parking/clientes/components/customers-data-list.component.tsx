@@ -35,9 +35,11 @@ export default function CustomersDataListComponent({
   error,
 }: Props) {
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
+  const errorShownRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (error) {
+    if (error && !errorShownRef.current) {
+      errorShownRef.current = true;
       toast.error("Error al cargar datos", {
         description: error,
       });

@@ -89,9 +89,11 @@ export default function ClosureDataListComponent({
   const { printClosureReceipt } = usePrint();
   const detailRequestInFlightRef = useRef(false);
   const printRequestInFlightRef = useRef(false);
+  const errorShownRef = useRef(false);
 
   useEffect(() => {
-    if (error) {
+    if (error && !errorShownRef.current) {
+      errorShownRef.current = true;
       toast.error("Error al cargar datos", {
         description: error,
       });

@@ -34,9 +34,11 @@ export default function SubscriptionsDataListComponent({
   error,
 }: Props) {
   const { openDialog, closeDialog } = UseDialogContext();
+  const errorShownRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (error) {
+    if (error && !errorShownRef.current) {
+      errorShownRef.current = true;
       toast.error("Error al cargar datos", {
         description: error,
       });

@@ -11,10 +11,14 @@ interface Props {
 export default async function ClosureDataFetchComponent({ searchParams }: Props) {
   const res = await listClosuresAction(searchParams);
 
+  // Create a key based on searchParams to force re-mount when filters change
+  const listKey = JSON.stringify(searchParams ?? {});
+
   if (!res.success || !res.data) {
     const errorMessage = res.error ?? "Error desconocido al cargar cierres";
     return (
       <ClosureDataListComponent
+        key={listKey}
         items={[]}
         total={0}
         totalPages={1}
@@ -29,6 +33,7 @@ export default async function ClosureDataFetchComponent({ searchParams }: Props)
 
   return (
     <ClosureDataListComponent
+      key={listKey}
       items={items}
       total={total}
       totalPages={totalPages}

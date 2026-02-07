@@ -12,10 +12,14 @@ interface Props {
 export default async function PaymentsDataFetchComponent({ searchParams }: Props) {
   const res = await listPaymentsAction(searchParams);
 
+  // Create a key based on searchParams to force re-mount when filters change
+  const listKey = JSON.stringify(searchParams ?? {});
+
   if (!res.success || !res.data || !res.data.success) {
     const errorMessage = res.error ?? "Error desconocido al cargar pagos";
     return (
       <PaymentsDataListComponent
+        key={listKey}
         items={[]}
         total={0}
         totalPages={1}
@@ -30,6 +34,7 @@ export default async function PaymentsDataFetchComponent({ searchParams }: Props
 
   return (
     <PaymentsDataListComponent
+      key={listKey}
       items={items}
       total={total}
       totalPages={totalPages}

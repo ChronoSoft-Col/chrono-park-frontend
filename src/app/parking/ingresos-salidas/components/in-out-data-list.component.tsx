@@ -10,11 +10,13 @@ import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout
 
 import { createInOutColumns } from "./table/columns.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
+import { useCommonContext } from "@/src/shared/context/common.context";
 import { InOutDetailDialogContent } from "./in-out-detail-dialog-content";
 import { ChangeRateDialogContent } from "./change-rate-dialog-content";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { toast } from "sonner";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
+import { ChronoSelect, ChronoSelectContent, ChronoSelectItem, ChronoSelectTrigger, ChronoSelectValue } from "@/src/shared/components/chrono-soft/chrono-select.component";
 import { getEntryTicketAction } from "../actions/get-entry-ticket.action";
 import { InOutStatusEnum } from "@/src/shared/enums/parking/in-out-status.enum";
 
@@ -39,10 +41,13 @@ export default function InOutDataListComponent({
   const [pending, startTransition] = React.useTransition();
 
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
+  const { vehicleTypes = [] } = useCommonContext();
   const { printIncomeReceipt } = usePrint();
+  const errorShownRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (error) {
+    if (error && !errorShownRef.current) {
+      errorShownRef.current = true;
       toast.error("Error al cargar datos", {
         description: error,
       });
@@ -50,6 +55,7 @@ export default function InOutDataListComponent({
   }, [error]);
 
   const currentStatus = (searchParams.get("status") as InOutStatusEnum | null) ?? InOutStatusEnum.ACTIVE;
+  const currentVehicleTypeId = searchParams.get("vehicleTypeId") ?? "all";
   const isEntriesTab = currentStatus === InOutStatusEnum.ACTIVE;
 
   const buildUrl = React.useCallback(
@@ -76,6 +82,24 @@ export default function InOutDataListComponent({
       });
     },
     [buildUrl, currentStatus, pending, router],
+  );
+
+  const setVehicleTypeId = React.useCallback(
+    (vehicleTypeId: string) => {
+      if (pending) return;
+      startTransition(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (vehicleTypeId === "all") {
+          params.delete("vehicleTypeId");
+        } else {
+          params.set("vehicleTypeId", vehicleTypeId);
+        }
+        params.set("page", "1");
+        const queryString = params.toString();
+        router.replace(queryString ? `${pathname}?${queryString}` : pathname);
+      });
+    },
+    [pathname, pending, router, searchParams],
   );
 
   const handleViewDetail = React.useCallback(
@@ -189,6 +213,26 @@ export default function InOutDataListComponent({
             >
               Salidas
             </ChronoButton>
+
+            <div className="ml-auto">
+              <ChronoSelect
+                value={currentVehicleTypeId}
+                onValueChange={setVehicleTypeId}
+                disabled={pending}
+              >
+                <ChronoSelectTrigger className="w-[180px]">
+                  <ChronoSelectValue placeholder="Tipo de vehículo" />
+                </ChronoSelectTrigger>
+                <ChronoSelectContent>
+                  <ChronoSelectItem value="all">Todos los tipos</ChronoSelectItem>
+                  {vehicleTypes.map((vt) => (
+                    <ChronoSelectItem key={vt.value} value={vt.value}>
+                      {vt.label}
+                    </ChronoSelectItem>
+                  ))}
+                </ChronoSelectContent>
+              </ChronoSelect>
+            </div>
           </div>
 
           <ChronoDataTable

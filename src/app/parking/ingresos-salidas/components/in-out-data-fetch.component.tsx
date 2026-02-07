@@ -11,10 +11,14 @@ interface Props {
 export default async function InOutDataFetchComponent({ searchParams }: Props) {
   const response = await getInOutsAction(searchParams);
   
+  // Create a key based on searchParams to force re-mount when filters change
+  const listKey = JSON.stringify(searchParams ?? {});
+  
   if (!response.success || !response.data || !response.data.success) {
     const errorMessage = response.error ?? "Error desconocido al cargar ingresos/salidas";
     return (
       <InOutDataListComponent
+        key={listKey}
         items={[]}
         total={0}
         totalPages={1}
@@ -28,6 +32,7 @@ export default async function InOutDataFetchComponent({ searchParams }: Props) {
 
   return (
     <InOutDataListComponent
+      key={listKey}
       items={items}
       total={total}
       totalPages={totalPages}
