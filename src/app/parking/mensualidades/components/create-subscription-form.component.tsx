@@ -2,8 +2,8 @@
 
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Save, X, Search, Loader2 } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { Save, X, Loader2, ChevronsUpDown, Check } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 import ChronoButton from "@chrono/chrono-button.component";
 import {
@@ -11,7 +11,6 @@ import {
   ChronoFieldError,
   ChronoFieldLabel,
 } from "@chrono/chrono-field.component";
-import { ChronoInput } from "@chrono/chrono-input.component";
 import {
   ChronoSelect,
   ChronoSelectContent,
@@ -20,6 +19,19 @@ import {
   ChronoSelectValue,
 } from "@chrono/chrono-select.component";
 import ChronoVehicleTypeSelect from "@chrono/chrono-vehicle-type-select.component";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/src/shared/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/src/shared/components/ui/command";
 
 import { useCommonContext } from "@/src/shared/context/common.context";
 import {
@@ -60,6 +72,8 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
   const [selectedVehicleType, setSelectedVehicleType] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerOption | null>(null);
   const [filteredVehicles, setFilteredVehicles] = useState<ICustomerVehicleEntity[]>([]);
+  const [customerPopoverOpen, setCustomerPopoverOpen] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const form = useForm<CreateSubscriptionForm>({
     resolver: zodResolver(CreateSubscriptionSchema) as Resolver<CreateSubscriptionForm>,
@@ -106,13 +120,27 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
     }
   }, []);
 
-  // Debounce para búsqueda de clientes
+  // Debounce para búsqueda de clientes en el Command
+  const handleCustomerSearchChange = useCallback((value: string) => {
+    setCustomerSearch(value);
+    
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    searchTimeoutRef.current = setTimeout(() => {
+      searchCustomers(value);
+    }, 500);
+  }, [searchCustomers]);
+
+  // Cleanup timeout on unmount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      searchCustomers(customerSearch);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [customerSearch, searchCustomers]);
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Cargar planes cuando cambia el tipo de vehículo
   useEffect(() => {
@@ -184,63 +212,84 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
           Seleccionar Cliente
         </ChronoSectionLabel>
 
-        <div className="grid gap-3 md:grid-cols-2">
-          <ChronoField className={fieldContainerClasses}>
-            <ChronoFieldLabel htmlFor="customerSearch" className={fieldLabelClasses}>
-              Buscar cliente
-            </ChronoFieldLabel>
-            <div className="relative mt-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <ChronoInput
-                id="customerSearch"
-                value={customerSearch}
-                onChange={(e) => setCustomerSearch(e.target.value)}
-                placeholder="Buscar por nombre o documento..."
-                className="pl-10"
-              />
-              {loadingCustomers && (
-                <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
-              )}
-            </div>
-          </ChronoField>
+        <Controller
+          control={control}
+          name="customerId"
+          render={({ field, fieldState }) => (
+            <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
+              <ChronoFieldLabel htmlFor="customerId" className={fieldLabelClasses}>
+                Cliente
+              </ChronoFieldLabel>
 
-          <Controller
-            control={control}
-            name="customerId"
-            render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="customerId" className={fieldLabelClasses}>
-                  Cliente seleccionado
-                </ChronoFieldLabel>
-
-                <ChronoSelect
-                  onValueChange={handleCustomerChange}
-                  value={field.value ?? ""}
-                  disabled={customers.length === 0}
-                >
-                  <ChronoSelectTrigger className="mt-1 text-left">
-                    <ChronoSelectValue
-                      placeholder={
-                        customers.length === 0
-                          ? "Busque un cliente primero"
-                          : "Seleccionar cliente"
-                      }
+              <Popover open={customerPopoverOpen} onOpenChange={setCustomerPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    role="combobox"
+                    aria-expanded={customerPopoverOpen}
+                    className="mt-1 flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {selectedCustomer
+                      ? `${selectedCustomer.name} - ${selectedCustomer.documentNumber}`
+                      : "Buscar cliente..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-0" align="start">
+                  <Command shouldFilter={false}>
+                    <CommandInput
+                      placeholder="Buscar por nombre o documento..."
+                      value={customerSearch}
+                      onValueChange={handleCustomerSearchChange}
                     />
-                  </ChronoSelectTrigger>
-                  <ChronoSelectContent>
-                    {customers.map((customer) => (
-                      <ChronoSelectItem key={customer.id} value={customer.id}>
-                        {customer.name} - {customer.documentNumber}
-                      </ChronoSelectItem>
-                    ))}
-                  </ChronoSelectContent>
-                </ChronoSelect>
+                    <CommandList>
+                      {loadingCustomers && (
+                        <div className="flex items-center justify-center py-6">
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                          <span className="ml-2 text-xs text-muted-foreground">Buscando...</span>
+                        </div>
+                      )}
+                      {!loadingCustomers && customerSearch.length < 2 && (
+                        <CommandEmpty>Escribe al menos 2 caracteres para buscar</CommandEmpty>
+                      )}
+                      {!loadingCustomers && customerSearch.length >= 2 && customers.length === 0 && (
+                        <CommandEmpty>No se encontraron clientes</CommandEmpty>
+                      )}
+                      {!loadingCustomers && customers.length > 0 && (
+                        <CommandGroup>
+                          {customers.map((customer) => (
+                            <CommandItem
+                              key={customer.id}
+                              value={customer.id}
+                              onSelect={() => {
+                                handleCustomerChange(customer.id);
+                                setCustomerPopoverOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={`mr-2 h-4 w-4 ${
+                                  field.value === customer.id ? "opacity-100" : "opacity-0"
+                                }`}
+                              />
+                              <div className="flex flex-col">
+                                <span className="font-medium">{customer.name}</span>
+                                <span className="text-xs text-muted-foreground">
+                                  {customer.documentNumber} • {customer.vehicles.length} vehículo(s)
+                                </span>
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
 
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
-              </ChronoField>
-            )}
-          />
-        </div>
+              {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
+            </ChronoField>
+          )}
+        />
       </div>
 
       <ChronoSeparator />
