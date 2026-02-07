@@ -27,7 +27,6 @@ const inOutSearchParamsSchema = z.object({
 export async function getInOutsAction(
     searchParams?: IPageProps["searchParams"]
 ): Promise<IActionResponse<IListInOutResponseEntity>> {
-    console.log("getInOutsAction called with searchParams:", searchParams);
     try {
         const params = buildSearchParams(inOutSearchParamsSchema, searchParams);
         const useCase = serverContainer.resolve<InOutUsecase>(SERVER_TOKENS.InOutUsecase);

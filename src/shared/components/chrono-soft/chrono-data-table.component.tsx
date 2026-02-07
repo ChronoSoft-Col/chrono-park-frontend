@@ -3,6 +3,7 @@
 import { ReactNode, isValidElement } from "react";
 
 import { cn } from "@/src/lib/utils";
+import { useIsMobile } from "@/src/hooks/use-mobile";
 import {
   Table,
   TableBody,
@@ -13,6 +14,10 @@ import {
   TableRow,
 } from "../ui/table";
 import { Skeleton } from "../ui/skeleton";
+import {
+  ChronoCard,
+  ChronoCardContent,
+} from "./chrono-card.component";
 
 const alignmentClassMap = {
   left: "text-left",
@@ -57,6 +62,8 @@ export function ChronoDataTable<T extends object>({
   getRowKey,
   className,
 }: ChronoDataTableProps<T>) {
+  const isMobile = useIsMobile();
+
   const resolveRowKey = (row: T, index: number) =>
     getRowKey?.(row, index) ?? (row as { id?: string | number })?.id ?? index;
 
@@ -76,6 +83,72 @@ export function ChronoDataTable<T extends object>({
     }
   };
 
+  const getCellContent = (row: T, column: ChronoDataTableColumn<T>, rowIndex: number): ReactNode => {
+    if (column.cell) {
+      return column.cell(row, rowIndex);
+    } else if (column.accessorFn) {
+      return column.accessorFn(row);
+    } else if (column.accessorKey) {
+      const key = String(column.accessorKey);
+      return ensureRenderableValue((row as Record<string, unknown>)[key]);
+    }
+    return null;
+  };
+
+  // Mobile: Renderizar como tarjetas
+  if (isMobile) {
+    return (
+      <div className={cn("space-y-3", className)}>
+        {caption && (
+          <p className="text-sm text-muted-foreground text-center">{caption}</p>
+        )}
+
+        {isLoading &&
+          Array.from({ length: skeletonRows }).map((_, idx) => (
+            <ChronoCard key={`skeleton-card-${idx}`}>
+              <ChronoCardContent className="space-y-2 pt-4">
+                {columns.map((_, colIdx) => (
+                  <Skeleton
+                    key={`skeleton-field-${idx}-${colIdx}`}
+                    className="h-4 w-full rounded"
+                  />
+                ))}
+              </ChronoCardContent>
+            </ChronoCard>
+          ))}
+
+        {showEmptyState && (
+          <p className="text-center text-xs text-muted-foreground py-8">
+            {emptyMessage}
+          </p>
+        )}
+
+        {!isLoading &&
+          data.map((row, rowIndex) => (
+            <ChronoCard key={resolveRowKey(row, rowIndex)}>
+              <ChronoCardContent className="pt-4 space-y-2">
+                {columns.map((column, columnIndex) => {
+                  const cellContent = getCellContent(row, column, rowIndex);
+                  return (
+                    <div
+                      key={column.id ?? String(column.accessorKey ?? columnIndex)}
+                      className="flex justify-between items-start gap-2"
+                    >
+                      <span className="text-xs text-muted-foreground font-medium shrink-0">
+                        {column.header}
+                      </span>
+                      <span className="text-sm text-right">{cellContent}</span>
+                    </div>
+                  );
+                })}
+              </ChronoCardContent>
+            </ChronoCard>
+          ))}
+      </div>
+    );
+  }
+
+  // Desktop: Renderizar como tabla
   return (
     <Table className={className}>
       {caption && <TableCaption>{caption}</TableCaption>}
@@ -122,16 +195,7 @@ export function ChronoDataTable<T extends object>({
             <TableRow key={resolveRowKey(row, rowIndex)}>
               {columns.map((column, columnIndex) => {
                 const alignmentClass = alignmentClassMap[column.align ?? "left"];
-                let cellContent: ReactNode = null;
-
-                if (column.cell) {
-                  cellContent = column.cell(row, rowIndex);
-                } else if (column.accessorFn) {
-                  cellContent = column.accessorFn(row);
-                } else if (column.accessorKey) {
-                  const key = String(column.accessorKey);
-                  cellContent = ensureRenderableValue((row as Record<string, unknown>)[key]);
-                }
+                const cellContent = getCellContent(row, column, rowIndex);
 
                 return (
                   <TableCell
