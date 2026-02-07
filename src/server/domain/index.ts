@@ -7,6 +7,7 @@ export * from "./repositories/parking/in-out.repository"
 export * from "./repositories/parking/customer.repository"
 export * from "./repositories/parking/closure.repository"
 export * from "./repositories/parking/subscription.repository"
+export * from "./repositories/parking/session-service.repository"
 
 //USE CASES
 export * from "./usecases/auth/login.usecase";
@@ -17,6 +18,7 @@ export * from "./usecases/parking/in-out.usecase";
 export * from "./usecases/parking/customer.usecase";
 export * from "./usecases/parking/closure.usecase";
 export * from "./usecases/parking/subscription.usecase";
+export * from "./usecases/parking/session-service.usecase";
 
 //ENTITIES
 export * from "./entities/auth/response/get-permissions-response.entity";
