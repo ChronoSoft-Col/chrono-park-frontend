@@ -358,36 +358,34 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
                     <ChronoCardTitle className="text-sm font-semibold">Desglose de cobro</ChronoCardTitle>
                 </ChronoCardHeader>
 
-                <ChronoCardContent className="space-y-3">
+                <ChronoCardContent className="space-y-2">
                     {/* Reglas aplicadas */}
                     {visibleRules.length > 0 && (
-                        <div className="space-y-1.5">
-                            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Reglas aplicadas</p>
-                            <div className="grid gap-1.5 sm:grid-cols-2">
+                        <div className="space-y-1">
+                            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Reglas aplicadas</p>
+                            <div className="divide-y divide-border/50 rounded-lg border">
                                 {visibleRules.map((rule, idx) => (
                                     <div
                                         key={`${rule.ruleType}-${idx}`}
-                                        className="rounded-2xl border border-border/60 px-3 py-1.5"
+                                        className="flex items-center gap-2 px-2.5 py-1.5"
                                     >
-                                        <div className="flex items-center justify-between gap-1.5">
-                                            <span className="text-[12px] font-semibold text-foreground">
-                                                {rule.ruleType}
-                                            </span>
-                                            <ChronoBadge variant="outline" className="border-primary/40 px-2 py-0.5 text-[10px] text-foreground">
-                                                {formatCurrency(rule.amount ?? 0)}
-                                            </ChronoBadge>
-                                        </div>
+                                        <span className="text-[11px] font-semibold text-foreground shrink-0">
+                                            {rule.ruleType}
+                                        </span>
                                         {rule.description && (
-                                            <p className="mt-1 text-[10px] text-muted-foreground line-clamp-2">
+                                            <span className="text-[10px] text-muted-foreground truncate min-w-0">
                                                 {rule.description}
-                                            </p>
+                                            </span>
                                         )}
+                                        <span className="ml-auto shrink-0 text-[11px] font-semibold text-foreground">
+                                            {formatCurrency(rule.amount ?? 0)}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
                             {hiddenRules > 0 && (
                                 <p className="text-center text-[10px] text-muted-foreground">
-                                    + {hiddenRules} reglas adicionales no mostradas.
+                                    + {hiddenRules} reglas adicionales
                                 </p>
                             )}
                         </div>
@@ -395,34 +393,29 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
 
                     {/* Servicios adicionales */}
                     {sessionServices.length > 0 && (
-                        <div className="space-y-1.5">
+                        <div className="space-y-1">
                             <div className="flex items-center justify-between">
-                                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+                                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
                                     <Package className="h-3 w-3" />
                                     Servicios adicionales
                                 </p>
-                                <ChronoBadge variant="secondary" className="px-2 py-0.5 text-[10px]">
-                                    {formatCurrency(sessionServicesTotal)}
-                                </ChronoBadge>
                             </div>
-                            <div className="grid gap-1.5 sm:grid-cols-2">
+                            <div className="divide-y divide-border/50 rounded-lg border">
                                 {sessionServices.map((service) => (
                                     <div
                                         key={service.id}
-                                        className="rounded-2xl border border-border/60 px-3 py-1.5"
+                                        className="flex items-center gap-2 px-2.5 py-1.5"
                                     >
-                                        <div className="flex items-center justify-between gap-1.5">
-                                            <span className="text-[12px] font-semibold text-foreground">
-                                                {service.serviceName}
-                                            </span>
-                                            <ChronoBadge variant="outline" className="border-primary/40 px-2 py-0.5 text-[10px] text-foreground">
-                                                {formatCurrency(service.totalAmount)}
-                                            </ChronoBadge>
-                                        </div>
-                                        <p className="mt-1 text-[10px] text-muted-foreground">
+                                        <span className="text-[11px] font-semibold text-foreground shrink-0">
+                                            {service.serviceName}
+                                        </span>
+                                        <span className="text-[10px] text-muted-foreground truncate min-w-0">
                                             {service.quantity} x {formatCurrency(service.unitPrice)}
-                                            {service.notes && ` • ${service.notes}`}
-                                        </p>
+                                            {service.notes && ` · ${service.notes}`}
+                                        </span>
+                                        <span className="ml-auto shrink-0 text-[11px] font-semibold text-foreground">
+                                            {formatCurrency(service.totalAmount)}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
@@ -431,8 +424,8 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
 
                     {/* Estado vacío cuando no hay ni reglas ni servicios */}
                     {visibleRules.length === 0 && sessionServices.length === 0 && (
-                        <div className="rounded-2xl border border-dashed px-3 py-4 text-center text-sm text-muted-foreground">
-                            Sin reglas ni servicios aplicados para este cálculo.
+                        <div className="rounded-lg border border-dashed px-3 py-3 text-center text-xs text-muted-foreground">
+                            Sin reglas ni servicios aplicados.
                         </div>
                     )}
                 </ChronoCardContent>
