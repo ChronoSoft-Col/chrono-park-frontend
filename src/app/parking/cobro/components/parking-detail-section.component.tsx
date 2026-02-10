@@ -23,9 +23,15 @@ import {
     ChronoSelectValue,
 } from "@chrono/chrono-select.component";
 import { ChronoLabel } from "@chrono/chrono-label.component";
-import { CalendarClock, Clock8, TimerReset, Wallet2, X, RefreshCw, Package, ChevronDown, ChevronUp } from "lucide-react";
+import { CalendarClock, Clock8, TimerReset, Wallet2, X, RefreshCw, Package, Scale } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import ChronoButton from "@chrono/chrono-button.component";
+import {
+    ChronoTabs,
+    ChronoTabsList,
+    ChronoTabsTrigger,
+    ChronoTabsContent,
+} from "@chrono/chrono-tabs.component";
 
 const currencyFormatter = new Intl.NumberFormat("es-CO", {
     style: "currency",
@@ -88,7 +94,6 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
     const [selectedVehicleTypeId, setSelectedVehicleTypeId] = useState<string | null>(null);
     const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
     const [prevValidateRaw, setPrevValidateRaw] = useState(validateRaw);
-    const [expandedRules, setExpandedRules] = useState(false);
 
     const detail: QrAmountDetail | null = validateRaw?.data ?? null;
     const currentVehicleTypeId = validateRaw?.data?.vehicle?.vehicleType?.id;
@@ -153,8 +158,6 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
     const exit = getDateParts(detail.exitTime);
     const discount = detail.discountPercentage ?? 0;
     const rules = detail.appliedRules ?? [];
-    const visibleRules = expandedRules ? rules : rules.slice(0, 4);
-    const hiddenRules = expandedRules ? 0 : Math.max(rules.length - 4, 0);
 
     return (
         <div className={cn("flex min-w-0 flex-col gap-2 overflow-y-auto py-2 lg:my-auto animate-in fade-in duration-500", className)}>
@@ -348,89 +351,81 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
                     <ChronoCardTitle className="text-sm font-semibold">Desglose de cobro</ChronoCardTitle>
                 </ChronoCardHeader>
 
-                <ChronoCardContent className="space-y-2">
-                    {/* Reglas aplicadas */}
-                    {visibleRules.length > 0 && (
-                        <div className="space-y-1">
-                            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Reglas aplicadas</p>
-                            <div className="divide-y divide-border/50 rounded-lg border">
-                                {visibleRules.map((rule, idx) => (
-                                    <div
-                                        key={`${rule.ruleType}-${idx}`}
-                                        className="flex items-center gap-2 px-2.5 py-1.5"
-                                    >
-                                        <span className="text-[11px] font-semibold text-foreground shrink-0">
-                                            {rule.ruleType}
-                                        </span>
-                                        {rule.description && (
-                                            <span className="text-[10px] text-muted-foreground truncate min-w-0">
-                                                {rule.description}
-                                            </span>
-                                        )}
-                                        <span className="ml-auto shrink-0 text-[11px] font-semibold text-foreground">
-                                            {formatCurrency(rule.amount ?? 0)}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                            {rules.length > 4 && (
-                                <button
-                                    type="button"
-                                    onClick={() => setExpandedRules(!expandedRules)}
-                                    className="flex items-center justify-center gap-1 w-full text-[10px] text-primary hover:text-primary/80 transition-colors py-1"
-                                >
-                                    {expandedRules ? (
-                                        <>
-                                            <ChevronUp className="h-3 w-3" />
-                                            Ver menos
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ChevronDown className="h-3 w-3" />
-                                            Ver {hiddenRules} reglas más
-                                        </>
-                                    )}
-                                </button>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Servicios adicionales */}
-                    {sessionServices.length > 0 && (
-                        <div className="space-y-1">
-                            <div className="flex items-center justify-between">
-                                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1">
-                                    <Package className="h-3 w-3" />
-                                    Servicios adicionales
-                                </p>
-                            </div>
-                            <div className="divide-y divide-border/50 rounded-lg border">
-                                {sessionServices.map((service) => (
-                                    <div
-                                        key={service.id}
-                                        className="flex items-center gap-2 px-2.5 py-1.5"
-                                    >
-                                        <span className="text-[11px] font-semibold text-foreground shrink-0">
-                                            {service.serviceName}
-                                        </span>
-                                        <span className="text-[10px] text-muted-foreground truncate min-w-0">
-                                            {service.quantity} x {formatCurrency(service.unitPrice)}
-                                            {service.notes && ` · ${service.notes}`}
-                                        </span>
-                                        <span className="ml-auto shrink-0 text-[11px] font-semibold text-foreground">
-                                            {formatCurrency(service.totalAmount)}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Estado vacío cuando no hay ni reglas ni servicios */}
-                    {visibleRules.length === 0 && sessionServices.length === 0 && (
+                <ChronoCardContent>
+                    {rules.length === 0 && sessionServices.length === 0 ? (
                         <div className="rounded-lg border border-dashed px-3 py-3 text-center text-xs text-muted-foreground">
                             Sin reglas ni servicios aplicados.
                         </div>
+                    ) : (
+                        <ChronoTabs defaultValue="rules">
+                            <ChronoTabsList>
+                                <ChronoTabsTrigger value="rules" badge={rules.length}>
+                                    <Scale className="h-3.5 w-3.5" />
+                                    Reglas
+                                </ChronoTabsTrigger>
+                                <ChronoTabsTrigger value="services" badge={sessionServices.length}>
+                                    <Package className="h-3.5 w-3.5" />
+                                    Servicios
+                                </ChronoTabsTrigger>
+                            </ChronoTabsList>
+
+                            <ChronoTabsContent value="rules">
+                                {rules.length > 0 ? (
+                                    <div className="divide-y divide-border/50 rounded-lg border max-h-40 overflow-y-auto">
+                                        {rules.map((rule, idx) => (
+                                            <div
+                                                key={`${rule.ruleType}-${idx}`}
+                                                className="flex items-center gap-2 px-2.5 py-1.5"
+                                            >
+                                                <span className="text-[11px] font-semibold text-foreground shrink-0">
+                                                    {rule.ruleType}
+                                                </span>
+                                                {rule.description && (
+                                                    <span className="text-[10px] text-muted-foreground truncate min-w-0">
+                                                        {rule.description}
+                                                    </span>
+                                                )}
+                                                <span className="ml-auto shrink-0 text-[11px] font-semibold text-foreground">
+                                                    {formatCurrency(rule.amount ?? 0)}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="rounded-lg border border-dashed px-3 py-3 text-center text-xs text-muted-foreground">
+                                        Sin reglas aplicadas.
+                                    </div>
+                                )}
+                            </ChronoTabsContent>
+
+                            <ChronoTabsContent value="services">
+                                {sessionServices.length > 0 ? (
+                                    <div className="divide-y divide-border/50 rounded-lg border max-h-40 overflow-y-auto">
+                                        {sessionServices.map((service) => (
+                                            <div
+                                                key={service.id}
+                                                className="flex items-center gap-2 px-2.5 py-1.5"
+                                            >
+                                                <span className="text-[11px] font-semibold text-foreground shrink-0">
+                                                    {service.serviceName}
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground truncate min-w-0">
+                                                    {service.quantity} x {formatCurrency(service.unitPrice)}
+                                                    {service.notes && ` · ${service.notes}`}
+                                                </span>
+                                                <span className="ml-auto shrink-0 text-[11px] font-semibold text-foreground">
+                                                    {formatCurrency(service.totalAmount)}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="rounded-lg border border-dashed px-3 py-3 text-center text-xs text-muted-foreground">
+                                        Sin servicios adicionales.
+                                    </div>
+                                )}
+                            </ChronoTabsContent>
+                        </ChronoTabs>
                     )}
                 </ChronoCardContent>
             </ChronoCard>

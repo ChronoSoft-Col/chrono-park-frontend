@@ -18,7 +18,7 @@ export default function Page() {
           <PaymentSectionComponent className="h-min min-h-0 min-w-0" />
         </div>
 
-        <QrDetailSectionComponent className="min-h-0 min-w-0" />
+        <QrDetailSectionComponent className="min-h-0 min-w-0 p-0.5" />
       </div>
     </section>
   );
