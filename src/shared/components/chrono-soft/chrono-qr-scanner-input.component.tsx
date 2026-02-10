@@ -99,31 +99,33 @@ const ChronoQrScannerInput = forwardRef<HTMLInputElement, ChronoQrScannerInputPr
     return (
       <div
         className={cn(
-          "flex items-center gap-4 rounded-xl border border-border px-4 transition-colors duration-200 bg-background/90",
+          "flex h-7 items-center gap-2 rounded-md border border-border px-2 transition-colors duration-200 bg-background/90",
           focused && "border-primary",
           flash && "border-emerald-400",
           className,
         )}
       >
-        <div className="flex h-10 w-12 items-center justify-center rounded-full text-primary">
-          <QrCode className="h-6 w-6" />
+        <div className="flex size-6 items-center justify-center text-primary">
+          <QrCode className="size-4" />
         </div>
 
-        <ChronoInput
-          ref={assignRef}
-          {...props}
-          value={value}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          className={cn(
-            "border-0 bg-transparent px-0 text-base font-medium shadow-none tracking-wide ring-0 focus-visible:ring-0 dark:bg-transparent",
-            props.readOnly && "text-muted-foreground",
-          )}
-        />
-        <div>
-          <ChronoButton type="button" className="h-8 w-8" variant="ghost" onClick={clearAndFocus}>
-            <RefreshCcw className="h-4 w-4" />
+        <div className="flex-1 min-w-0">
+          <ChronoInput
+            ref={assignRef}
+            {...props}
+            value={value}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            className={cn(
+              "border-0 bg-transparent px-0 text-sm font-medium shadow-none tracking-wide ring-0 focus-visible:ring-0 dark:bg-transparent",
+              props.readOnly && "text-muted-foreground",
+            )}
+          />
+        </div>
+        <div className="ml-auto shrink-0">
+          <ChronoButton type="button" size="icon-sm" variant="ghost" onClick={clearAndFocus}>
+            <RefreshCcw className="size-3" />
           </ChronoButton>
         </div>
       </div>

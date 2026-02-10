@@ -29,6 +29,7 @@ export async function getInOutsAction(
 ): Promise<IActionResponse<IListInOutResponseEntity>> {
     try {
         const params = buildSearchParams(inOutSearchParamsSchema, searchParams);
+        console.log("Fetching In/Out records with params:", params);
         const useCase = serverContainer.resolve<InOutUsecase>(SERVER_TOKENS.InOutUsecase);
         const response = await useCase.listInOuts(params);
         return { success: true, data: response };

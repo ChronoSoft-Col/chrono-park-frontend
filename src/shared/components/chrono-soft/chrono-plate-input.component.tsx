@@ -99,34 +99,36 @@ const ChronoPlateInput = forwardRef<HTMLInputElement, ChronoPlateInputProps>(
     return (
       <div
         className={cn(
-          "flex items-center gap-4 rounded-xl border border-border px-4 transition-colors duration-200 bg-background/90",
+          "flex h-7 items-center gap-2 rounded-md border border-border px-2 transition-colors duration-200 bg-background/90",
           focused && "border-primary", 
           className,
         )}
       >
-        <div className="flex h-10 w-12 items-center justify-center rounded-full text-primary">
-          <IdCard  className="h-6 w-6" />
+        <div className="flex size-6 items-center justify-center text-primary">
+          <IdCard className="size-4" />
         </div>
 
-        <ChronoInput
-          ref={assignRef}
-          {...props}
-          inputMode="text"
-          autoCapitalize="characters"
-          value={value}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          className={cn(
-            "border-0 bg-transparent px-0 text-xl font-medium shadow-none tracking-[0.3em] uppercase focus-visible:ring-0 dark:bg-transparent",
-            "placeholder:normal-case placeholder:tracking-normal placeholder:text-sm placeholder:font-normal",
-            props.readOnly && "text-muted-foreground",
-          )}
-        />
+        <div className="flex-1 min-w-0">
+          <ChronoInput
+            ref={assignRef}
+            {...props}
+            inputMode="text"
+            autoCapitalize="characters"
+            value={value}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            className={cn(
+              "border-0 bg-transparent px-0 text-sm font-medium shadow-none tracking-[0.3em] uppercase focus-visible:ring-0 dark:bg-transparent",
+              "placeholder:normal-case placeholder:tracking-normal placeholder:text-sm placeholder:font-normal",
+              props.readOnly && "text-muted-foreground",
+            )}
+          />
+        </div>
 
-        <div>
-          <ChronoButton type="button" className="h-8 w-8" variant="ghost" onClick={clearAndFocus}>
-            <RefreshCcw className="h-4 w-4" />
+        <div className="ml-auto shrink-0">
+          <ChronoButton type="button" size="icon-sm" variant="ghost" onClick={clearAndFocus}>
+            <RefreshCcw className="size-3" />
           </ChronoButton>
         </div>
       </div>

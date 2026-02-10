@@ -15,7 +15,8 @@ const normalizeSearchParams = (
 
   return Object.entries(searchParams).reduce<NormalizedSearchParams>(
     (acc, [key, value]) => {
-      acc[key] = Array.isArray(value) ? value[0] : value;
+      const firstValue = Array.isArray(value) ? value[0] : value;
+      acc[key] = firstValue === "" ? undefined : firstValue;
       return acc;
     },
     {}
@@ -28,10 +29,19 @@ export const buildSearchParams = <TSchema extends ZodTypeAny>(
   overrides?: Record<string, unknown>
 ): z.output<TSchema> => {
   const normalized = normalizeSearchParams(searchParams);
-  return schema.parse({
+
+  const merged: Record<string, unknown> = {
     ...normalized,
     ...overrides,
-  });
+  };
+
+  for (const [key, value] of Object.entries(merged)) {
+    if (value === "") {
+      merged[key] = undefined;
+    }
+  }
+
+  return schema.parse(merged);
 };
 
 export { normalizeSearchParams };

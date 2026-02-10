@@ -37,7 +37,7 @@ export default function HeaderComponent() {
       >
         <div className="flex items-center gap-3">
           <ChronoSidebarTrigger className="shrink-0" />
-          <BreadcrumbComponent hideRoot />
+          {!isMobile && <BreadcrumbComponent hideRoot />}
         </div>
         {showDatePicker && <DateRangeComponent />}
         {showDateRangePicker && <DateRangePickerComponent />}

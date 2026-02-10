@@ -132,7 +132,7 @@ export default function ChronoVehicleTypeSelect({
   const iconNode = React.useMemo(() => {
     const vehicleType = getVehicleTypeFromValueOrLabel(selected?.value, selected?.label);
     const Icon = getIconForVehicleType(vehicleType);
-    return <Icon className="size-6" />;
+    return <Icon className="size-4" />;
   }, [selected?.label, selected?.value]);
 
   const clear = React.useCallback(() => {
@@ -149,7 +149,7 @@ export default function ChronoVehicleTypeSelect({
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 items-center gap-4 rounded-xl border border-border px-4 transition-colors duration-200 bg-background/90",
+        "flex h-7 w-full min-w-0 items-center gap-2 rounded-md border border-border px-2 transition-colors duration-200 bg-background/90",
         (focused || open) && "border-primary",
         disabled && "opacity-70",
         className,
@@ -161,7 +161,7 @@ export default function ChronoVehicleTypeSelect({
         activate();
       }}
     >
-      <div className="flex h-10 w-12 items-center justify-center rounded-full text-primary">
+      <div className="flex size-6 items-center justify-center text-primary">
         {iconNode}
       </div>
 
@@ -175,12 +175,11 @@ export default function ChronoVehicleTypeSelect({
         >
           <ChronoSelectTrigger
             className={cn(
-              "w-full! min-w-0!",
-              "h-10 border-0",
-              "px-0",
-              "text-xl font-medium focus:ring-0 focus-visible:ring-0",
-              "data-placeholder:text-sm data-placeholder:font-normal",
-              "bg-transparent dark:bg-transparent dark:hover:bg-transparent backdrop-blur-0",
+              "w-full! h-full!",
+              "border-0! rounded-none! p-0! shadow-none!",
+              "bg-transparent! hover:bg-transparent! focus-visible:bg-transparent! aria-expanded:bg-transparent!",
+              "dark:bg-transparent! dark:hover:bg-transparent!",
+              "backdrop-blur-none! ring-0! focus-visible:ring-0! focus-visible:border-transparent!",
               "[&_[data-slot=select-value]_svg]:hidden",
               triggerClassName,
             )}
@@ -197,14 +196,13 @@ export default function ChronoVehicleTypeSelect({
               <ChronoSelectItem
                 key={option.value}
                 value={option.value}
-                className="min-h-12 py-3 text-sm gap-3"
               >
                 {(() => {
                   const vehicleType = getVehicleTypeFromValueOrLabel(option.value, option.label);
                   const Icon = getIconForVehicleType(vehicleType);
                   return (
-                    <span className="flex items-center gap-3">
-                      <Icon className="size-5 text-primary" />
+                    <span className="flex items-center gap-2">
+                      <Icon className="size-4 text-primary" />
                       <span className="font-medium">{option.label}</span>
                     </span>
                   );
@@ -215,11 +213,11 @@ export default function ChronoVehicleTypeSelect({
         </ChronoSelect>
       </div>
 
-      <div>
+      <div className="ml-auto shrink-0">
         <ChronoButton
           type="button"
           data-chrono-vehicle-type-clear
-          className="h-8 w-8"
+          size="icon-sm"
           variant="ghost"
           onClick={(event) => {
             event.stopPropagation();
@@ -227,7 +225,7 @@ export default function ChronoVehicleTypeSelect({
           }}
           disabled={disabled || !value}
         >
-          <RefreshCcw className="h-4 w-4" />
+          <RefreshCcw className="size-3" />
         </ChronoButton>
       </div>
     </div>

@@ -116,17 +116,17 @@ const ChronoCashInput = forwardRef<HTMLInputElement, ChronoCashInputProps>(
     return (
       <div
         className={cn(
-          "flex items-center gap-4 rounded-xl border border-border px-4 transition-colors duration-200 bg-background/90",
+          "flex h-7 items-center gap-2 rounded-md border border-border px-2 transition-colors duration-200 bg-background/90",
           focused && "border-primary",
           className,
         )}
       >
-        <div className="flex h-10 w-12 items-center justify-center rounded-full text-primary">
-          <Wallet2 className="h-6 w-6" />
+        <div className="flex size-6 items-center justify-center text-primary">
+          <Wallet2 className="size-4" />
         </div>
 
-        <div className="flex-1 flex items-baseline gap-1">
-          <span className="text-base font-medium text-muted-foreground">$</span>
+        <div className="flex-1 min-w-0 flex items-baseline gap-1">
+          <span className="text-xs font-medium text-muted-foreground">$</span>
           <ChronoInput
             ref={assignRef}
             {...props}
@@ -137,15 +137,15 @@ const ChronoCashInput = forwardRef<HTMLInputElement, ChronoCashInputProps>(
             onFocus={handleFocus}
             onBlur={handleBlur}
             className={cn(
-              "border-0 bg-transparent px-0 text-base font-medium shadow-none tracking-wide focus-visible:ring-0 dark:bg-transparent",
+              "border-0 bg-transparent px-0 text-sm font-medium shadow-none tracking-wide focus-visible:ring-0 dark:bg-transparent",
               props.readOnly && "text-muted-foreground",
             )}
           />
         </div>
 
-        <div>
-          <ChronoButton type="button" className="h-8 w-8" variant="ghost" onClick={clearAndFocus}>
-            <RefreshCcw className="h-4 w-4" />
+        <div className="ml-auto shrink-0">
+          <ChronoButton type="button" size="icon-sm" variant="ghost" onClick={clearAndFocus}>
+            <RefreshCcw className="size-3" />
           </ChronoButton>
         </div>
       </div>

@@ -11,8 +11,11 @@ import {
   ChronoPopoverTrigger,
 } from "@chrono/chrono-popover.component";
 import { useRouter } from "next/navigation";
+import { useChronoSidebar } from "@chrono/chrono-sidebar.component";
 
 export function DateRangeComponent() {
+
+  const { isMobile } = useChronoSidebar();
 
   const {replace} = useRouter()
 
@@ -105,7 +108,11 @@ export function DateRangeComponent() {
           <ChronoButton
             type="button"
             variant="outline"
-            className="min-w-[300px] h-9 relative overflow-hidden justify-center z-20"
+            className={
+              isMobile
+                ? "w-[180px] h-9 relative overflow-hidden justify-center z-20"
+                : "min-w-[300px] h-9 relative overflow-hidden justify-center z-20"
+            }
           >
             <motion.div
               key={currentDate ? currentDate.toDateString() : "today"}
