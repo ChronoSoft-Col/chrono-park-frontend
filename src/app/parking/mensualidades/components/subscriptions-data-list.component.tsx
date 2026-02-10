@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import type { ISubscriptionEntity } from "@/server/domain";
 import { ChronoDataTable } from "@chrono/chrono-data-table.component";
@@ -18,6 +19,8 @@ import { createSubscriptionColumns } from "./table/columns.component";
 import { SubscriptionDetailDialogContent } from "./subscription-detail-dialog-content";
 import { SubscriptionHistoryDialogContent } from "./subscription-history-dialog-content";
 import { CreateSubscriptionDialogContent } from "./create-subscription-dialog.component";
+import { PaySubscriptionDialogContent } from "./pay-subscription-dialog.component";
+import { cancelSubscriptionAction } from "../actions/cancel-subscription.action";
 
 interface Props {
   items: ISubscriptionEntity[];
@@ -34,8 +37,10 @@ export default function SubscriptionsDataListComponent({
   pageSize,
   error,
 }: Props) {
+  const router = useRouter();
   const { openDialog, closeDialog } = UseDialogContext();
   const errorShownRef = React.useRef(false);
+  const [cancellingId, setCancellingId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (error && !errorShownRef.current) {
@@ -110,9 +115,62 @@ export default function SubscriptionsDataListComponent({
     });
   }, [openDialog]);
 
+  const handlePaySubscription = React.useCallback(
+    (item: ISubscriptionEntity) => {
+      openDialog({
+        title: "Pagar Suscripción",
+        description: "Complete el pago para activar la suscripción",
+        content: <PaySubscriptionDialogContent subscription={item} />,
+      });
+    },
+    [openDialog]
+  );
+
+  const handleCancelSubscription = React.useCallback(
+    async (item: ISubscriptionEntity) => {
+      if (cancellingId) return;
+      if (!confirm("¿Está seguro de cancelar esta suscripción?")) return;
+
+      setCancellingId(item.id);
+      const toastId = toast.loading("Cancelando suscripción...");
+      try {
+        const result = await cancelSubscriptionAction(item.id, {
+          reason: "Cancelado por el usuario",
+        });
+        if (result.success && result.data?.success) {
+          toast.success("Suscripción cancelada", { id: toastId });
+          router.refresh();
+        } else {
+          toast.error(result.error || "Error al cancelar la suscripción", {
+            id: toastId,
+          });
+        }
+      } catch (error) {
+        console.error("Error cancelling subscription:", error);
+        toast.error("Error al cancelar la suscripción", { id: toastId });
+      } finally {
+        setCancellingId(null);
+      }
+    },
+    [cancellingId, router]
+  );
+
   const columns = React.useMemo(
-    () => createSubscriptionColumns(handleViewDetail, handleViewHistory),
-    [handleViewDetail, handleViewHistory]
+    () =>
+      createSubscriptionColumns(
+        handleViewDetail,
+        handleViewHistory,
+        handlePaySubscription,
+        handleCancelSubscription,
+        (item) => cancellingId === item.id
+      ),
+    [
+      handleViewDetail,
+      handleViewHistory,
+      handlePaySubscription,
+      handleCancelSubscription,
+      cancellingId,
+    ]
   );
 
   const safeTotalPages = Math.max(

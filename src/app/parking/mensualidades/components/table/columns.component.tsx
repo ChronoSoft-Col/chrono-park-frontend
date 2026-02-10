@@ -10,15 +10,27 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/src/shared/components/ui/tooltip";
-import { Eye, History } from "lucide-react";
+import { CreditCard, Eye, History, XCircle } from "lucide-react";
 
 type ViewDetailHandler = (item: ISubscriptionEntity) => void;
 type ViewHistoryHandler = (item: ISubscriptionEntity) => void;
+type PayHandler = (item: ISubscriptionEntity) => void;
+type CancelHandler = (item: ISubscriptionEntity) => void;
+type IsCancellingHandler = (item: ISubscriptionEntity) => boolean;
 
 const formatDate = (value?: Date | string) => {
   if (!value) return "-";
   const date = value instanceof Date ? value : new Date(value);
   return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(date);
+};
+
+const isExpiredSubscription = (row: ISubscriptionEntity) => {
+  if (!row.endDate) return false;
+  const end = row.endDate instanceof Date ? row.endDate : new Date(row.endDate);
+  if (Number.isNaN(end.getTime())) return false;
+  const endOfDay = new Date(end);
+  endOfDay.setHours(23, 59, 59, 999);
+  return endOfDay.getTime() < Date.now();
 };
 
 const getStatusBadgeStyles = (status: SubscriptionStatus) => {
@@ -57,7 +69,10 @@ const getStatusLabel = (status: SubscriptionStatus) => {
 
 export const createSubscriptionColumns = (
   onViewDetail?: ViewDetailHandler,
-  onViewHistory?: ViewHistoryHandler
+  onViewHistory?: ViewHistoryHandler,
+  onPay?: PayHandler,
+  onCancel?: CancelHandler,
+  isCancelling?: IsCancellingHandler
 ): ChronoDataTableColumn<ISubscriptionEntity>[] => [
   {
     id: "customer",
@@ -115,8 +130,72 @@ export const createSubscriptionColumns = (
     align: "right",
     headerClassName: "text-right",
     cellClassName: "text-right",
-    cell: (row) => (
-      <div className="flex justify-end gap-2">
+    cell: (row) => {
+      const expired = isExpiredSubscription(row);
+      const canPay = Boolean(onPay) && row.status === "PENDIENTE" && !expired;
+      const canCancel =
+        Boolean(onCancel) &&
+        (row.status === "PENDIENTE" ||
+          row.status === "ACTIVA" ||
+          row.status === "PERIODO_GRACIA") &&
+        !expired;
+      const cancelLoading = isCancelling?.(row) ?? false;
+
+      const payDisabledReason = !onPay
+        ? "Acción no disponible"
+        : expired
+        ? "Mensualidad vencida"
+        : row.status !== "PENDIENTE"
+          ? "Solo disponible cuando está Pendiente"
+          : undefined;
+
+      const cancelDisabledReason = !onCancel
+        ? "Acción no disponible"
+        : expired
+        ? "Mensualidad vencida"
+        : row.status === "CANCELADA"
+          ? "Mensualidad cancelada"
+          : row.status === "INACTIVA"
+            ? "Mensualidad inactiva"
+            : undefined;
+
+      return (
+        <div className="flex justify-end gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                variant="default"
+                aria-label="Pagar mensualidad"
+                disabled={!canPay}
+                onClick={() => onPay?.(row)}
+              >
+                <CreditCard className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              {canPay ? "Pagar" : `No disponible: ${payDisabledReason ?? "Estado no permitido"}`}
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                variant="destructive"
+                aria-label="Cancelar mensualidad"
+                disabled={!canCancel || cancelLoading}
+                loading={cancelLoading}
+                onClick={() => onCancel?.(row)}
+              >
+                <XCircle className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              {canCancel ? "Cancelar" : `No disponible: ${cancelDisabledReason ?? "Estado no permitido"}`}
+            </TooltipContent>
+          </Tooltip>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <ChronoButton
@@ -145,6 +224,7 @@ export const createSubscriptionColumns = (
           <TooltipContent side="top">Ver historial de pagos</TooltipContent>
         </Tooltip>
       </div>
-    ),
+      );
+    },
   },
 ];
