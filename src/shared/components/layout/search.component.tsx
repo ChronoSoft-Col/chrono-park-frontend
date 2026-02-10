@@ -77,6 +77,7 @@ export default function SearchComponent() {
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar..."
               className="w-full"
+              clearable
             />
             <ChronoButton
               type="button"
@@ -102,6 +103,7 @@ export default function SearchComponent() {
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Buscar..."
         className="max-w-sm"
+        clearable
       />
     </div>
   );

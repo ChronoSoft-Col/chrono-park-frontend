@@ -2,11 +2,13 @@ import { QrDetailSectionComponent } from "./components/parking-detail-section.co
 import { QrSectionComponent } from "./components/qr-section.component";
 import { PaymentSectionComponent } from "./components/payment-section.component";
 import { ServicesCartDrawerComponent } from "./components/services-cart-drawer.component";
+import { SetupHeaderFilters } from "@/src/shared/components/layout/setup-header-filters.component";
 
 export default function Page() {
   return (
     <section className="relative h-full max-h-full min-h-0">
-      <div className="absolute right-0 -top-12 z-10">
+      <SetupHeaderFilters showDatePicker={false} showDateRangePicker={false} showSearch={false} />
+      <div className="absolute right-0 top-0 z-10">
         <ServicesCartDrawerComponent />
       </div>
       

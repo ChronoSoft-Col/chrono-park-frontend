@@ -32,7 +32,7 @@ export default function HeaderComponent() {
     >
       <div
         className={`flex items-center justify-between transition-colors duration-200 ease-linear hover:bg-muted ${
-          isMobile ? "bg-muted" : "bg-muted/50"
+          "bg-muted"
         } px-4 py-1 rounded h-14`}
       >
         <div className="flex items-center gap-3">

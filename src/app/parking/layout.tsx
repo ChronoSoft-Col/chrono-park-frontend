@@ -15,7 +15,7 @@ export default async function ParkingLayout({ children }: PropsWithChildren) {
       <SidebarComponent applications={applications} />
       <ChronoSidebarInset className="min-w-0 overflow-x-hidden">
         <HeaderComponent />
-        <div className="flex flex-col min-w-0 w-full flex-1 px-4 sm:px-6 md:px-8 py-12 overflow-x-hidden relative">
+        <div className="flex flex-col min-w-0 w-full flex-1 px-4 sm:px-6 md:px-8 pt-16 pb-12 overflow-x-hidden relative">
           <section className="max-w-full mx-auto w-full h-full">{children}</section>
           <FooterComponent />
         </div>
