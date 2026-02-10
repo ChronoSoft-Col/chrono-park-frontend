@@ -111,13 +111,13 @@ export const ChronoSelectTrigger = React.forwardRef<
     <SelectTrigger
       ref={ref}
       className={cn(
-        "chrono-select__trigger border-primary/20 bg-background/90 backdrop-blur",
+        "chrono-select__trigger w-full border-primary/20 bg-background/90 backdrop-blur",
         className
       )}
       {...props}
     >
-      <div className="flex min-w-0 flex-1 items-center">
-        <div className="min-w-0 flex-1">{children}</div>
+      <div className="flex min-w-0 flex-1 items-center text-left">
+        <div className="min-w-0 flex-1 truncate">{children}</div>
         {showClear ? (
           <span
             role="button"
