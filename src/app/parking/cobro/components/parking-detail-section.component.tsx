@@ -291,36 +291,30 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
                     </div>
                 </ChronoCardHeader>
 
-                <ChronoCardContent className="space-y-1 mb-0">
-                    <div className="rounded-2xl border border-primary/20 bg-linear-to-r from-primary/10 via-primary/5 to-transparent px-3 py-2.5 shadow-inner">
-                        <div className="flex items-center gap-2.5 text-foreground">
-                            <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-primary/10">
-                                <Wallet2 className="h-3.5 w-3.5" />
+                <ChronoCardContent className="space-y-1.5 mb-0">
+                    <div className="flex items-center gap-2.5 rounded-2xl border border-primary/20 bg-linear-to-r from-primary/10 via-primary/5 to-transparent px-3 py-2 shadow-inner">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                            <Wallet2 className="h-3.5 w-3.5" />
+                        </span>
+                        <div className="flex flex-col min-w-0">
+                            <ChronoSectionLabel size="xs">
+                                Total estimado
+                            </ChronoSectionLabel>
+                            <span className="text-[9px] text-foreground/60 truncate">
+                                {exit.dateLabel} · {exit.timeLabel}
+                                {discount > 0 && ` · Subtotal ${formatCurrency(detail.calculatedAmount)}`}
                             </span>
-                            <div className="flex flex-col">
-                                <ChronoSectionLabel size="xs">
-                                    Total estimado
-                                </ChronoSectionLabel>
-                                <span className="text-[9px] text-foreground/70">
-                                    Última actualización {exit.dateLabel} · {exit.timeLabel}
-                                </span>
-                            </div>
                         </div>
-
-                        <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+                        <div className="ml-auto flex shrink-0 items-center gap-2">
+                            {discount > 0 && (
+                                <ChronoBadge className="border-green-500/40 bg-green-50 px-1.5 py-0 text-[9px] font-semibold text-green-700">
+                                    -{discount}%
+                                </ChronoBadge>
+                            )}
                             <ChronoValue size="lg" weight="bold">
                                 {formatCurrency(detail.finalAmount)}
                             </ChronoValue>
-                            {discount > 0 && (
-                                <ChronoBadge className="border-green-500/40 bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-700">
-                                    Descuento {discount}%
-                                </ChronoBadge>
-                            )}
                         </div>
-
-                        <p className="mt-1 text-[10px] text-muted-foreground">
-                            Subtotal antes de descuentos: {formatCurrency(detail.calculatedAmount)}
-                        </p>
                     </div>
 
                     <div className="grid gap-1.5 md:grid-cols-2">
