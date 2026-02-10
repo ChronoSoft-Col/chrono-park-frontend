@@ -13,6 +13,7 @@ import { UseDialogContext } from "@/src/shared/context/dialog.context";
 import { useCommonContext } from "@/src/shared/context/common.context";
 import { InOutDetailDialogContent } from "./in-out-detail-dialog-content";
 import { ChangeRateDialogContent } from "./change-rate-dialog-content";
+import { ChangePlateDialogContent } from "./change-plate-dialog-content";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { toast } from "sonner";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
@@ -179,12 +180,34 @@ export default function InOutDataListComponent({
     [openDialog, closeDialog, router],
   );
 
+  const handleChangePlate = React.useCallback(
+    (item: IInOutEntity) => {
+      openDialog({
+        title: `Cambiar placa - ${item.vehicle.licensePlate}`,
+        description: "Ingrese la nueva placa del vehículo",
+        dialogClassName: "w-full sm:max-w-lg",
+        content: (
+          <ChangePlateDialogContent
+            item={item}
+            onClose={closeDialog}
+            onSuccess={() => {
+              router.refresh();
+            }}
+          />
+        ),
+      });
+    },
+    [openDialog, closeDialog, router],
+  );
+
   const columns = React.useMemo(
     () => createInOutColumns(handleViewDetail, handlePrint, {
       onChangeRate: handleChangeRate,
       showChangeRate: isEntriesTab,
+      onChangePlate: handleChangePlate,
+      showChangePlate: isEntriesTab,
     }),
-    [handleViewDetail, handlePrint, handleChangeRate, isEntriesTab],
+    [handleViewDetail, handlePrint, handleChangeRate, handleChangePlate, isEntriesTab],
   );
   const safeTotalPages = Math.max(
     1,
@@ -214,7 +237,7 @@ export default function InOutDataListComponent({
               Salidas
             </ChronoButton>
 
-            <div className="ml-auto w-[240px]">
+            <div className="ml-auto w-60">
               <ChronoVehicleTypeSelect
                 value={currentVehicleTypeId === "all" ? "" : currentVehicleTypeId}
                 onValueChange={setVehicleTypeId}

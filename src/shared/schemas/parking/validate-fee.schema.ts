@@ -1,18 +1,6 @@
 import z from "zod";
 
-const normalizePlate = (value: string) => {
-  return value
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "");
-};
-
-const isValidColombianPlate = (plate: string) => {
-  if (!plate) return false;
-  // Car: ABC123
-  // Motorcycle: ABC12D
-  return /^[A-Z]{3}\d{3}$/.test(plate) || /^[A-Z]{3}\d{2}[A-Z]$/.test(plate);
-};
+import { isValidColombianPlate, normalizePlate } from "@/src/lib/utils/plate.utils";
 
 export const ValidateFeeSchema = z.object({
   parkingSessionId: z

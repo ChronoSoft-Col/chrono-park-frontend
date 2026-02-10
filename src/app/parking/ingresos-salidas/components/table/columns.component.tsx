@@ -3,7 +3,7 @@ import { IInOutEntity } from "@/server/domain";
 import { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
 import ChronoButton from "@chrono/chrono-button.component";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
-import { Eye, Printer, RefreshCcw } from "lucide-react";
+import { Eye, PenLine, Printer, RefreshCcw } from "lucide-react";
 
 const formatDateTime = (value?: string) => {
   if (!value) return "-";
@@ -16,18 +16,26 @@ const formatDateTime = (value?: string) => {
 type ViewDetailHandler = (item: IInOutEntity) => void;
 type PrintHandler = (item: IInOutEntity) => void;
 type ChangeRateHandler = (item: IInOutEntity) => void;
+type ChangePlateHandler = (item: IInOutEntity) => void;
 
 interface CreateInOutColumnsOptions {
   onViewDetail?: ViewDetailHandler;
   onPrint?: PrintHandler;
   onChangeRate?: ChangeRateHandler;
   showChangeRate?: boolean;
+  onChangePlate?: ChangePlateHandler;
+  showChangePlate?: boolean;
 }
 
 export const createInOutColumns = (
   onViewDetail?: ViewDetailHandler,
   onPrint?: PrintHandler,
-  options?: { onChangeRate?: ChangeRateHandler; showChangeRate?: boolean },
+  options?: {
+    onChangeRate?: ChangeRateHandler;
+    showChangeRate?: boolean;
+    onChangePlate?: ChangePlateHandler;
+    showChangePlate?: boolean;
+  },
 ): ChronoDataTableColumn<IInOutEntity>[] => [
   {
     id: "license-plate",
@@ -62,6 +70,23 @@ export const createInOutColumns = (
     cellClassName: "text-right",
     cell: (row: IInOutEntity) => (
       <div className="flex justify-end gap-2">
+        {options?.showChangePlate && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                size="icon-sm"
+                variant="outline"
+                aria-label="Cambiar placa"
+                onClick={() => options.onChangePlate?.(row)}
+              >
+                <PenLine className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">Cambiar placa</TooltipContent>
+          </Tooltip>
+        )}
+
         {options?.showChangeRate && (
           <Tooltip>
             <TooltipTrigger asChild>

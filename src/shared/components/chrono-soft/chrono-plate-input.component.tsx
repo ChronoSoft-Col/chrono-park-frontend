@@ -11,19 +11,13 @@ import {
 import { IdCard, RefreshCcw } from "lucide-react";
 
 import { cn } from "@/src/lib/utils";
+import { normalizePlate } from "@/src/lib/utils/plate.utils";
 import ChronoButton from "./chrono-button.component";
 import { ChronoInput } from "./chrono-input.component";
 
 type ChronoPlateInputProps = ComponentProps<typeof ChronoInput> & {
   onClear?: () => void;
 };
-
-const normalizePlate = (value: string) =>
-  value
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
-    .slice(0, 6);
 
 const ChronoPlateInput = forwardRef<HTMLInputElement, ChronoPlateInputProps>(
   function ChronoPlateInput({
@@ -54,7 +48,7 @@ const ChronoPlateInput = forwardRef<HTMLInputElement, ChronoPlateInputProps>(
       if (!inputRef.current) return;
       if (typeof value !== "string") return;
 
-      const normalized = normalizePlate(value);
+      const normalized = normalizePlate(value).slice(0, 6);
       if (normalized !== value) {
         inputRef.current.value = normalized;
       }
@@ -62,7 +56,7 @@ const ChronoPlateInput = forwardRef<HTMLInputElement, ChronoPlateInputProps>(
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const target = event.target;
-      const normalized = normalizePlate(target.value);
+      const normalized = normalizePlate(target.value).slice(0, 6);
 
       if (normalized !== target.value) {
         target.value = normalized;

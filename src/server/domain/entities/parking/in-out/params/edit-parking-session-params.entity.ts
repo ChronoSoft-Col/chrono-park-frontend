@@ -1,3 +1,4 @@
 export interface IEditParkingSessionParamsEntity {
-  rateProfileId: string;
+  rateProfileId?: string;
+  licensePlate?: string;
 }
