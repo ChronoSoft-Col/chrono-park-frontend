@@ -16,7 +16,7 @@ import { ChangeRateDialogContent } from "./change-rate-dialog-content";
 import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { toast } from "sonner";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
-import { ChronoSelect, ChronoSelectContent, ChronoSelectItem, ChronoSelectTrigger, ChronoSelectValue } from "@/src/shared/components/chrono-soft/chrono-select.component";
+import ChronoVehicleTypeSelect from "@/src/shared/components/chrono-soft/chrono-vehicle-type-select.component";
 import { getEntryTicketAction } from "../actions/get-entry-ticket.action";
 import { InOutStatusEnum } from "@/src/shared/enums/parking/in-out-status.enum";
 
@@ -89,7 +89,7 @@ export default function InOutDataListComponent({
       if (pending) return;
       startTransition(() => {
         const params = new URLSearchParams(searchParams.toString());
-        if (vehicleTypeId === "all") {
+        if (!vehicleTypeId || vehicleTypeId === "all") {
           params.delete("vehicleTypeId");
         } else {
           params.set("vehicleTypeId", vehicleTypeId);
@@ -214,24 +214,14 @@ export default function InOutDataListComponent({
               Salidas
             </ChronoButton>
 
-            <div className="ml-auto">
-              <ChronoSelect
-                value={currentVehicleTypeId}
+            <div className="ml-auto w-[240px]">
+              <ChronoVehicleTypeSelect
+                value={currentVehicleTypeId === "all" ? "" : currentVehicleTypeId}
                 onValueChange={setVehicleTypeId}
+                options={vehicleTypes}
+                placeholder="Tipo de vehículo"
                 disabled={pending}
-              >
-                <ChronoSelectTrigger className="w-[180px]">
-                  <ChronoSelectValue placeholder="Tipo de vehículo" />
-                </ChronoSelectTrigger>
-                <ChronoSelectContent>
-                  <ChronoSelectItem value="all">Todos los tipos</ChronoSelectItem>
-                  {vehicleTypes.map((vt) => (
-                    <ChronoSelectItem key={vt.value} value={vt.value}>
-                      {vt.label}
-                    </ChronoSelectItem>
-                  ))}
-                </ChronoSelectContent>
-              </ChronoSelect>
+              />
             </div>
           </div>
 
