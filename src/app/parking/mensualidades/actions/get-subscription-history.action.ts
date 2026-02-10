@@ -17,6 +17,7 @@ type GetCustomerSubscriptionsActionResponse = Promise<
 export async function getCustomerSubscriptionsAction(
   customerId: string
 ): GetCustomerSubscriptionsActionResponse {
+  console.log("Executing getCustomerSubscriptionsAction with customerId:", customerId);
   try {
     const useCase = serverContainer.resolve<SubscriptionUsecase>(
       SERVER_TOKENS.SubscriptionUsecase

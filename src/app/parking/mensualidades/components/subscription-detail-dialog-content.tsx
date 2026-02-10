@@ -1,21 +1,45 @@
 "use client";
 
 import * as React from "react";
+import { Loader2 } from "lucide-react";
 
-import type { ISubscriptionEntity, SubscriptionStatus } from "@/server/domain";
+import type {
+  ISubscriptionEntity,
+  ISubscriptionPayment,
+  ISubscriptionStatusLog,
+  SubscriptionStatus,
+} from "@/server/domain";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoSeparator } from "@chrono/chrono-separator.component";
 import { ChronoValue } from "@chrono/chrono-value.component";
+import { getSubscriptionByIdAction } from "../actions/get-subscription-detail.action";
 
 interface SubscriptionDetailDialogContentProps {
-  item: ISubscriptionEntity;
+  subscriptionId: string;
+  /** Fallback data from the list to show while loading */
+  fallback: ISubscriptionEntity;
 }
 
 const formatDate = (value?: Date | string) => {
   if (!value) return "-";
   const date = value instanceof Date ? value : new Date(value);
   return new Intl.DateTimeFormat("es-CO", { dateStyle: "long" }).format(date);
+};
+
+const formatShortDate = (value?: Date | string) => {
+  if (!value) return "-";
+  const date = value instanceof Date ? value : new Date(value);
+  return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(date);
+};
+
+const formatDateTime = (value?: Date | string) => {
+  if (!value) return "-";
+  const date = value instanceof Date ? value : new Date(value);
+  return new Intl.DateTimeFormat("es-CO", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
 };
 
 const formatPrice = (price?: number) => {
@@ -27,7 +51,7 @@ const formatPrice = (price?: number) => {
   }).format(price);
 };
 
-const getStatusBadgeStyles = (status: SubscriptionStatus) => {
+const getStatusBadgeStyles = (status: SubscriptionStatus | string) => {
   switch (status) {
     case "PENDIENTE":
       return "border-yellow-500/40 bg-yellow-50 text-yellow-700";
@@ -44,7 +68,7 @@ const getStatusBadgeStyles = (status: SubscriptionStatus) => {
   }
 };
 
-const getStatusLabel = (status: SubscriptionStatus) => {
+const getStatusLabel = (status: SubscriptionStatus | string) => {
   switch (status) {
     case "PENDIENTE":
       return "Pendiente de Pago";
@@ -62,30 +86,34 @@ const getStatusLabel = (status: SubscriptionStatus) => {
 };
 
 export function SubscriptionDetailDialogContent({
-  item,
+  subscriptionId,
+  fallback,
 }: SubscriptionDetailDialogContentProps) {
+  const [item, setItem] = React.useState<ISubscriptionEntity>(fallback);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    getSubscriptionByIdAction(subscriptionId).then((res) => {
+      if (cancelled) return;
+      if (res.success && res.data?.data) {
+        setItem(res.data.data);
+      }
+      setLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [subscriptionId]);
+
   const customerName = item.customer
     ? `${item.customer.firstName} ${item.customer.lastName}`.trim()
     : "-";
 
-  const headerRows = [
-    {
-      label: "Documento",
-      value: item.customer?.documentNumber || "-",
-    },
-    {
-      label: "Email",
-      value: item.customer?.email || "-",
-    },
-    {
-      label: "Plan Mensual",
-      value: item.monthlyPlan?.name || "-",
-    },
-    {
-      label: "Precio del Plan",
-      value: formatPrice(item.monthlyPlan?.price),
-    },
-  ];
+  const payments = item.payments ?? [];
+  const statusHistory = item.statusHistory ?? [];
 
   return (
     <div className="space-y-5">
@@ -105,9 +133,10 @@ export function SubscriptionDetailDialogContent({
       <ChronoSeparator />
 
       <dl className="grid gap-4 sm:grid-cols-2">
-        {headerRows.map((row) => (
-          <InfoRow key={row.label} label={row.label} value={row.value} />
-        ))}
+        <InfoRow label="Documento" value={item.customer?.documentNumber || "-"} />
+        <InfoRow label="Email" value={item.customer?.email || "-"} />
+        <InfoRow label="Plan Mensual" value={item.monthlyPlan?.name || "-"} />
+        <InfoRow label="Precio del Plan" value={formatPrice(item.monthlyPlan?.price)} />
       </dl>
 
       <div className="space-y-3">
@@ -146,6 +175,56 @@ export function SubscriptionDetailDialogContent({
           <InfoRow label="Fecha de vencimiento" value={formatDate(item.endDate)} />
         </div>
       </div>
+
+      <ChronoSeparator />
+
+      {/* Payment History */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+            Historial de pagos
+          </ChronoSectionLabel>
+          {loading && (
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+          )}
+        </div>
+
+        {payments.length > 0 ? (
+          <div className="rounded-lg border border-border/60 divide-y divide-border/40">
+            {payments.map((payment) => (
+              <PaymentRow key={payment.id} payment={payment} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-border/60 bg-muted/30 px-4 py-4 text-center text-xs text-muted-foreground">
+            {loading ? "Cargando pagos..." : "Sin pagos registrados."}
+          </div>
+        )}
+      </div>
+
+      {/* Status History */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+            Historial de estado
+          </ChronoSectionLabel>
+          {loading && (
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+          )}
+        </div>
+
+        {statusHistory.length > 0 ? (
+          <div className="rounded-lg border border-border/60 divide-y divide-border/40">
+            {statusHistory.map((log) => (
+              <StatusLogRow key={log.id} log={log} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-border/60 bg-muted/30 px-4 py-4 text-center text-xs text-muted-foreground">
+            {loading ? "Cargando historial..." : "Sin cambios de estado."}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -157,6 +236,62 @@ function InfoRow({ label, value }: { label: string; value: string }) {
         {label}
       </p>
       <p className="text-base font-semibold text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function PaymentRow({ payment }: { payment: ISubscriptionPayment }) {
+  return (
+    <div className="flex items-center justify-between gap-3 px-4 py-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium">
+          {formatShortDate(payment.periodStart)} – {formatShortDate(payment.periodEnd)}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {payment.monthsCount} {payment.monthsCount === 1 ? "mes" : "meses"}
+          {payment.proratedDays ? ` + ${payment.proratedDays} días prorrateados` : ""}
+        </p>
+      </div>
+      <div className="text-right">
+        <p className="text-sm font-semibold">{formatPrice(payment.amount)}</p>
+        <p className="text-[11px] text-muted-foreground">
+          {formatDateTime(payment.createdAt)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function StatusLogRow({ log }: { log: ISubscriptionStatusLog }) {
+  return (
+    <div className="flex items-center gap-3 px-4 py-3">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        {log.previousStatus && (
+          <>
+            <ChronoBadge
+              variant="outline"
+              className={`text-[10px] ${getStatusBadgeStyles(log.previousStatus)}`}
+            >
+              {getStatusLabel(log.previousStatus)}
+            </ChronoBadge>
+            <span className="text-xs text-muted-foreground">→</span>
+          </>
+        )}
+        <ChronoBadge
+          variant="outline"
+          className={`text-[10px] ${getStatusBadgeStyles(log.newStatus)}`}
+        >
+          {getStatusLabel(log.newStatus)}
+        </ChronoBadge>
+      </div>
+      <div className="text-right shrink-0">
+        <p className="text-[11px] text-muted-foreground">
+          {formatDateTime(log.changedAt)}
+        </p>
+        {log.reason && (
+          <p className="text-[11px] text-muted-foreground italic">{log.reason}</p>
+        )}
+      </div>
     </div>
   );
 }

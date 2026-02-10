@@ -56,7 +56,14 @@ export default function SubscriptionsDataListComponent({
       openDialog({
         title: `Detalle de Mensualidad`,
         description: "Información de la mensualidad seleccionada",
-        content: <SubscriptionDetailDialogContent item={item} />,
+        dialogClassName: "w-full sm:max-w-2xl",
+        contentClassName: "max-h-[75vh] overflow-y-auto pr-1",
+        content: (
+          <SubscriptionDetailDialogContent
+            subscriptionId={item.id}
+            fallback={item}
+          />
+        ),
         footer: (
           <ChronoButton
             onClick={closeDialog}
