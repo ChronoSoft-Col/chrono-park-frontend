@@ -30,7 +30,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <main className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-4 py-10">
+    <main className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/12 via-background to-muted/20" />
       <div className="pointer-events-none absolute left-1/2 top-[-120px] h-[280px] w-[280px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
 

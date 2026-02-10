@@ -96,7 +96,7 @@ export function ServicesCartDrawerComponent({
   // Set default price when service is selected
   useEffect(() => {
     if (selectedServiceId) {
-      const selectedService = additionalServices.find(
+      const selectedService = additionalServices?.find(
         (s) => s.value === selectedServiceId,
       );
       if (selectedService) {
@@ -108,7 +108,7 @@ export function ServicesCartDrawerComponent({
   const handleAddService = async () => {
     if (!sessionId || !selectedServiceId) return;
 
-    const selectedService = additionalServices.find(
+    const selectedService = additionalServices?.find(
       (s) => s.value === selectedServiceId,
     );
     if (!selectedService) return;
@@ -195,7 +195,7 @@ export function ServicesCartDrawerComponent({
   };
 
   const selectedServicePrice =
-    additionalServices.find((s) => s.value === selectedServiceId)?.price ?? 0;
+    additionalServices?.find((s) => s.value === selectedServiceId)?.price ?? 0;
   const currentUnitPrice = unitPrice
     ? parseInt(unitPrice)
     : selectedServicePrice;
@@ -258,7 +258,7 @@ export function ServicesCartDrawerComponent({
                     <ChronoSelectValue placeholder="Seleccionar servicio..." />
                   </ChronoSelectTrigger>
                   <ChronoSelectContent>
-                    {additionalServices.map((service) => (
+                    {additionalServices?.map((service) => (
                       <ChronoSelectItem
                         key={service.value}
                         value={service.value}
