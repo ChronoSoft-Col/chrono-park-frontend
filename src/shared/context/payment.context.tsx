@@ -70,7 +70,6 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
       const res = await validateFeeAction(params);
       if (!res.success) {
         setValidateRaw(null);
-        console.error("validateFee error:", res);
         toast.error(`Error validando los datos: ${res.error}`, { id: toastId });
         return false;
       }
@@ -105,7 +104,6 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
       return true;
     } catch (error) {
       setValidateRaw(null);
-      console.error("validateFee error:", error);
       toast.error(`Error validando los datos: ${error}`, { id: toastId });
       return false;
     } finally {

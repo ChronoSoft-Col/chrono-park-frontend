@@ -95,14 +95,6 @@ export function DateRangeComponent() {
 
   return (
     <div className="flex items-center gap-2">
-      <ChronoButton
-        variant={"ghost"}
-        onClick={() => {
-          operateDay(-1);
-        }}
-      >
-        <ArrowLeftToLine />
-      </ChronoButton>
       <ChronoPopover open={isPickerOpen} onOpenChange={setIsPickerOpen}>
         <ChronoPopoverTrigger asChild>
           <ChronoButton
@@ -136,7 +128,7 @@ export function DateRangeComponent() {
             selected={currentDate ?? undefined}
             defaultMonth={currentDate ?? new Date()}
             onSelect={(date) => handleSelectDate(date ?? null)}
-            initialFocus
+            autoFocus
           />
         </ChronoPopoverContent>
       </ChronoPopover>
@@ -149,15 +141,6 @@ export function DateRangeComponent() {
         disabled={!currentDate}
       >
         <X className="h-4 w-4" />
-      </ChronoButton>
-
-      <ChronoButton
-        variant={"ghost"}
-        onClick={() => {
-          operateDay(1);
-        }}
-      >
-        <ArrowRightToLine />
       </ChronoButton>
     </div>
   );
