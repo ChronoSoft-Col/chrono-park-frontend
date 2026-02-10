@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CHRONO PARK",
-  description: "Gerstiona tu parqueadero de manera eficiente y sencilla con Chrono Park.",
+  description: "Gestiona tu parqueadero de manera eficiente y sencilla con Chrono Park.",
 };
 
 export default function RootLayout({
@@ -34,10 +34,11 @@ export default function RootLayout({
         <AppBackground>
           <RootProviders>
             {children}
-            <Toaster richColors />
             <ChronoCustomDialog />
           </RootProviders>
         </AppBackground>
+
+        <Toaster richColors style={{ zIndex: 2147483647 }} />
       </body>
     </html>
   );
