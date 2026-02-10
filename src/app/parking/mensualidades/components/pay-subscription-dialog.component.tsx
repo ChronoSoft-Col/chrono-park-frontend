@@ -68,11 +68,11 @@ export function PaySubscriptionDialogContent({ subscription }: Props) {
 
   const monthsCount = watch("monthsCount");
 
-  // Calcular precio cuando cambia la cantidad de meses
+  // Calcular precio cuando cambia la cantidad de meses (con debounce)
   useEffect(() => {
-    const fetchPrice = async () => {
-      if (!subscription.id) return;
+    if (!subscription.id || !monthsCount || monthsCount < 1 || monthsCount > 12) return;
 
+    const timeout = setTimeout(async () => {
       setLoadingPrice(true);
       try {
         const result = await calculatePriceAction(subscription.id, monthsCount);
@@ -84,9 +84,9 @@ export function PaySubscriptionDialogContent({ subscription }: Props) {
       } finally {
         setLoadingPrice(false);
       }
-    };
+    }, 500);
 
-    fetchPrice();
+    return () => clearTimeout(timeout);
   }, [subscription.id, monthsCount]);
 
   const handlePayment = handleSubmit(async (data) => {
@@ -154,10 +154,10 @@ export function PaySubscriptionDialogContent({ subscription }: Props) {
       </div>
 
       {/* Price Calculation */}
-      <div className="rounded-lg border bg-emerald-50/50 p-4">
+      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Calculator className="h-4 w-4 text-emerald-600" />
-          <h4 className="text-sm font-semibold text-emerald-800">Cálculo de Precio</h4>
+          <Calculator className="h-4 w-4 text-primary" />
+          <h4 className="text-sm font-semibold">Cálculo de Precio</h4>
           {loadingPrice && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
         </div>
 
@@ -180,7 +180,7 @@ export function PaySubscriptionDialogContent({ subscription }: Props) {
               <span>x{monthsCount}</span>
             </div>
             <ChronoSeparator className="my-2" />
-            <div className="flex justify-between text-base font-semibold text-emerald-700">
+            <div className="flex justify-between text-base font-semibold text-primary">
               <span>Total a pagar:</span>
               <span>{formatPrice(priceCalculation.totalAmount)}</span>
             </div>
@@ -211,7 +211,20 @@ export function PaySubscriptionDialogContent({ subscription }: Props) {
                   min={1}
                   max={12}
                   value={field.value}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    if (raw === "") {
+                      field.onChange(0);
+                      return;
+                    }
+                    const num = parseInt(raw, 10);
+                    if (!isNaN(num)) field.onChange(num);
+                  }}
+                  onBlur={(e) => {
+                    const clamped = Math.min(12, Math.max(1, field.value || 1));
+                    field.onChange(clamped);
+                    field.onBlur();
+                  }}
                   className="mt-1"
                 />
                 {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}

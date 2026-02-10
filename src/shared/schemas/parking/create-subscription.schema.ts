@@ -21,7 +21,7 @@ export type CreateSubscriptionForm = z.infer<typeof CreateSubscriptionSchema>;
  */
 export const PaySubscriptionSchema = z.object({
   paymentMethodId: z.string().min(1, "El método de pago es requerido"),
-  monthsCount: z.number().min(1, "Debe pagar al menos 1 mes").default(1),
+  monthsCount: z.number().min(1, "Debe pagar al menos 1 mes").max(12, "Máximo 12 meses").default(1),
 });
 
 export type PaySubscriptionForm = z.infer<typeof PaySubscriptionSchema>;
