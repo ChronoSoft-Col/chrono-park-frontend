@@ -200,7 +200,7 @@ export const createSubscriptionColumns = (
           <TooltipTrigger asChild>
             <ChronoButton
               type="button"
-              variant="default"
+              variant="secondary"
               aria-label="Ver detalle"
               onClick={() => onViewDetail?.(row)}
             >
