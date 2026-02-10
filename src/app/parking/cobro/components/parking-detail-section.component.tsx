@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import EmptyState from "@/src/shared/components/empty-state.component";
 import { usePaymentContext } from "@/src/shared/context/payment.context";
 import { useCommonContext } from "@/src/shared/context/common.context";
@@ -82,31 +82,23 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
         recalculateWithRate,
         isValidating,
         sessionServices,
-        sessionServicesTotal
     } = usePaymentContext();
     const { vehicleTypes } = useCommonContext();
     const [showRateSelector, setShowRateSelector] = useState(false);
     const [selectedVehicleTypeId, setSelectedVehicleTypeId] = useState<string | null>(null);
     const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
+    const [prevValidateRaw, setPrevValidateRaw] = useState(validateRaw);
 
     const detail: QrAmountDetail | null = validateRaw?.data ?? null;
     const currentVehicleTypeId = validateRaw?.data?.vehicle?.vehicleType?.id;
     const currentVehicleTypeName = validateRaw?.data?.vehicle?.vehicleType?.name;
 
-    // Reset rate selector when validateRaw changes (new validation)
-    useEffect(() => {
+    if (prevValidateRaw !== validateRaw) {
+        setPrevValidateRaw(validateRaw);
         setShowRateSelector(false);
         setSelectedVehicleTypeId(null);
         setSelectedRateId(null);
-    }, [validateRaw]);
-
-    // When opening selector, set the current vehicle type as selected
-    useEffect(() => {
-        if (showRateSelector && currentVehicleTypeId && !selectedVehicleTypeId) {
-            setSelectedVehicleTypeId(currentVehicleTypeId);
-            loadRatesForVehicleType(currentVehicleTypeId);
-        }
-    }, [showRateSelector, currentVehicleTypeId, selectedVehicleTypeId, loadRatesForVehicleType]);
+    }
 
     const handleVehicleTypeChange = (vehicleTypeId: string) => {
         setSelectedVehicleTypeId(vehicleTypeId);
@@ -135,8 +127,12 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
             setSelectedVehicleTypeId(null);
             setSelectedRateId(null);
         } else {
-            // Opening
+            // Opening — pre-select current vehicle type and load its rates
             setShowRateSelector(true);
+            if (currentVehicleTypeId) {
+                setSelectedVehicleTypeId(currentVehicleTypeId);
+                loadRatesForVehicleType(currentVehicleTypeId);
+            }
         }
     };
 
@@ -297,13 +293,9 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
                             <Wallet2 className="h-3.5 w-3.5" />
                         </span>
                         <div className="flex flex-col min-w-0">
-                            <ChronoSectionLabel size="xs">
+                            <ChronoSectionLabel size="base">
                                 Total estimado
                             </ChronoSectionLabel>
-                            <span className="text-[9px] text-foreground/60 truncate">
-                                {exit.dateLabel} · {exit.timeLabel}
-                                {discount > 0 && ` · Subtotal ${formatCurrency(detail.calculatedAmount)}`}
-                            </span>
                         </div>
                         <div className="ml-auto flex shrink-0 items-center gap-2">
                             {discount > 0 && (
