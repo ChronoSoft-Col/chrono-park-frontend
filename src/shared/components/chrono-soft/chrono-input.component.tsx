@@ -99,7 +99,7 @@ export const ChronoInput = React.forwardRef<
 	}, [isControlled]);
 
 	return (
-		<div className="relative">
+		<div className="relative w-full">
 			<Input
 				ref={setRefs}
 				type={type}

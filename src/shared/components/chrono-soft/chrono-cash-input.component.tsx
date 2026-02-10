@@ -120,12 +120,13 @@ const ChronoCashInput = forwardRef<HTMLInputElement, ChronoCashInputProps>(
           focused && "border-primary",
           className,
         )}
+        onClick={()=>inputRef.current?.focus()}
       >
         <div className="flex size-6 items-center justify-center text-primary">
           <Wallet2 className="size-4" />
         </div>
 
-        <div className="flex-1 min-w-0 flex items-baseline gap-1">
+        <div className="flex-1 min-w-0 flex items-baseline gap-1 w-full ">
           <span className="text-xs font-medium text-muted-foreground">$</span>
           <ChronoInput
             ref={assignRef}
