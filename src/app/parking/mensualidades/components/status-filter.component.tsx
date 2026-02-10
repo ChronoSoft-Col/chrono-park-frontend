@@ -47,7 +47,13 @@ export function StatusFilterComponent() {
 
   return (
     <ChronoSelect value={currentStatus} onValueChange={handleStatusChange}>
-      <ChronoSelectTrigger className="w-[200px]">
+      <ChronoSelectTrigger
+      className="w-fit"
+        clearable
+        selectedValue={currentStatus !== "ALL" ? currentStatus : null}
+        onClear={() => handleStatusChange("ALL")}
+        clearAriaLabel="Quitar filtro"
+      >
         <ChronoSelectValue placeholder="Filtrar por estado" />
       </ChronoSelectTrigger>
       <ChronoSelectContent>
