@@ -21,8 +21,8 @@ export function DateRangePickerComponent() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
     if (typeof window === "undefined") return undefined;
     const params = new URLSearchParams(window.location.search);
-    const fromParam = params.get("dateFrom");
-    const toParam = params.get("dateTo");
+    const fromParam = params.get("startDate");
+    const toParam = params.get("endDate");
 
     let from: Date | undefined;
     let to: Date | undefined;
@@ -60,15 +60,15 @@ export function DateRangePickerComponent() {
       const params = new URLSearchParams(window.location.search);
 
       if (range?.from) {
-        params.set("dateFrom", format(range.from, "yyyy-MM-dd"));
+        params.set("startDate", format(range.from, "yyyy-MM-dd"));
       } else {
-        params.delete("dateFrom");
+        params.delete("startDate");
       }
 
       if (range?.to) {
-        params.set("dateTo", format(range.to, "yyyy-MM-dd"));
+        params.set("endDate", format(range.to, "yyyy-MM-dd"));
       } else {
-        params.delete("dateTo");
+        params.delete("endDate");
       }
 
       // Reset to page 1 when date changes
