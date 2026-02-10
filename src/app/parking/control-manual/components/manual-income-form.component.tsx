@@ -26,7 +26,7 @@ import {
   ChronoSelectValue,
 } from "@chrono/chrono-select.component";
 import ChronoVehicleTypeSelect from "@chrono/chrono-vehicle-type-select.component";
-import { useCommonContext } from "@/shared/context/common.context";
+import { useCommonStore } from "@/shared/stores/common.store";
 import {
   ManualIncomeForm,
   ManualIncomeSchema,
@@ -44,7 +44,7 @@ import { usePrint } from "@/shared/hooks/common/use-print.hook";
 import { IGenerateManualIncomeResponse } from "@/server/domain/entities/parking/manual-income/response/generate-manual-income-response.entity";
 
 export default function ManualIncomeFormComponent() {
-  const { vehicleTypes } = useCommonContext();
+  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
   const { printIncomeReceipt } = usePrint();
 
   const onManualIncomeSubmit = async (

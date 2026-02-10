@@ -10,7 +10,7 @@ import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout
 
 import { createInOutColumns } from "./table/columns.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 import { InOutDetailDialogContent } from "./in-out-detail-dialog-content";
 import { ChangeRateDialogContent } from "./change-rate-dialog-content";
 import { ChangePlateDialogContent } from "./change-plate-dialog-content";
@@ -42,7 +42,7 @@ export default function InOutDataListComponent({
   const [pending, startTransition] = React.useTransition();
 
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
-  const { vehicleTypes = [] } = useCommonContext();
+  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
   const { printIncomeReceipt } = usePrint();
   const errorShownRef = React.useRef(false);
 

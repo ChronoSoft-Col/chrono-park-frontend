@@ -27,7 +27,7 @@ import {
   DrawerTrigger,
 } from "@/shared/components/ui/drawer";
 import { usePaymentContext } from "@/src/shared/context/payment.context";
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 import { addSessionServiceAction } from "../actions/add-session-service.action";
 import { removeSessionServiceAction } from "../actions/remove-session-service.action";
 import { toast } from "sonner";
@@ -47,7 +47,7 @@ export function ServicesCartDrawerComponent({
   className,
 }: ServicesCartDrawerProps) {
   const { validateRaw, validateFee, sessionServices, sessionServicesTotal, loadSessionServices } = usePaymentContext();
-  const { additionalServices } = useCommonContext();
+  const additionalServices = useCommonStore((s) => s.additionalServices);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

@@ -7,7 +7,7 @@ import { ChronoBadge } from "@chrono/chrono-badge.component";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoValue } from "@chrono/chrono-value.component";
 import { ChronoSeparator } from "@chrono/chrono-separator.component";
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 
 interface InOutDetailDialogContentProps {
   item: IInOutEntity;
@@ -22,7 +22,7 @@ const formatDateTime = (value?: string) => {
 };
 
 export function InOutDetailDialogContent({ item }: InOutDetailDialogContentProps) {
-  const { vehicleTypes = [] } = useCommonContext();
+  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
   const isClosed = Boolean(item.exitTime);
 
   const vehicleTypeLabel = React.useMemo(() => {

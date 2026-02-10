@@ -3,7 +3,7 @@
 import { useState } from "react";
 import EmptyState from "@/src/shared/components/empty-state.component";
 import { usePaymentContext } from "@/src/shared/context/payment.context";
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoValue } from "@chrono/chrono-value.component";
@@ -83,7 +83,7 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
         isValidating,
         sessionServices,
     } = usePaymentContext();
-    const { vehicleTypes } = useCommonContext();
+    const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
     const [showRateSelector, setShowRateSelector] = useState(false);
     const [selectedVehicleTypeId, setSelectedVehicleTypeId] = useState<string | null>(null);
     const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
