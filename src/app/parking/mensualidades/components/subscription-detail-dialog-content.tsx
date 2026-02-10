@@ -5,7 +5,6 @@ import { Loader2 } from "lucide-react";
 
 import type {
   ISubscriptionEntity,
-  ISubscriptionPayment,
   ISubscriptionStatusLog,
   SubscriptionStatus,
 } from "@/server/domain";
@@ -17,7 +16,6 @@ import { getSubscriptionByIdAction } from "../actions/get-subscription-detail.ac
 
 interface SubscriptionDetailDialogContentProps {
   subscriptionId: string;
-  /** Fallback data from the list to show while loading */
   fallback: ISubscriptionEntity;
 }
 
@@ -27,11 +25,6 @@ const formatDate = (value?: Date | string) => {
   return new Intl.DateTimeFormat("es-CO", { dateStyle: "long" }).format(date);
 };
 
-const formatShortDate = (value?: Date | string) => {
-  if (!value) return "-";
-  const date = value instanceof Date ? value : new Date(value);
-  return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(date);
-};
 
 const formatDateTime = (value?: Date | string) => {
   if (!value) return "-";
@@ -112,7 +105,6 @@ export function SubscriptionDetailDialogContent({
     ? `${item.customer.firstName} ${item.customer.lastName}`.trim()
     : "-";
 
-  const payments = item.payments ?? [];
   const statusHistory = item.statusHistory ?? [];
 
   return (
@@ -178,30 +170,6 @@ export function SubscriptionDetailDialogContent({
 
       <ChronoSeparator />
 
-      {/* Payment History */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
-            Historial de pagos
-          </ChronoSectionLabel>
-          {loading && (
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-          )}
-        </div>
-
-        {payments.length > 0 ? (
-          <div className="rounded-lg border border-border/60 divide-y divide-border/40">
-            {payments.map((payment) => (
-              <PaymentRow key={payment.id} payment={payment} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-xl border border-dashed border-border/60 bg-muted/30 px-4 py-4 text-center text-xs text-muted-foreground">
-            {loading ? "Cargando pagos..." : "Sin pagos registrados."}
-          </div>
-        )}
-      </div>
-
       {/* Status History */}
       <div className="space-y-3">
         <div className="flex items-center gap-2">
@@ -236,28 +204,6 @@ function InfoRow({ label, value }: { label: string; value: string }) {
         {label}
       </p>
       <p className="text-base font-semibold text-foreground">{value}</p>
-    </div>
-  );
-}
-
-function PaymentRow({ payment }: { payment: ISubscriptionPayment }) {
-  return (
-    <div className="flex items-center justify-between gap-3 px-4 py-3">
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium">
-          {formatShortDate(payment.periodStart)} – {formatShortDate(payment.periodEnd)}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {payment.monthsCount} {payment.monthsCount === 1 ? "mes" : "meses"}
-          {payment.proratedDays ? ` + ${payment.proratedDays} días prorrateados` : ""}
-        </p>
-      </div>
-      <div className="text-right">
-        <p className="text-sm font-semibold">{formatPrice(payment.amount)}</p>
-        <p className="text-[11px] text-muted-foreground">
-          {formatDateTime(payment.createdAt)}
-        </p>
-      </div>
     </div>
   );
 }
