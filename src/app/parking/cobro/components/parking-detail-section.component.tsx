@@ -23,7 +23,7 @@ import {
     ChronoSelectValue,
 } from "@chrono/chrono-select.component";
 import { ChronoLabel } from "@chrono/chrono-label.component";
-import { CalendarClock, Clock8, TimerReset, Wallet2, X, RefreshCw, Package } from "lucide-react";
+import { CalendarClock, Clock8, TimerReset, Wallet2, X, RefreshCw, Package, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import ChronoButton from "@chrono/chrono-button.component";
 
@@ -88,6 +88,7 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
     const [selectedVehicleTypeId, setSelectedVehicleTypeId] = useState<string | null>(null);
     const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
     const [prevValidateRaw, setPrevValidateRaw] = useState(validateRaw);
+    const [expandedRules, setExpandedRules] = useState(false);
 
     const detail: QrAmountDetail | null = validateRaw?.data ?? null;
     const currentVehicleTypeId = validateRaw?.data?.vehicle?.vehicleType?.id;
@@ -152,8 +153,8 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
     const exit = getDateParts(detail.exitTime);
     const discount = detail.discountPercentage ?? 0;
     const rules = detail.appliedRules ?? [];
-    const visibleRules = rules.slice(0, 4);
-    const hiddenRules = Math.max(rules.length - visibleRules.length, 0);
+    const visibleRules = expandedRules ? rules : rules.slice(0, 4);
+    const hiddenRules = expandedRules ? 0 : Math.max(rules.length - 4, 0);
 
     return (
         <div className={cn("flex min-w-0 flex-col gap-2 overflow-y-auto py-2 lg:my-auto animate-in fade-in duration-500", className)}>
@@ -372,10 +373,24 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
                                     </div>
                                 ))}
                             </div>
-                            {hiddenRules > 0 && (
-                                <p className="text-center text-[10px] text-muted-foreground">
-                                    + {hiddenRules} reglas adicionales
-                                </p>
+                            {rules.length > 4 && (
+                                <button
+                                    type="button"
+                                    onClick={() => setExpandedRules(!expandedRules)}
+                                    className="flex items-center justify-center gap-1 w-full text-[10px] text-primary hover:text-primary/80 transition-colors py-1"
+                                >
+                                    {expandedRules ? (
+                                        <>
+                                            <ChevronUp className="h-3 w-3" />
+                                            Ver menos
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ChevronDown className="h-3 w-3" />
+                                            Ver {hiddenRules} reglas más
+                                        </>
+                                    )}
+                                </button>
                             )}
                         </div>
                     )}

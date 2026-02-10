@@ -10,26 +10,10 @@ import { DateRangePickerComponent } from "./date-range-picker.component";
 import { UseHeaderContext } from "../../context/header.context";
 
 export default function HeaderComponent() {
-  const { open, isMobile } = useChronoSidebar();
+  const { isMobile } = useChronoSidebar();
   const { showDatePicker, showSearch, showDateRangePicker } = UseHeaderContext();
   return (
-    <header
-      className="fixed z-10 top-0 transition-all duration-200 ease-linear"
-      style={{
-        left:
-          open && !isMobile
-            ? "var(--sidebar-width)"
-            : isMobile
-            ? "0px"
-            : "var(--sidebar-width-icon)",
-        width:
-          open && !isMobile
-            ? "calc(100% - var(--sidebar-width))"
-            : isMobile
-            ? "100%"
-            : "calc(100% - var(--sidebar-width-icon))",
-      }}
-    >
+    <header className="shrink-0">
       <div
         className={`flex items-center justify-between transition-colors duration-200 ease-linear hover:bg-muted ${
           isMobile ? "bg-muted" : "bg-muted/50"
