@@ -125,10 +125,7 @@ export function DateRangeComponent() {
                     month: "long",
                     day: "numeric",
                   })
-                : new Date().toLocaleDateString("es-ES", {
-                    year: "numeric",
-                    month: "long",
-                  })}
+                : "Seleccionar fecha"}
             </motion.div>
             <span className="sr-only">Seleccionar fecha</span>
           </ChronoButton>

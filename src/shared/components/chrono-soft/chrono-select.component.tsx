@@ -119,10 +119,11 @@ export const ChronoSelectTrigger = React.forwardRef<
       <div className="flex min-w-0 flex-1 items-center">
         <div className="min-w-0 flex-1">{children}</div>
         {showClear ? (
-          <button
-            type="button"
+          <span
+            role="button"
+            tabIndex={0}
             aria-label={clearAriaLabel}
-            className="ml-1 shrink-0 text-muted-foreground hover:text-foreground focus-visible:ring-ring/30 focus-visible:ring-2 rounded-sm"
+            className="ml-1 shrink-0 cursor-pointer text-muted-foreground hover:text-foreground focus-visible:ring-ring/30 focus-visible:ring-2 rounded-sm"
             onPointerDown={(event) => {
               event.preventDefault();
               event.stopPropagation();
@@ -132,9 +133,16 @@ export const ChronoSelectTrigger = React.forwardRef<
               event.stopPropagation();
               handleClear();
             }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                event.stopPropagation();
+                handleClear();
+              }
+            }}
           >
             <XIcon className="size-3.5" />
-          </button>
+          </span>
         ) : null}
       </div>
     </SelectTrigger>
