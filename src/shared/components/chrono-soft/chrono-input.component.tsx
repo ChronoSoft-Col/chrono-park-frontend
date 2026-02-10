@@ -74,8 +74,16 @@ export const ChronoInput = React.forwardRef<
 		const input = innerRef.current;
 		if (!input) return;
 
-		// Update the DOM value (useful for uncontrolled)
-		input.value = "";
+		// Use native setter so React's internal value tracker sees the change.
+		const valueSetter = Object.getOwnPropertyDescriptor(
+			HTMLInputElement.prototype,
+			"value"
+		)?.set;
+		if (valueSetter) {
+			valueSetter.call(input, "");
+		} else {
+			input.value = "";
+		}
 
 		// Fire events so any listeners (and React Hook Form) can react.
 		try {
