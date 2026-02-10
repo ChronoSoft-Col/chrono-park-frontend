@@ -110,28 +110,33 @@ export const ChronoSelectTrigger = React.forwardRef<
   return (
     <SelectTrigger
       ref={ref}
-      className={cn("chrono-select__trigger border-primary/20 bg-background/90 backdrop-blur", className)}
+      className={cn(
+        "chrono-select__trigger border-primary/20 bg-background/90 backdrop-blur",
+        className
+      )}
       {...props}
     >
-      {children}
-      {showClear ? (
-        <button
-          type="button"
-          aria-label={clearAriaLabel}
-          className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/30 focus-visible:ring-2 rounded-sm -mr-0.5"
-          onPointerDown={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-          }}
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            handleClear();
-          }}
-        >
-          <XIcon className="size-3.5" />
-        </button>
-      ) : null}
+      <div className="flex min-w-0 flex-1 items-center">
+        <div className="min-w-0 flex-1">{children}</div>
+        {showClear ? (
+          <button
+            type="button"
+            aria-label={clearAriaLabel}
+            className="ml-1 shrink-0 text-muted-foreground hover:text-foreground focus-visible:ring-ring/30 focus-visible:ring-2 rounded-sm"
+            onPointerDown={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+            }}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              handleClear();
+            }}
+          >
+            <XIcon className="size-3.5" />
+          </button>
+        ) : null}
+      </div>
     </SelectTrigger>
   );
 });

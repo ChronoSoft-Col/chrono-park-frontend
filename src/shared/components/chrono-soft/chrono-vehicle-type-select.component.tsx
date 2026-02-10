@@ -184,6 +184,7 @@ export default function ChronoVehicleTypeSelect({
               "[&_[data-slot=select-value]_svg]:hidden",
               triggerClassName,
             )}
+            clearable={false}
             ref={triggerRef}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
