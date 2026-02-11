@@ -200,6 +200,12 @@ export class PrintUsecase {
     const rateSummary = parseJsonMaybe<RateSummary>(
       closure.detail?.rateSummary,
     );
+    const additionalServiceSummary = parseJsonMaybe<RateSummary>(
+      closure.detail?.additionalServiceSummary,
+    );
+    const subscriptionSummary = parseJsonMaybe<RateSummary>(
+      closure.detail?.subscriptionSummary,
+    );
 
     // Layout (menos separadores)
     operations.push(printerOps.feed(2));
@@ -313,6 +319,40 @@ export class PrintUsecase {
         const label = this.sanitizeText(rateName);
         const countText = String(rateData?.count ?? 0);
         const totalText = this.moneyNoCents(rateData?.total ?? "0");
+        const line = `${label.slice(0, col1).padEnd(col1)}${countText.padStart(col2)}${totalText.padStart(col3)}`;
+        this.pushLine(operations, line);
+      }
+    }
+
+    this.strongSeparator(operations);
+
+    this.pushLine(operations, "Servicios adicionales");
+    if (!additionalServiceSummary || Object.keys(additionalServiceSummary).length === 0) {
+      this.pushLine(operations, "(Sin servicios adicionales)");
+    } else {
+      this.separator(operations);
+      this.pushLine(operations, tableHeader);
+      for (const [serviceName, serviceData] of Object.entries(additionalServiceSummary)) {
+        const label = this.sanitizeText(serviceName);
+        const countText = String(serviceData?.count ?? 0);
+        const totalText = this.moneyNoCents(serviceData?.total ?? "0");
+        const line = `${label.slice(0, col1).padEnd(col1)}${countText.padStart(col2)}${totalText.padStart(col3)}`;
+        this.pushLine(operations, line);
+      }
+    }
+
+    this.strongSeparator(operations);
+
+    this.pushLine(operations, "Mensualidades");
+    if (!subscriptionSummary || Object.keys(subscriptionSummary).length === 0) {
+      this.pushLine(operations, "(Sin mensualidades)");
+    } else {
+      this.separator(operations);
+      this.pushLine(operations, tableHeader);
+      for (const [planName, planData] of Object.entries(subscriptionSummary)) {
+        const label = this.sanitizeText(planName);
+        const countText = String(planData?.count ?? 0);
+        const totalText = this.moneyNoCents(planData?.total ?? "0");
         const line = `${label.slice(0, col1).padEnd(col1)}${countText.padStart(col2)}${totalText.padStart(col3)}`;
         this.pushLine(operations, line);
       }
