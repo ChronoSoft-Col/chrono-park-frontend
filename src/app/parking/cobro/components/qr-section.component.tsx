@@ -54,7 +54,7 @@ type QrSectionProps = {
 
 export function QrSectionComponent({ className }: QrSectionProps) {
   const { validateFee, clearValidateResult, validateRaw, isValidating } = usePaymentContext();
-  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
+  const { vehicleTypes } = useCommonStore();
   
   // Pre-scan rate configuration state - one entry per vehicle type
   const [showRateConfig, setShowRateConfig] = useState(false);

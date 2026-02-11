@@ -47,7 +47,7 @@ export function ServicesCartDrawerComponent({
   className,
 }: ServicesCartDrawerProps) {
   const { validateRaw, validateFee, sessionServices, sessionServicesTotal, loadSessionServices } = usePaymentContext();
-  const additionalServices = useCommonStore((s) => s.additionalServices);
+  const { additionalServices } = useCommonStore();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

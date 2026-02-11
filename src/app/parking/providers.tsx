@@ -7,7 +7,7 @@ import { PropsWithChildren, useEffect } from "react";
 import { useCommonStore } from "@/src/shared/stores/common.store";
 
 function CommonStoreInitializer() {
-  const fetchCommonData = useCommonStore((s) => s.fetchCommonData);
+  const { fetchCommonData } = useCommonStore();
 
   useEffect(() => {
     fetchCommonData();

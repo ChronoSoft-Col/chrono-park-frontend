@@ -44,7 +44,7 @@ import { usePrint } from "@/shared/hooks/common/use-print.hook";
 import { IGenerateManualIncomeResponse } from "@/server/domain/entities/parking/manual-income/response/generate-manual-income-response.entity";
 
 export default function ManualIncomeFormComponent() {
-  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
+  const { vehicleTypes } = useCommonStore();
   const { printIncomeReceipt } = usePrint();
 
   const onManualIncomeSubmit = async (

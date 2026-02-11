@@ -46,7 +46,7 @@ type Props = {
 export function PaySubscriptionDialogContent({ subscription }: Props) {
   const router = useRouter();
   const { closeDialog, showYesNoDialog } = UseDialogContext();
-  const paymentMethods = useCommonStore((s) => s.paymentMethods);
+  const { paymentMethods } = useCommonStore();
   const { printPaymentTicketByPaymentId } = usePrint();
 
   const [priceCalculation, setPriceCalculation] = useState<IPriceCalculation | null>(null);

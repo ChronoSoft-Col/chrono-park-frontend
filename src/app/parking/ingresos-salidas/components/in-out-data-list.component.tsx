@@ -48,7 +48,7 @@ export default function InOutDataListComponent({
   const [pending, startTransition] = React.useTransition();
 
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
-  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
+  const { vehicleTypes } = useCommonStore();
   const { printIncomeReceipt } = usePrint();
   const errorShownRef = React.useRef(false);
 

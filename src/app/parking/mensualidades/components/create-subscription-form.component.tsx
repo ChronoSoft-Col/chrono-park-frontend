@@ -63,7 +63,7 @@ type Props = {
 };
 
 export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
-  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
+  const { vehicleTypes } = useCommonStore();
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [monthlyPlans, setMonthlyPlans] = useState<IMonthlyPlanEntity[]>([]);
   const [loadingCustomers, setLoadingCustomers] = useState(false);

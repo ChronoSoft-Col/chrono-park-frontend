@@ -22,7 +22,7 @@ const formatDateTime = (value?: string) => {
 };
 
 export function InOutDetailDialogContent({ item }: InOutDetailDialogContentProps) {
-  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
+  const { vehicleTypes } = useCommonStore();
   const isClosed = Boolean(item.exitTime);
 
   const vehicleTypeLabel = React.useMemo(() => {

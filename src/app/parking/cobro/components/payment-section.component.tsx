@@ -47,7 +47,7 @@ type PaymentSectionProps = {
 export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   const { validateRaw, clearValidateResult } = usePaymentContext();
   const { showYesNoDialog } = UseDialogContext();
-  const paymentMethods = useCommonStore((s) => s.paymentMethods);
+  const { paymentMethods } = useCommonStore();
   const { printPaymentTicketByPaymentId } = usePrint();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [amountReceived, setAmountReceived] = useState("");

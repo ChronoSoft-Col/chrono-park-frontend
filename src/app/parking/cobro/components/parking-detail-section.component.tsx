@@ -89,7 +89,7 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
         isValidating,
         sessionServices,
     } = usePaymentContext();
-    const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
+    const { vehicleTypes } = useCommonStore();
     const [showRateSelector, setShowRateSelector] = useState(false);
     const [selectedVehicleTypeId, setSelectedVehicleTypeId] = useState<string | null>(null);
     const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
