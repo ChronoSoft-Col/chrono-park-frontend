@@ -11,6 +11,7 @@ import { calculatePriceAction } from "../actions/calculate-price.action";
 import { paySubscriptionAction } from "../actions/pay-subscription.action";
 import { UseDialogContext } from "@/shared/context/dialog.context";
 import { useCommonContext } from "@/src/shared/context/common.context";
+import { usePrint } from "@/shared/hooks/common/use-print.hook";
 import { ISubscriptionEntity, IPriceCalculation } from "@/server/domain";
 import {
   PaySubscriptionForm,
@@ -44,8 +45,9 @@ type Props = {
 
 export function PaySubscriptionDialogContent({ subscription }: Props) {
   const router = useRouter();
-  const { closeDialog } = UseDialogContext();
+  const { closeDialog, showYesNoDialog } = UseDialogContext();
   const { paymentMethods = [] } = useCommonContext();
+  const { printPaymentTicketByPaymentId } = usePrint();
 
   const [priceCalculation, setPriceCalculation] = useState<IPriceCalculation | null>(null);
   const [loadingPrice, setLoadingPrice] = useState(false);
@@ -106,8 +108,32 @@ export function PaySubscriptionDialogContent({ subscription }: Props) {
       }
 
       toast.success("Pago procesado correctamente", { id: toastId });
-      closeDialog();
-      router.refresh();
+      
+      const paymentId = result.data.data?.paymentId;
+      if (paymentId) {
+        showYesNoDialog({
+          title: "Imprimir comprobante",
+          description: "¿Desea imprimir el comprobante de pago?",
+          handleYes: async () => {
+            const printToastId = toast.loading("Enviando impresión...");
+            const printRes = await printPaymentTicketByPaymentId(paymentId);
+            if (printRes.success) {
+              toast.success("Impresión enviada correctamente", { id: printToastId });
+            } else {
+              toast.error(printRes.error || "Error al imprimir", { id: printToastId });
+            }
+            closeDialog();
+            router.refresh();
+          },
+          handleNo: async () => {
+            closeDialog();
+            router.refresh();
+          },
+        });
+      } else {
+        closeDialog();
+        router.refresh();
+      }
     } catch (error) {
       console.error("Error processing payment:", error);
       toast.error("Error inesperado al procesar el pago", { id: toastId });

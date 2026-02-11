@@ -34,7 +34,6 @@ export async function listPaymentsAction(
       search: params.search,
       ...startEnd,
     });
-
     return { success: true, data: response };
   } catch (error) {
     rethrowNextNavigationErrors(error);

@@ -33,6 +33,29 @@ const formatCurrency = (value?: number) => {
   }).format(safe);
 };
 
+const getDetailTypeLabel = (type: string) => {
+  switch (type) {
+    case "PARKING":
+      return "Parqueo";
+    case "SERVICE":
+      return "Servicio";
+    case "OTHER":
+      return "Otro";
+    default:
+      return type;
+  }
+};
+
+const getDetailDescription = (detail: IPaymentItemEntity["details"][0]) => {
+  if (!detail.reference) return null;
+  
+  if ("name" in detail.reference) {
+    return detail.reference.name;
+  }
+  
+  return null;
+};
+
 export function PaymentDetailDialogContent({ item }: Props) {
   const plate = React.useMemo(() => {
     const parking = item.details?.find((d) => d.type === "PARKING");
@@ -88,24 +111,34 @@ export function PaymentDetailDialogContent({ item }: Props) {
           {(item.details ?? []).length === 0 ? (
             <p className="text-sm text-muted-foreground">(Sin detalle)</p>
           ) : (
-            item.details.map((detail) => (
-              <div
-                key={detail.id}
-                className="rounded-xl border border-border/60 bg-card/70 px-4 py-3"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm font-semibold">{detail.type}</p>
-                  <p className="text-sm font-semibold">{formatCurrency(detail.amount)}</p>
+            item.details.map((detail) => {
+              const typeLabel = getDetailTypeLabel(detail.type);
+              const description = getDetailDescription(detail);
+
+              return (
+                <div
+                  key={detail.id}
+                  className="rounded-xl border border-border/60 bg-card/70 px-4 py-3"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <ChronoBadge variant="outline" className="text-xs">
+                        {typeLabel}
+                      </ChronoBadge>
+                      {description && (
+                        <span className="text-sm font-medium">{description}</span>
+                      )}
+                    </div>
+                    <p className="text-sm font-semibold">{formatCurrency(detail.amount)}</p>
+                  </div>
+                  {detail.reference && "licensePlate" in detail.reference && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Placa: {detail.reference.licensePlate}
+                    </p>
+                  )}
                 </div>
-                {detail.reference && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {"name" in detail.reference
-                      ? `Servicio: ${detail.reference.name}`
-                      : `Sesión: ${detail.reference.id} - Placa: ${detail.reference.licensePlate}`}
-                  </p>
-                )}
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

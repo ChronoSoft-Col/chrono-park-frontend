@@ -126,6 +126,7 @@ export default function ClosureDataListComponent({
       openDialog({
         title: "Detalle del cierre",
         description: "",
+        dialogClassName: "w-full sm:max-w-3xl",
         content: <ClosureDetailDialog closure={closureDetail} operatorName={closure.operatorName} />, 
         footer: (
           <ClosureDetailFooter

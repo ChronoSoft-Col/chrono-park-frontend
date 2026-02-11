@@ -1,6 +1,6 @@
 "use client";
 
-import { IClosureEntity } from "@/server/domain/entities/parking/closures/closure.entity";
+import { IClosureEntity, IClosureSummaryItem } from "@/server/domain/entities/parking/closures/closure.entity";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ChronoSectionLabel } from "@/src/shared/components/chrono-soft/chrono-section-label.component";
@@ -18,6 +18,7 @@ type MethodBucket = {
 
 type SummaryByMethod = Record<string, MethodBucket>;
 type RateSummary = Record<string, { total: string; count: number }>;
+type ServiceSummary = Record<string, IClosureSummaryItem>;
 
 const safeFormatDateTime = (value?: string | null) => {
   if (!value) return "-";
@@ -54,6 +55,8 @@ export function ClosureDetailDialog({ closure, operatorName }: Props) {
 
   const summaryByMethod = parseJsonMaybe<SummaryByMethod>(closure.detail?.summary);
   const rateSummary = parseJsonMaybe<RateSummary>(closure.detail?.rateSummary);
+  const additionalServiceSummary = parseJsonMaybe<ServiceSummary>(closure.detail?.additionalServiceSummary);
+  const subscriptionSummary = parseJsonMaybe<ServiceSummary>(closure.detail?.subscriptionSummary);
 
   return (
     <div className="max-h-[70vh] space-y-6 overflow-y-auto px-4">
@@ -188,6 +191,78 @@ export function ClosureDetailDialog({ closure, operatorName }: Props) {
                   </div>
                   <div className="text-right">
                     <ChronoValue size="sm">{formatCurrency(rateData?.total ?? null)}</ChronoValue>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Resumen de servicios adicionales */}
+      <div className="space-y-4 rounded-lg border border-border/60 bg-muted/40 p-4">
+        <ChronoSectionLabel size="md">Servicios adicionales</ChronoSectionLabel>
+
+        {!additionalServiceSummary || Object.keys(additionalServiceSummary).length === 0 ? (
+          <p className="text-sm text-muted-foreground">Sin servicios adicionales en este cierre.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <div className="min-w-[560px] space-y-2">
+              <div className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-background/40 p-3">
+                <span className="text-xs text-muted-foreground">Servicio</span>
+                <span className="text-xs text-muted-foreground">Cantidad</span>
+                <span className="text-right text-xs text-muted-foreground">Total</span>
+              </div>
+
+              {Object.entries(additionalServiceSummary).map(([serviceName, serviceData]) => (
+                <div
+                  key={serviceName}
+                  className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-card/60 p-3"
+                >
+                  <div>
+                    <ChronoValue size="sm">{serviceName}</ChronoValue>
+                  </div>
+                  <div>
+                    <ChronoValue size="sm">{String(serviceData?.count ?? 0)}</ChronoValue>
+                  </div>
+                  <div className="text-right">
+                    <ChronoValue size="sm">{formatCurrency(serviceData?.total ?? null)}</ChronoValue>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Resumen de suscripciones/mensualidades */}
+      <div className="space-y-4 rounded-lg border border-border/60 bg-muted/40 p-4">
+        <ChronoSectionLabel size="md">Suscripciones / Mensualidades</ChronoSectionLabel>
+
+        {!subscriptionSummary || Object.keys(subscriptionSummary).length === 0 ? (
+          <p className="text-sm text-muted-foreground">Sin pagos de suscripciones en este cierre.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <div className="min-w-[560px] space-y-2">
+              <div className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-background/40 p-3">
+                <span className="text-xs text-muted-foreground">Plan</span>
+                <span className="text-xs text-muted-foreground">Cantidad</span>
+                <span className="text-right text-xs text-muted-foreground">Total</span>
+              </div>
+
+              {Object.entries(subscriptionSummary).map(([planName, planData]) => (
+                <div
+                  key={planName}
+                  className="grid grid-cols-[minmax(240px,1fr)_120px_160px] gap-3 rounded-md border border-border/60 bg-card/60 p-3"
+                >
+                  <div>
+                    <ChronoValue size="sm">{planName}</ChronoValue>
+                  </div>
+                  <div>
+                    <ChronoValue size="sm">{String(planData?.count ?? 0)}</ChronoValue>
+                  </div>
+                  <div className="text-right">
+                    <ChronoValue size="sm">{formatCurrency(planData?.total ?? null)}</ChronoValue>
                   </div>
                 </div>
               ))}

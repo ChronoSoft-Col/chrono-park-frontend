@@ -9,7 +9,8 @@ export type IPaymentTicketHeaderEntity = {
 };
 
 export type IPaymentTicketDetailEntity = {
-  type: string;
+  /** Tipo de detalle: PARKING | ADDITIONAL_SERVICE | SUBSCRIPTION | OTHER */
+  type: "PARKING" | "ADDITIONAL_SERVICE" | "SUBSCRIPTION" | "OTHER";
   description: string;
   licensePlate: string;
   entryTime: string;

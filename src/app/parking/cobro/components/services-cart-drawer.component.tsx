@@ -365,6 +365,14 @@ export function ServicesCartDrawerComponent({
                         <ChronoBadge variant="outline" className="text-[10px]">
                           x{service.quantity}
                         </ChronoBadge>
+                        {service.status && (
+                          <ChronoBadge
+                            variant={service.status === "PAID" ? "success" : service.status === "CANCELLED" ? "destructive" : "secondary"}
+                            className="text-[10px]"
+                          >
+                            {service.status === "PENDING" ? "Pendiente" : service.status === "PAID" ? "Pagado" : "Cancelado"}
+                          </ChronoBadge>
+                        )}
                       </div>
                       {service.notes && (
                         <p className="text-xs text-muted-foreground truncate mt-0.5">

@@ -12,6 +12,10 @@ export interface IMonthlyPlanEntity {
   description?: string | null;
   vehicleTypeId: string;
   price: number;
+  /** Si el precio incluye impuestos */
+  taxIncluded: boolean;
+  /** Porcentaje de impuesto (ej: 19) */
+  taxPercent: number;
   isActive: boolean;
   createdAt?: Date | string;
   vehicleType?: {

@@ -31,7 +31,7 @@ export type IServiceReferenceEntity = {
 
 export type IPaymentDetailItemEntity = {
   id: string;
-  type: "PARKING" | "SERVICE";
+  type: "PARKING" | "SERVICE" | "OTHER";
   amount: number;
   taxableAmount: number;
   taxAmount: number;
