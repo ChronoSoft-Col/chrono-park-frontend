@@ -21,7 +21,7 @@ import { ChronoValue } from "@chrono/chrono-value.component";
 import EmptyState from "@/src/shared/components/empty-state.component";
 import { usePaymentContext } from "@/src/shared/context/payment.context";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 import { generatePaymentAction } from "@/src/app/parking/cobro/actions/generate-payment.action";
 import { toast } from "sonner";
 import { ChronoInput } from "@chrono/chrono-input.component";
@@ -47,7 +47,7 @@ type PaymentSectionProps = {
 export function PaymentSectionComponent({ className }: PaymentSectionProps) {
   const { validateRaw, clearValidateResult } = usePaymentContext();
   const { showYesNoDialog } = UseDialogContext();
-  const { paymentMethods } = useCommonContext();
+  const paymentMethods = useCommonStore((s) => s.paymentMethods);
   const { printPaymentTicketByPaymentId } = usePrint();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [amountReceived, setAmountReceived] = useState("");

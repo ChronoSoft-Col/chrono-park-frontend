@@ -33,7 +33,7 @@ import {
   CommandList,
 } from "@/src/shared/components/ui/command";
 
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 import {
   CreateSubscriptionForm,
   CreateSubscriptionSchema,
@@ -63,7 +63,7 @@ type Props = {
 };
 
 export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
-  const { vehicleTypes = [] } = useCommonContext();
+  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [monthlyPlans, setMonthlyPlans] = useState<IMonthlyPlanEntity[]>([]);
   const [loadingCustomers, setLoadingCustomers] = useState(false);

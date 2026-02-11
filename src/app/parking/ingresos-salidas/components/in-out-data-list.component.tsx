@@ -10,7 +10,7 @@ import { ChronoViewWithTableLayout } from "@chrono/chrono-view-with-table-layout
 
 import { createInOutColumns } from "./table/columns.component";
 import { UseDialogContext } from "@/src/shared/context/dialog.context";
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 import { InOutDetailDialogContent } from "./in-out-detail-dialog-content";
 import { ChangeRateDialogContent } from "./change-rate-dialog-content";
 import { ChangePlateDialogContent } from "./change-plate-dialog-content";
@@ -18,8 +18,14 @@ import { usePrint } from "@/src/shared/hooks/common/use-print.hook";
 import { toast } from "sonner";
 import ChronoButton from "@/src/shared/components/chrono-soft/chrono-button.component";
 import ChronoVehicleTypeSelect from "@/src/shared/components/chrono-soft/chrono-vehicle-type-select.component";
+import {
+  ChronoTabs,
+  ChronoTabsList,
+  ChronoTabsTrigger,
+} from "@chrono/chrono-tabs.component";
 import { getEntryTicketAction } from "../actions/get-entry-ticket.action";
 import { InOutStatusEnum } from "@/src/shared/enums/parking/in-out-status.enum";
+import { LogIn, LogOut } from "lucide-react";
 
 interface Props {
   items: IInOutEntity[];
@@ -42,7 +48,7 @@ export default function InOutDataListComponent({
   const [pending, startTransition] = React.useTransition();
 
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
-  const { vehicleTypes = [] } = useCommonContext();
+  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
   const { printIncomeReceipt } = usePrint();
   const errorShownRef = React.useRef(false);
 
@@ -220,22 +226,21 @@ export default function InOutDataListComponent({
       table={
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <ChronoButton
-              type="button"
-              variant={isEntriesTab ? "default" : "secondary"}
-              disabled={pending}
-              onClick={() => setStatus(InOutStatusEnum.ACTIVE)}
+            <ChronoTabs
+              value={currentStatus}
+              onValueChange={(value) => setStatus(value as InOutStatusEnum)}
             >
-              Entradas
-            </ChronoButton>
-            <ChronoButton
-              type="button"
-              variant={!isEntriesTab ? "default" : "secondary"}
-              disabled={pending}
-              onClick={() => setStatus(InOutStatusEnum.INACTIVE)}
-            >
-              Salidas
-            </ChronoButton>
+              <ChronoTabsList>
+                <ChronoTabsTrigger value={InOutStatusEnum.ACTIVE} disabled={pending}>
+                  <LogIn className="h-3.5 w-3.5" />
+                  Entradas
+                </ChronoTabsTrigger>
+                <ChronoTabsTrigger value={InOutStatusEnum.INACTIVE} disabled={pending}>
+                  <LogOut className="h-3.5 w-3.5" />
+                  Salidas
+                </ChronoTabsTrigger>
+              </ChronoTabsList>
+            </ChronoTabs>
 
             <div className="ml-auto w-60">
               <ChronoVehicleTypeSelect

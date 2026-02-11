@@ -13,12 +13,12 @@ export default async function ParkingLayout({ children }: PropsWithChildren) {
   return (
     <ParkingProviders>
       <SidebarComponent applications={applications} />
-      <ChronoSidebarInset className="min-w-0 overflow-x-hidden">
+      <ChronoSidebarInset className="min-w-0 overflow-hidden grid grid-rows-[auto_1fr_auto] h-screen p-0">
         <HeaderComponent />
-        <div className="flex flex-col min-w-0 w-full flex-1 px-4 sm:px-6 md:px-8 pt-16 pb-12 overflow-x-hidden relative">
+        <main className="overflow-y-auto overflow-x-hidden px-4 sm:px-6 md:px-8">
           <section className="max-w-full mx-auto w-full h-full">{children}</section>
-          <FooterComponent />
-        </div>
+        </main>
+        <FooterComponent />
       </ChronoSidebarInset>
     </ParkingProviders>
   );

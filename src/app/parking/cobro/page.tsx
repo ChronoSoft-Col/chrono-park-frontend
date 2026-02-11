@@ -8,7 +8,7 @@ export default function Page() {
   return (
     <section className="relative h-full max-h-full min-h-0">
       <SetupHeaderFilters showDatePicker={false} showDateRangePicker={false} showSearch={false} />
-      <div className="absolute right-0 top-0 z-10">
+      <div className="absolute my-auto z-10 top-14 right-0">
         <ServicesCartDrawerComponent />
       </div>
       
@@ -18,7 +18,7 @@ export default function Page() {
           <PaymentSectionComponent className="h-min min-h-0 min-w-0" />
         </div>
 
-        <QrDetailSectionComponent className="min-h-0 min-w-0" />
+        <QrDetailSectionComponent className="min-h-0 min-w-0 p-0.5" />
       </div>
     </section>
   );

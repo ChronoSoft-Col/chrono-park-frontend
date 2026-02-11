@@ -32,7 +32,7 @@ import ChronoButton from "@chrono/chrono-button.component";
 import { Settings2, X } from "lucide-react";
 
 import { usePaymentContext } from "@/src/shared/context/payment.context";
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 import { cn } from "@/src/lib/utils";
 import { useDebouncedCallback } from "use-debounce";
 import { getRateProfileAction } from "@/src/app/global-actions/get-common.action";
@@ -54,7 +54,7 @@ type QrSectionProps = {
 
 export function QrSectionComponent({ className }: QrSectionProps) {
   const { validateFee, clearValidateResult, validateRaw, isValidating } = usePaymentContext();
-  const { vehicleTypes = [] } = useCommonContext();
+  const vehicleTypes = useCommonStore((s) => s.vehicleTypes);
   
   // Pre-scan rate configuration state - one entry per vehicle type
   const [showRateConfig, setShowRateConfig] = useState(false);

@@ -21,7 +21,7 @@ import {
 import ChronoPlateInput from "@chrono/chrono-plate-input.component";
 import ChronoVehicleTypeSelect from "@chrono/chrono-vehicle-type-select.component";
 
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 import {
   CreateCustomerForm,
   CreateCustomerSchema,
@@ -38,7 +38,7 @@ type Props = {
 };
 
 export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
-  const { vehicleTypes = [], documentTypes = [] } = useCommonContext();
+  const { vehicleTypes, documentTypes } = useCommonStore();
 
   const form = useForm<CreateCustomerForm>({
     resolver: zodResolver(CreateCustomerSchema) as Resolver<CreateCustomerForm>,

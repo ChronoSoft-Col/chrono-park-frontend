@@ -10,7 +10,7 @@ import { CreditCard, Calculator, Loader2 } from "lucide-react";
 import { calculatePriceAction } from "../actions/calculate-price.action";
 import { paySubscriptionAction } from "../actions/pay-subscription.action";
 import { UseDialogContext } from "@/shared/context/dialog.context";
-import { useCommonContext } from "@/src/shared/context/common.context";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 import { usePrint } from "@/shared/hooks/common/use-print.hook";
 import { ISubscriptionEntity, IPriceCalculation } from "@/server/domain";
 import {
@@ -46,7 +46,7 @@ type Props = {
 export function PaySubscriptionDialogContent({ subscription }: Props) {
   const router = useRouter();
   const { closeDialog, showYesNoDialog } = UseDialogContext();
-  const { paymentMethods = [] } = useCommonContext();
+  const paymentMethods = useCommonStore((s) => s.paymentMethods);
   const { printPaymentTicketByPaymentId } = usePrint();
 
   const [priceCalculation, setPriceCalculation] = useState<IPriceCalculation | null>(null);
