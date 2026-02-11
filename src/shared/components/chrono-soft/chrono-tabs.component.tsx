@@ -53,7 +53,7 @@ function ChronoTabsTrigger({
     return (
         <TabsTrigger 
             className={cn(
-                "gap-2 flex-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
+                "gap-2 flex-none data-[state=active]:!bg-primary data-[state=active]:!text-primary-foreground",
                 className
             )} 
             {...props}

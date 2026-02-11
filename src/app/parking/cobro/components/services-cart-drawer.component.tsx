@@ -150,7 +150,7 @@ export function ServicesCartDrawerComponent({
           exitTime: new Date(),
         });
       }
-    } catch (error) {
+    } catch {
       toast.error("Error al agregar el servicio", { id: toastId });
     } finally {
       setIsAdding(false);
@@ -367,8 +367,8 @@ export function ServicesCartDrawerComponent({
                         </ChronoBadge>
                         {service.status && (
                           <ChronoBadge
-                            variant={service.status === "PAID" ? "success" : service.status === "CANCELLED" ? "destructive" : "secondary"}
-                            className="text-[10px]"
+                            variant={service.status === "CANCELLED" ? "destructive" : "secondary"}
+                            className={cn("text-[10px]", service.status === "PAID" && "border-green-500/40 bg-green-50 text-green-700")}
                           >
                             {service.status === "PENDING" ? "Pendiente" : service.status === "PAID" ? "Pagado" : "Cancelado"}
                           </ChronoBadge>
