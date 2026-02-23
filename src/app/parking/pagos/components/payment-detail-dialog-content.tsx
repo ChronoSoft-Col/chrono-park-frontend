@@ -39,6 +39,8 @@ const getDetailTypeLabel = (type: string) => {
       return "Parqueo";
     case "SERVICE":
       return "Servicio";
+    case "SUBSCRIPTION":
+      return "Suscripción";
     case "OTHER":
       return "Otro";
     default:
@@ -48,11 +50,11 @@ const getDetailTypeLabel = (type: string) => {
 
 const getDetailDescription = (detail: IPaymentItemEntity["details"][0]) => {
   if (!detail.reference) return null;
-  
+
   if ("name" in detail.reference) {
     return detail.reference.name;
   }
-  
+
   return null;
 };
 
@@ -79,7 +81,9 @@ export function PaymentDetailDialogContent({ item }: Props) {
           <ChronoSectionLabel size="base" className="tracking-[0.25em]">
             Pago
           </ChronoSectionLabel>
-          <ChronoValue size="xl">{formatCurrency(item.totalAmount)}</ChronoValue>
+          <ChronoValue size="xl">
+            {formatCurrency(item.totalAmount)}
+          </ChronoValue>
         </div>
         <ChronoBadge variant="outline" className="text-xs font-semibold">
           {item.status}
@@ -99,7 +103,10 @@ export function PaymentDetailDialogContent({ item }: Props) {
       <div className="space-y-3">
         <ChronoSectionLabel size="sm">Totales</ChronoSectionLabel>
         <dl className="grid gap-4 sm:grid-cols-3">
-          <InfoRow label="Base gravable" value={formatCurrency(item.taxableAmount)} />
+          <InfoRow
+            label="Base gravable"
+            value={formatCurrency(item.taxableAmount)}
+          />
           <InfoRow label="Impuestos" value={formatCurrency(item.taxAmount)} />
           <InfoRow label="Total" value={formatCurrency(item.totalAmount)} />
         </dl>
@@ -126,10 +133,14 @@ export function PaymentDetailDialogContent({ item }: Props) {
                         {typeLabel}
                       </ChronoBadge>
                       {description && (
-                        <span className="text-sm font-medium">{description}</span>
+                        <span className="text-sm font-medium">
+                          {description}
+                        </span>
                       )}
                     </div>
-                    <p className="text-sm font-semibold">{formatCurrency(detail.amount)}</p>
+                    <p className="text-sm font-semibold">
+                      {formatCurrency(detail.amount)}
+                    </p>
                   </div>
                   {detail.reference && "licensePlate" in detail.reference && (
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -161,7 +172,9 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </p>
-      <p className="text-base font-semibold text-foreground break-all">{value}</p>
+      <p className="text-base font-semibold text-foreground break-all">
+        {value}
+      </p>
     </div>
   );
 }

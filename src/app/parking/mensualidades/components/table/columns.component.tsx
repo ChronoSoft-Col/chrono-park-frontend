@@ -72,7 +72,7 @@ export const createSubscriptionColumns = (
   onViewHistory?: ViewHistoryHandler,
   onPay?: PayHandler,
   onCancel?: CancelHandler,
-  isCancelling?: IsCancellingHandler
+  isCancelling?: IsCancellingHandler,
 ): ChronoDataTableColumn<ISubscriptionEntity>[] => [
   {
     id: "customer",
@@ -93,7 +93,9 @@ export const createSubscriptionColumns = (
     cell: (row) => (
       <div>
         <p className="font-medium">{row.vehicle?.plateNumber || "-"}</p>
-        <p className="text-xs text-muted-foreground">{row.vehicle?.vehicleTypeName || "-"}</p>
+        <p className="text-xs text-muted-foreground">
+          {row.vehicle?.vehicleTypeName || "-"}
+        </p>
       </div>
     ),
   },
@@ -119,7 +121,10 @@ export const createSubscriptionColumns = (
     headerClassName: "text-center",
     cellClassName: "text-center",
     cell: (row) => (
-      <ChronoBadge variant="outline" className={getStatusBadgeStyles(row.status)}>
+      <ChronoBadge
+        variant="outline"
+        className={getStatusBadgeStyles(row.status)}
+      >
         {getStatusLabel(row.status)}
       </ChronoBadge>
     ),
@@ -132,32 +137,31 @@ export const createSubscriptionColumns = (
     cellClassName: "text-right",
     cell: (row) => {
       const expired = isExpiredSubscription(row);
-      const canPay = Boolean(onPay) && row.status === "PENDIENTE" && !expired;
+      const canPay = Boolean(onPay) && row.status !== "CANCELADA";
       const canCancel =
         Boolean(onCancel) &&
         (row.status === "PENDIENTE" ||
           row.status === "ACTIVA" ||
-          row.status === "PERIODO_GRACIA") &&
-        !expired;
+          row.status === "PERIODO_GRACIA");
       const cancelLoading = isCancelling?.(row) ?? false;
 
       const payDisabledReason = !onPay
         ? "Acción no disponible"
         : expired
-        ? "Mensualidad vencida"
-        : row.status !== "PENDIENTE"
-          ? "Solo disponible cuando está Pendiente"
-          : undefined;
+          ? "Mensualidad vencida"
+          : row.status === "CANCELADA"
+            ? "Mensualidad cancelada"
+            : undefined;
 
       const cancelDisabledReason = !onCancel
         ? "Acción no disponible"
         : expired
-        ? "Mensualidad vencida"
-        : row.status === "CANCELADA"
-          ? "Mensualidad cancelada"
-          : row.status === "INACTIVA"
-            ? "Mensualidad inactiva"
-            : undefined;
+          ? "Mensualidad vencida"
+          : row.status === "CANCELADA"
+            ? "Mensualidad cancelada"
+            : row.status === "INACTIVA"
+              ? "Mensualidad inactiva"
+              : undefined;
 
       return (
         <div className="flex justify-end gap-2">
@@ -174,7 +178,9 @@ export const createSubscriptionColumns = (
               </ChronoButton>
             </TooltipTrigger>
             <TooltipContent side="top">
-              {canPay ? "Pagar" : `No disponible: ${payDisabledReason ?? "Estado no permitido"}`}
+              {canPay
+                ? "Pagar"
+                : `No disponible: ${payDisabledReason ?? "Estado no permitido"}`}
             </TooltipContent>
           </Tooltip>
 
@@ -192,38 +198,40 @@ export const createSubscriptionColumns = (
               </ChronoButton>
             </TooltipTrigger>
             <TooltipContent side="top">
-              {canCancel ? "Cancelar" : `No disponible: ${cancelDisabledReason ?? "Estado no permitido"}`}
+              {canCancel
+                ? "Cancelar"
+                : `No disponible: ${cancelDisabledReason ?? "Estado no permitido"}`}
             </TooltipContent>
           </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <ChronoButton
-              type="button"
-              variant="secondary"
-              aria-label="Ver detalle"
-              onClick={() => onViewDetail?.(row)}
-            >
-              <Eye className="h-4 w-4" />
-            </ChronoButton>
-          </TooltipTrigger>
-          <TooltipContent side="top">Ver detalle</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                variant="secondary"
+                aria-label="Ver detalle"
+                onClick={() => onViewDetail?.(row)}
+              >
+                <Eye className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">Ver detalle</TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <ChronoButton
-              type="button"
-              variant="outline"
-              aria-label="Ver historial"
-              onClick={() => onViewHistory?.(row)}
-            >
-              <History className="h-4 w-4" />
-            </ChronoButton>
-          </TooltipTrigger>
-          <TooltipContent side="top">Ver historial de pagos</TooltipContent>
-        </Tooltip>
-      </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                variant="outline"
+                aria-label="Ver historial"
+                onClick={() => onViewHistory?.(row)}
+              >
+                <History className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">Ver historial de pagos</TooltipContent>
+          </Tooltip>
+        </div>
       );
     },
   },

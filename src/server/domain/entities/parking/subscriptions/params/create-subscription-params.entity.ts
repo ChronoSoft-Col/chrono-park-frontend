@@ -3,6 +3,9 @@ export interface ICreateSubscriptionParamsEntity {
   customerId: string;
   monthlyPlanId: string;
   vehicleId?: string;
+  startDate?: string;
+  endDate?: string;
+  vehicleTypeRestricted?: boolean;
 }
 
 // Parámetros para pagar una suscripción
