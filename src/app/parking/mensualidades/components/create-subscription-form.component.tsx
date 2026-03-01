@@ -2,8 +2,17 @@
 
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Save, X, Loader2, ChevronsUpDown, Check } from "lucide-react";
+import {
+  Save,
+  X,
+  Loader2,
+  ChevronsUpDown,
+  Check,
+  CalendarIcon,
+} from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 import ChronoButton from "@chrono/chrono-button.component";
 import {
@@ -32,6 +41,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/src/shared/components/ui/command";
+import { Calendar } from "@/src/shared/components/ui/calendar";
+import { Checkbox } from "@/src/shared/components/ui/checkbox";
 
 import { useCommonStore } from "@/src/shared/stores/common.store";
 import {
@@ -70,18 +81,28 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
   const [loadingPlans, setLoadingPlans] = useState(false);
   const [customerSearch, setCustomerSearch] = useState("");
   const [selectedVehicleType, setSelectedVehicleType] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerOption | null>(null);
-  const [filteredVehicles, setFilteredVehicles] = useState<ICustomerVehicleEntity[]>([]);
+  const [selectedCustomer, setSelectedCustomer] =
+    useState<CustomerOption | null>(null);
+  const [filteredVehicles, setFilteredVehicles] = useState<
+    ICustomerVehicleEntity[]
+  >([]);
   const [customerPopoverOpen, setCustomerPopoverOpen] = useState(false);
+  const [startDatePopoverOpen, setStartDatePopoverOpen] = useState(false);
+  const [endDatePopoverOpen, setEndDatePopoverOpen] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const form = useForm<CreateSubscriptionForm>({
-    resolver: zodResolver(CreateSubscriptionSchema) as Resolver<CreateSubscriptionForm>,
+    resolver: zodResolver(
+      CreateSubscriptionSchema,
+    ) as Resolver<CreateSubscriptionForm>,
     mode: "onChange",
     defaultValues: {
       customerId: "",
       monthlyPlanId: "",
       vehicleId: "",
+      startDate: "",
+      endDate: "",
+      vehicleTypeRestricted: false,
     },
   });
 
@@ -110,7 +131,7 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
             name: `${c.firstName} ${c.lastName}`,
             documentNumber: c.documentNumber,
             vehicles: c.vehicles || [],
-          }))
+          })),
         );
       }
     } catch (error) {
@@ -121,17 +142,20 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
   }, []);
 
   // Debounce para búsqueda de clientes en el Command
-  const handleCustomerSearchChange = useCallback((value: string) => {
-    setCustomerSearch(value);
-    
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-    
-    searchTimeoutRef.current = setTimeout(() => {
-      searchCustomers(value);
-    }, 500);
-  }, [searchCustomers]);
+  const handleCustomerSearchChange = useCallback(
+    (value: string) => {
+      setCustomerSearch(value);
+
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      searchTimeoutRef.current = setTimeout(() => {
+        searchCustomers(value);
+      }, 500);
+    },
+    [searchCustomers],
+  );
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -150,7 +174,7 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
         .then((response) => {
           if (response.success && response.data?.data) {
             setMonthlyPlans(
-              Array.isArray(response.data.data) ? response.data.data : []
+              Array.isArray(response.data.data) ? response.data.data : [],
             );
           } else {
             setMonthlyPlans([]);
@@ -168,7 +192,7 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
   useEffect(() => {
     if (selectedCustomer && selectedVehicleType) {
       const vehicles = selectedCustomer.vehicles.filter(
-        (v) => v.vehicleTypeId === selectedVehicleType && v.isActive
+        (v) => v.vehicleTypeId === selectedVehicleType && v.isActive,
       );
       setFilteredVehicles(vehicles);
     } else if (selectedCustomer) {
@@ -188,10 +212,12 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
   };
 
   const handleFormSubmit = handleSubmit(async (data) => {
-    // Limpiar vehicleId si está vacío
+    // Limpiar campos opcionales vacíos
     const cleanData = {
       ...data,
       vehicleId: data.vehicleId || undefined,
+      startDate: data.startDate || undefined,
+      endDate: data.endDate || undefined,
     };
     await onSubmit(cleanData);
   });
@@ -216,12 +242,21 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
           control={control}
           name="customerId"
           render={({ field, fieldState }) => (
-            <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-              <ChronoFieldLabel htmlFor="customerId" className={fieldLabelClasses}>
+            <ChronoField
+              data-invalid={fieldState.invalid}
+              className={fieldContainerClasses}
+            >
+              <ChronoFieldLabel
+                htmlFor="customerId"
+                className={fieldLabelClasses}
+              >
                 Cliente
               </ChronoFieldLabel>
 
-              <Popover open={customerPopoverOpen} onOpenChange={setCustomerPopoverOpen}>
+              <Popover
+                open={customerPopoverOpen}
+                onOpenChange={setCustomerPopoverOpen}
+              >
                 <PopoverTrigger asChild>
                   <button
                     type="button"
@@ -246,15 +281,23 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
                       {loadingCustomers && (
                         <div className="flex items-center justify-center py-6">
                           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                          <span className="ml-2 text-xs text-muted-foreground">Buscando...</span>
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            Buscando...
+                          </span>
                         </div>
                       )}
                       {!loadingCustomers && customerSearch.length < 2 && (
-                        <CommandEmpty>Escribe al menos 2 caracteres para buscar</CommandEmpty>
+                        <CommandEmpty>
+                          Escribe al menos 2 caracteres para buscar
+                        </CommandEmpty>
                       )}
-                      {!loadingCustomers && customerSearch.length >= 2 && customers.length === 0 && (
-                        <CommandEmpty>No se encontraron clientes</CommandEmpty>
-                      )}
+                      {!loadingCustomers &&
+                        customerSearch.length >= 2 &&
+                        customers.length === 0 && (
+                          <CommandEmpty>
+                            No se encontraron clientes
+                          </CommandEmpty>
+                        )}
                       {!loadingCustomers && customers.length > 0 && (
                         <CommandGroup>
                           {customers.map((customer) => (
@@ -268,13 +311,18 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
                             >
                               <Check
                                 className={`mr-2 h-4 w-4 ${
-                                  field.value === customer.id ? "opacity-100" : "opacity-0"
+                                  field.value === customer.id
+                                    ? "opacity-100"
+                                    : "opacity-0"
                                 }`}
                               />
                               <div className="flex flex-col">
-                                <span className="font-medium">{customer.name}</span>
+                                <span className="font-medium">
+                                  {customer.name}
+                                </span>
                                 <span className="text-xs text-muted-foreground">
-                                  {customer.documentNumber} • {customer.vehicles.length} vehículo(s)
+                                  {customer.documentNumber} •{" "}
+                                  {customer.vehicles.length} vehículo(s)
                                 </span>
                               </div>
                             </CommandItem>
@@ -286,7 +334,9 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
                 </PopoverContent>
               </Popover>
 
-              {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
+              {fieldState.invalid && (
+                <ChronoFieldError errors={[fieldState.error]} />
+              )}
             </ChronoField>
           )}
         />
@@ -302,13 +352,19 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
 
         <div className="grid gap-3 md:grid-cols-2">
           <ChronoField className={fieldContainerClasses}>
-            <ChronoFieldLabel htmlFor="vehicleTypeFilter" className={fieldLabelClasses}>
+            <ChronoFieldLabel
+              htmlFor="vehicleTypeFilter"
+              className={fieldLabelClasses}
+            >
               Tipo de vehículo
             </ChronoFieldLabel>
             <ChronoVehicleTypeSelect
               value={selectedVehicleType}
               onValueChange={setSelectedVehicleType}
-              options={vehicleTypes.map((vt) => ({ value: vt.value, label: vt.label }))}
+              options={vehicleTypes.map((vt) => ({
+                value: vt.value,
+                label: vt.label,
+              }))}
               className="mt-1"
             />
           </ChronoField>
@@ -317,8 +373,14 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
             control={control}
             name="monthlyPlanId"
             render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="monthlyPlanId" className={fieldLabelClasses}>
+              <ChronoField
+                data-invalid={fieldState.invalid}
+                className={fieldContainerClasses}
+              >
+                <ChronoFieldLabel
+                  htmlFor="monthlyPlanId"
+                  className={fieldLabelClasses}
+                >
                   Plan mensual
                 </ChronoFieldLabel>
 
@@ -333,8 +395,8 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
                         loadingPlans
                           ? "Cargando..."
                           : monthlyPlans.length === 0
-                          ? "Seleccione tipo de vehículo primero"
-                          : "Seleccionar plan"
+                            ? "Seleccione tipo de vehículo primero"
+                            : "Seleccionar plan"
                       }
                     />
                   </ChronoSelectTrigger>
@@ -347,11 +409,192 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
                   </ChronoSelectContent>
                 </ChronoSelect>
 
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <ChronoFieldError errors={[fieldState.error]} />
+                )}
               </ChronoField>
             )}
           />
         </div>
+      </div>
+
+      <ChronoSeparator />
+
+      {/* Date Range Section (Optional) */}
+      <div className="space-y-4">
+        <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+          Fechas (Opcional)
+        </ChronoSectionLabel>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <Controller
+            control={control}
+            name="startDate"
+            render={({ field, fieldState }) => (
+              <ChronoField
+                data-invalid={fieldState.invalid}
+                className={fieldContainerClasses}
+              >
+                <ChronoFieldLabel
+                  htmlFor="startDate"
+                  className={fieldLabelClasses}
+                >
+                  Fecha de inicio
+                </ChronoFieldLabel>
+                <Popover
+                  open={startDatePopoverOpen}
+                  onOpenChange={setStartDatePopoverOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="mt-1 flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {field.value ? (
+                        format(
+                          new Date(field.value + "T00:00:00"),
+                          "dd/MM/yyyy",
+                          { locale: es },
+                        )
+                      ) : (
+                        <span className="text-muted-foreground">
+                          Seleccionar fecha inicio
+                        </span>
+                      )}
+                      <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        field.value
+                          ? new Date(field.value + "T00:00:00")
+                          : undefined
+                      }
+                      onSelect={(date) => {
+                        if (date) {
+                          field.onChange(format(date, "yyyy-MM-dd"));
+                        } else {
+                          field.onChange("");
+                        }
+                        setStartDatePopoverOpen(false);
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                {fieldState.invalid && (
+                  <ChronoFieldError errors={[fieldState.error]} />
+                )}
+              </ChronoField>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field, fieldState }) => (
+              <ChronoField
+                data-invalid={fieldState.invalid}
+                className={fieldContainerClasses}
+              >
+                <ChronoFieldLabel
+                  htmlFor="endDate"
+                  className={fieldLabelClasses}
+                >
+                  Fecha de fin
+                </ChronoFieldLabel>
+                <Popover
+                  open={endDatePopoverOpen}
+                  onOpenChange={setEndDatePopoverOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="mt-1 flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {field.value ? (
+                        format(
+                          new Date(field.value + "T00:00:00"),
+                          "dd/MM/yyyy",
+                          { locale: es },
+                        )
+                      ) : (
+                        <span className="text-muted-foreground">
+                          Seleccionar fecha fin
+                        </span>
+                      )}
+                      <CalendarIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        field.value
+                          ? new Date(field.value + "T00:00:00")
+                          : undefined
+                      }
+                      onSelect={(date) => {
+                        if (date) {
+                          field.onChange(format(date, "yyyy-MM-dd"));
+                        } else {
+                          field.onChange("");
+                        }
+                        setEndDatePopoverOpen(false);
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                {fieldState.invalid && (
+                  <ChronoFieldError errors={[fieldState.error]} />
+                )}
+              </ChronoField>
+            )}
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Las fechas son opcionales. Formato esperado: YYYY-MM-DD.
+        </p>
+      </div>
+
+      <ChronoSeparator />
+
+      {/* Vehicle Type Restriction */}
+      <div className="space-y-4">
+        <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
+          Restricciones
+        </ChronoSectionLabel>
+
+        <Controller
+          control={control}
+          name="vehicleTypeRestricted"
+          render={({ field }) => (
+            <ChronoField className={fieldContainerClasses}>
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="vehicleTypeRestricted"
+                  checked={field.value}
+                  onCheckedChange={(checked) =>
+                    field.onChange(Boolean(checked))
+                  }
+                />
+                <ChronoFieldLabel
+                  htmlFor="vehicleTypeRestricted"
+                  className="text-sm font-medium cursor-pointer select-none"
+                >
+                  Restricción por tipo de vehículo
+                </ChronoFieldLabel>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Si se activa, la suscripción estará restringida al tipo de
+                vehículo seleccionado.
+              </p>
+            </ChronoField>
+          )}
+        />
       </div>
 
       <ChronoSeparator />
@@ -367,8 +610,14 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
             control={control}
             name="vehicleId"
             render={({ field, fieldState }) => (
-              <ChronoField data-invalid={fieldState.invalid} className={fieldContainerClasses}>
-                <ChronoFieldLabel htmlFor="vehicleId" className={fieldLabelClasses}>
+              <ChronoField
+                data-invalid={fieldState.invalid}
+                className={fieldContainerClasses}
+              >
+                <ChronoFieldLabel
+                  htmlFor="vehicleId"
+                  className={fieldLabelClasses}
+                >
                   Vehículo del cliente
                 </ChronoFieldLabel>
                 <ChronoSelect
@@ -382,8 +631,8 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
                         !selectedCustomer
                           ? "Seleccione un cliente primero"
                           : filteredVehicles.length === 0
-                          ? "No hay vehículos disponibles"
-                          : "Seleccionar vehículo (opcional)"
+                            ? "No hay vehículos disponibles"
+                            : "Seleccionar vehículo (opcional)"
                       }
                     />
                   </ChronoSelectTrigger>
@@ -395,13 +644,20 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
                     ))}
                   </ChronoSelectContent>
                 </ChronoSelect>
-                {fieldState.invalid && <ChronoFieldError errors={[fieldState.error]} />}
+                {fieldState.invalid && (
+                  <ChronoFieldError errors={[fieldState.error]} />
+                )}
               </ChronoField>
             )}
           />
         </div>
         <p className="text-xs text-muted-foreground">
-          El vehículo es opcional. Solo se muestran vehículos activos del cliente{selectedVehicleType ? " que coinciden con el tipo de vehículo seleccionado" : ""}.
+          El vehículo es opcional. Solo se muestran vehículos activos del
+          cliente
+          {selectedVehicleType
+            ? " que coinciden con el tipo de vehículo seleccionado"
+            : ""}
+          .
         </p>
       </div>
 

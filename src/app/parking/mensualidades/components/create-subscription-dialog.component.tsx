@@ -30,18 +30,25 @@ export function CreateSubscriptionDialogContent() {
         customerId: parsed.data.customerId,
         monthlyPlanId: parsed.data.monthlyPlanId,
         vehicleId: parsed.data.vehicleId || undefined,
+        startDate: parsed.data.startDate || undefined,
+        endDate: parsed.data.endDate || undefined,
+        vehicleTypeRestricted: parsed.data.vehicleTypeRestricted,
       };
 
       const result = await createSubscriptionAction(payload);
       if (!result.success || !result.data?.success) {
         toast.error(
-          result.error || result.data?.message || "Error al crear la suscripción",
-          { id: toastId }
+          result.error ||
+            result.data?.message ||
+            "Error al crear la suscripción",
+          { id: toastId },
         );
         return false;
       }
 
-      toast.success("Suscripción creada correctamente. Proceda al pago.", { id: toastId });
+      toast.success("Suscripción creada correctamente. Proceda al pago.", {
+        id: toastId,
+      });
       closeDialog();
       router.refresh();
       return true;
@@ -52,5 +59,10 @@ export function CreateSubscriptionDialogContent() {
     }
   };
 
-  return <CreateSubscriptionFormComponent onSubmit={handleSubmit} onCancel={closeDialog} />;
+  return (
+    <CreateSubscriptionFormComponent
+      onSubmit={handleSubmit}
+      onCancel={closeDialog}
+    />
+  );
 }
