@@ -65,10 +65,22 @@ export function StayDurationChartComponent() {
               <ChartTooltip
                 content={
                   <ChartTooltipContent
-                    formatter={(value, _name, item) => {
-                      const percentage = item?.payload?.percentage;
-                      return `${(value as number).toLocaleString("es-CO")} (${percentage?.toFixed(1)}%)`;
-                    }}
+                    formatter={(value, name, item) => (
+                      <>
+                        <div
+                          className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                          style={{ backgroundColor: (item.color || item.payload?.fill || "currentColor") as string }}
+                        />
+                        <div className="flex flex-1 justify-between items-center gap-2">
+                          <span className="text-muted-foreground">
+                            {chartConfig[name as keyof typeof chartConfig]?.label || name}
+                          </span>
+                          <span className="text-foreground font-mono font-medium tabular-nums">
+                            {`${(value as number).toLocaleString("es-CO")} (${item.payload?.percentage?.toFixed(1)}%)`}
+                          </span>
+                        </div>
+                      </>
+                    )}
                   />
                 }
               />

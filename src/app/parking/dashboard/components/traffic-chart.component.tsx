@@ -81,7 +81,13 @@ export function TrafficChartComponent() {
                 tickFormatter={formatDateLabel}
               />
               <YAxis tickLine={false} axisLine={false} tickMargin={8} />
-              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    labelFormatter={(label) => formatDateLabel(label as string)}
+                  />
+                }
+              />
               <ChartLegend content={<ChartLegendContent />} />
               <Area
                 dataKey="entries"

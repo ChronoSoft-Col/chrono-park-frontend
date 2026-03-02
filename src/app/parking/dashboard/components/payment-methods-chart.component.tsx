@@ -74,7 +74,22 @@ export function PaymentMethodsChartComponent() {
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      formatter={(value) => formatCurrency(value as number)}
+                      hideLabel
+                      nameKey="method"
+                      formatter={(value, name, item) => (
+                        <>
+                          <div
+                            className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                            style={{ backgroundColor: (item.payload?.fill || item.color || "currentColor") as string }}
+                          />
+                          <div className="flex flex-1 justify-between items-center gap-2">
+                            <span className="text-muted-foreground">{name}</span>
+                            <span className="text-foreground font-mono font-medium tabular-nums">
+                              {formatCurrency(value as number)}
+                            </span>
+                          </div>
+                        </>
+                      )}
                     />
                   }
                 />

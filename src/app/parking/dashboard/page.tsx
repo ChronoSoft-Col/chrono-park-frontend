@@ -30,6 +30,7 @@ export default function DashboardPage() {
           Dashboard
         </span>
       }
+      showAsCard={false}
       description="Resumen operativo y analíticas del estacionamiento"
       filters={<DashboardDateFilterComponent />}
       contentClassName="space-y-6 p-6"

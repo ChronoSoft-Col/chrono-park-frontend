@@ -16,7 +16,13 @@ import {
   ChartLegendContent,
   type ChartConfig,
 } from "@/src/shared/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { Skeleton } from "@/src/shared/components/ui/skeleton";
 
 const chartConfig = {
@@ -56,7 +62,17 @@ export function PeakHoursChartComponent() {
         )}
         {!isLoadingPeakHours && !errorPeakHours && peakHours && (
           <ChartContainer config={chartConfig} className="h-[300px] w-full">
-            <BarChart data={peakHours.hourlyAverage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <AreaChart data={peakHours.hourlyAverage} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="fillAvgEntries" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--color-avgEntries)" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="var(--color-avgEntries)" stopOpacity={0.05} />
+                </linearGradient>
+                <linearGradient id="fillAvgOccupancy" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--color-avgOccupancy)" stopOpacity={0.4} />
+                  <stop offset="95%" stopColor="var(--color-avgOccupancy)" stopOpacity={0.05} />
+                </linearGradient>
+              </defs>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="hour"
@@ -74,19 +90,21 @@ export function PeakHoursChartComponent() {
                 }
               />
               <ChartLegend content={<ChartLegendContent />} />
-              <Bar
+              <Area
                 dataKey="avgEntries"
-                fill="var(--color-avgEntries)"
-                radius={[4, 4, 0, 0]}
-                barSize={12}
+                type="monotone"
+                fill="url(#fillAvgEntries)"
+                stroke="var(--color-avgEntries)"
+                strokeWidth={2}
               />
-              <Bar
+              <Area
                 dataKey="avgOccupancy"
-                fill="var(--color-avgOccupancy)"
-                radius={[4, 4, 0, 0]}
-                barSize={12}
+                type="monotone"
+                fill="url(#fillAvgOccupancy)"
+                stroke="var(--color-avgOccupancy)"
+                strokeWidth={2}
               />
-            </BarChart>
+            </AreaChart>
           </ChartContainer>
         )}
       </ChronoCardContent>

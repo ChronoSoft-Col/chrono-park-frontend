@@ -91,10 +91,25 @@ export function TransactionsChartComponent() {
               <ChartTooltip
                 content={
                   <ChartTooltipContent
-                    formatter={(value, name) => {
-                      if (name === "revenue") return formatCurrency(value as number);
-                      return (value as number).toLocaleString("es-CO");
-                    }}
+                    labelFormatter={(label) => formatDateLabel(label as string)}
+                    formatter={(value, name, item) => (
+                      <>
+                        <div
+                          className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                          style={{ backgroundColor: (item.color || "currentColor") as string }}
+                        />
+                        <div className="flex flex-1 justify-between items-center gap-2">
+                          <span className="text-muted-foreground">
+                            {chartConfig[name as keyof typeof chartConfig]?.label || name}
+                          </span>
+                          <span className="text-foreground font-mono font-medium tabular-nums">
+                            {name === "revenue"
+                              ? formatCurrency(value as number)
+                              : (value as number).toLocaleString("es-CO")}
+                          </span>
+                        </div>
+                      </>
+                    )}
                   />
                 }
               />

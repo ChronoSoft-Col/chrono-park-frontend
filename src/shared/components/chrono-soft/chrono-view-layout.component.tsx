@@ -20,6 +20,7 @@ export type ChronoViewLayoutProps = {
   className?: string;
   headerClassName?: string;
   contentClassName?: string;
+  showAsCard?: boolean;
 };
 
 export function ChronoViewLayout({
@@ -31,6 +32,7 @@ export function ChronoViewLayout({
   className,
   headerClassName,
   contentClassName,
+  showAsCard = true,
 }: ChronoViewLayoutProps) {
   return (
     <section className={cn("space-y-6", className)}>
@@ -62,7 +64,7 @@ export function ChronoViewLayout({
 
       <div
         className={cn(
-          "rounded-3xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur",
+          showAsCard ? "rounded-3xl border border-border/60 bg-card/80 p-4 shadow-sm backdrop-blur" : "",
           contentClassName,
         )}
       >
