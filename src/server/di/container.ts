@@ -12,6 +12,7 @@ import {
   PaymentUsecase,
   SubscriptionUsecase,
   SessionServiceUsecase,
+  DashboardUsecase,
 } from "@/server/domain";
 import {
   CommonDatasourceService,
@@ -26,6 +27,8 @@ import {
   ManualControlRepositoryImp,
   PaymentDatasourceService,
   PaymentRepositoryImp,
+  DashboardDatasourceService,
+  DashboardRepositoryImp,
 } from "@/server/infrastructure";
 import { ClosureDatasourceService } from "@/server/infrastructure/datasources/parking/closure-datasource.service";
 import { ClosureRepositoryImpl } from "@/server/infrastructure/repositories/parking/closure.repository-imp";
@@ -166,6 +169,23 @@ if (!container.isRegistered(SERVER_TOKENS.SessionServiceRepository)) {
 
 if (!container.isRegistered(SERVER_TOKENS.SessionServiceUsecase)) {
   container.register(SERVER_TOKENS.SessionServiceUsecase, { useClass: SessionServiceUsecase });
+}
+
+// Dashboard
+if (!container.isRegistered(SERVER_TOKENS.DashboardDatasourceService)) {
+  container.register(SERVER_TOKENS.DashboardDatasourceService, {
+    useClass: DashboardDatasourceService,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.DashboardRepository)) {
+  container.register(SERVER_TOKENS.DashboardRepository, {
+    useClass: DashboardRepositoryImp,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.DashboardUsecase)) {
+  container.register(SERVER_TOKENS.DashboardUsecase, { useClass: DashboardUsecase });
 }
 
 // set-company bindings removed (companies flow deprecated)

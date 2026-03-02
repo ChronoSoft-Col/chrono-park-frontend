@@ -8,6 +8,7 @@ export * from "./repositories/parking/customer.repository"
 export * from "./repositories/parking/closure.repository"
 export * from "./repositories/parking/subscription.repository"
 export * from "./repositories/parking/session-service.repository"
+export * from "./repositories/parking/dashboard.repository"
 
 //USE CASES
 export * from "./usecases/auth/login.usecase";
@@ -19,6 +20,7 @@ export * from "./usecases/parking/customer.usecase";
 export * from "./usecases/parking/closure.usecase";
 export * from "./usecases/parking/subscription.usecase";
 export * from "./usecases/parking/session-service.usecase";
+export * from "./usecases/parking/dashboard.usecase";
 
 //ENTITIES
 export * from "./entities/auth/response/get-permissions-response.entity";
@@ -71,3 +73,5 @@ export * from "./entities/parking/subscriptions/response/monthly-plan-response.e
 export * from "./entities/parking/subscriptions/response/billing-response.entity"
 
 export * from "./entities/parking/session-services"
+
+export * from "./entities/parking/dashboard"
