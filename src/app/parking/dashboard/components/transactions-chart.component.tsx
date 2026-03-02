@@ -12,6 +12,8 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
   type ChartConfig,
 } from "@/src/shared/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, Line, ComposedChart, XAxis, YAxis } from "recharts";
@@ -96,6 +98,7 @@ export function TransactionsChartComponent() {
                   />
                 }
               />
+              <ChartLegend content={<ChartLegendContent />} />
               <Bar yAxisId="left" dataKey="count" fill="var(--color-count)" radius={[4, 4, 0, 0]} barSize={20} />
               <Line
                 yAxisId="right"

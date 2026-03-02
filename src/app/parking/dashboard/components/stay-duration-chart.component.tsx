@@ -12,6 +12,8 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
   type ChartConfig,
 } from "@/src/shared/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
@@ -70,6 +72,7 @@ export function StayDurationChartComponent() {
                   />
                 }
               />
+              <ChartLegend content={<ChartLegendContent />} />
               <Bar
                 dataKey="count"
                 fill="var(--color-count)"

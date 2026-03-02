@@ -12,6 +12,8 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
   type ChartConfig,
 } from "@/src/shared/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
@@ -71,6 +73,7 @@ export function PeakHoursChartComponent() {
                   />
                 }
               />
+              <ChartLegend content={<ChartLegendContent />} />
               <Bar
                 dataKey="avgEntries"
                 fill="var(--color-avgEntries)"
