@@ -57,6 +57,10 @@ export async function loginAction(
     const applications = (payload["applications"] as TApplication[]) || [];
     const role = (payload["role"] as { id: string; name: string }) || null;
 
+    console.log("Login exitoso, creando sesión para usuario:", sessionUser);
+    console.log("Tokens obtenidos:", tokens);
+    console.log("Aplicaciones del usuario:", applications);
+
     await createSession({
       user: sessionUser,
       permissions: null,
