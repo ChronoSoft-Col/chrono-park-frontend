@@ -25,4 +25,8 @@ export class ClosureUsecase {
   async getClosureById(id: string): Promise<IClosureEntity> {
     return this.closureRepository.getClosureById(id);
   }
+
+  async sendReport(id: string): Promise<{ message: string }> {
+    return this.closureRepository.sendReport(id);
+  }
 }

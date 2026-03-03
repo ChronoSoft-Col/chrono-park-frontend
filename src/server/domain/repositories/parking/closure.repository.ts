@@ -8,4 +8,5 @@ export abstract class ClosureRepository {
   abstract createClosure(params: ICloseClosureParamsEntity): Promise<IClosureEntity>;
   abstract listClosures(params: IListClosureParamsEntity): Promise<IListClosureResponseEntity>;
   abstract getClosureById(id: string): Promise<IClosureEntity>;
+  abstract sendReport(id: string): Promise<{ message: string }>;
 }

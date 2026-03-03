@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { ClosureDetailDialog } from "./closure-detail-dialog.component";
 import { createClosureColumns } from "./table/columns.component";
 import { getClosureByIdAction } from "../actions/get-closure-by-id.action";
+import { sendClosureReportAction } from "../actions/send-closure-report.action";
 import { toast } from "sonner";
 import ChronoButton from "@chrono/chrono-button.component";
 import { Plus } from "lucide-react";
@@ -90,6 +91,7 @@ export default function ClosureDataListComponent({
   const { printClosureReceipt } = usePrint();
   const detailRequestInFlightRef = useRef(false);
   const printRequestInFlightRef = useRef(false);
+  const sendEmailRequestInFlightRef = useRef(false);
   const errorShownRef = useRef(false);
 
   useEffect(() => {
@@ -186,9 +188,38 @@ export default function ClosureDataListComponent({
     });
   }, [printClosureReceipt, showYesNoDialog]);
 
+  const handleSendEmail = useCallback((closure: IClosureListItemEntity) => {
+    if (sendEmailRequestInFlightRef.current) return;
+
+    showYesNoDialog({
+      title: "Enviar reporte por correo",
+      description: "Se enviará el reporte de este cierre al correo electrónico configurado.",
+      iconVariant: "warning",
+      handleYes: async () => {
+        sendEmailRequestInFlightRef.current = true;
+        const toastId = toast.loading("Enviando reporte por correo...");
+        try {
+          const res = await sendClosureReportAction(closure.id);
+          if (!res.success) {
+            toast.error(res.error || "No se pudo enviar el reporte", { id: toastId });
+            return;
+          }
+
+          toast.success(res.data?.message || "Reporte enviado correctamente", { id: toastId });
+        } catch (error) {
+          console.error("Error sending closure report:", error);
+          toast.error("Error inesperado al enviar el reporte", { id: toastId });
+        } finally {
+          sendEmailRequestInFlightRef.current = false;
+        }
+      },
+      handleNo: async () => {},
+    });
+  }, [showYesNoDialog]);
+
   const columns = useMemo(
-    () => createClosureColumns(handleViewDetail, handlePrint),
-    [handlePrint, handleViewDetail]
+    () => createClosureColumns(handleViewDetail, handlePrint, handleSendEmail),
+    [handlePrint, handleSendEmail, handleViewDetail]
   );
 
   const safeTotalPages = Math.max(1, totalPages || Math.ceil(total / pageSize) || 1);

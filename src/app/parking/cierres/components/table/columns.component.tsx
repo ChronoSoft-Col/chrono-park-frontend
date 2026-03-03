@@ -2,7 +2,7 @@
 
 import { IClosureListItemEntity } from "@/server/domain/entities/parking/closures/closure-list-item.entity";
 import { ChronoDataTableColumn } from "@/src/shared/components/chrono-soft/chrono-data-table.component";
-import { Eye, Printer } from "lucide-react";
+import { Eye, Mail, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import ChronoButton from "@chrono/chrono-button.component";
@@ -20,10 +20,12 @@ const formatDateTime = (value?: string | null) => {
 
 type ViewDetailHandler = (closure: IClosureListItemEntity) => void;
 type PrintHandler = (closure: IClosureListItemEntity) => void;
+type SendEmailHandler = (closure: IClosureListItemEntity) => void;
 
 export const createClosureColumns = (
   onViewDetail?: ViewDetailHandler,
-  onPrint?: PrintHandler
+  onPrint?: PrintHandler,
+  onSendEmail?: SendEmailHandler
 ): ChronoDataTableColumn<IClosureListItemEntity>[] => [
   {
     id: "closure-type",
@@ -80,6 +82,20 @@ export const createClosureColumns = (
               icon={<Printer className="h-4 w-4" />}
             >
               Imprimir
+            </ChronoButton>
+          </PermissionGuard>
+        ) : null}
+
+        {onSendEmail ? (
+          <PermissionGuard action={CierresAction.VER_DETALLE_CIERRE} hidden>
+            <ChronoButton
+              variant="outline"
+              size="sm"
+              onClick={() => onSendEmail(row)}
+              className="text-xs font-semibold"
+              icon={<Mail className="h-4 w-4" />}
+            >
+              Enviar
             </ChronoButton>
           </PermissionGuard>
         ) : null}
