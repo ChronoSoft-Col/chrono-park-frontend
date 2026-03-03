@@ -39,6 +39,8 @@ export type IPrintPaymentTicketContentEntity = {
   company: ICompanyInfoEntity;
   headerMessage?: string;
   header: IPaymentTicketHeaderEntity;
+  customerName?: string;
+  customerIdentificationNumber?: string;
   details: IPaymentTicketDetailEntity[];
   totals: IPaymentTicketTotalEntity;
   bodyMessage?: string;

@@ -493,6 +493,29 @@ export class PrintUsecase {
       ops,
       this.lr("Fecha:", this.safe(ticket.header?.paymentDate), this.LINE_WIDTH),
     );
+
+    // Cliente
+    if (ticket.customerIdentificationNumber) {
+      this.pushLine(
+        ops,
+        this.lr(
+          "NIT/CC:",
+          this.safe(ticket.customerIdentificationNumber),
+          this.LINE_WIDTH,
+        ),
+      );
+    }
+    if (ticket.customerName) {
+      this.pushLine(
+        ops,
+        this.lr(
+          "Cliente:",
+          this.safe(ticket.customerName),
+          this.LINE_WIDTH,
+        ),
+      );
+    }
+
     this.pushLine(
       ops,
       this.lr(
