@@ -30,7 +30,8 @@ export const CreateCustomerSchema = z.object({
         vehicleTypeId: z.preprocess(normalizeText, z.string().min(1, "Selecciona el tipo de vehículo")),
       }),
     )
-    .min(1, "Agrega al menos un vehículo"),
+    .optional()
+    .default([]),
 });
 
 export type CreateCustomerForm = z.infer<typeof CreateCustomerSchema>;
