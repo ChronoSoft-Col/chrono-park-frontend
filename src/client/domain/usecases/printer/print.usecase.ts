@@ -562,7 +562,7 @@ export class PrintUsecase {
           subtotalNum != null && taxNum != null ? subtotalNum + taxNum : null;
 
         const itemLines = this.wrapText(
-          this.sanitizeText(this.safe(d.type)),
+          this.sanitizeText(this.safe(d.description)),
           colItem,
         );
         const base = this.moneyNoCents(d.subtotal);
