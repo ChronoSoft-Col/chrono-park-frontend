@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import ChronoButton from "@chrono/chrono-button.component";
 import { Plus } from "lucide-react";
 import CreateClosureDialogContent from "./create-closure-dialog.component";
+import { CierresAction } from "@/src/shared/enums/auth/permissions.enum";
 
 interface Props {
   items: IClosureListItemEntity[];
@@ -200,6 +201,7 @@ export default function ClosureDataListComponent({
         label: "Nuevo cierre",
         icon: <Plus className="h-4 w-4" />,
         onClick: handleOpenCreateClosure,
+        permission: CierresAction.CREAR_CIERRE,
       }}
       table={(
         <ChronoDataTable

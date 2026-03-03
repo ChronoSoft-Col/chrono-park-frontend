@@ -1,4 +1,3 @@
-import { TPermission } from "./permission.type";
 import TUser from "./user.type";
 import { TApplication } from "./application.type";
 
@@ -13,9 +12,28 @@ export type SessionUser = Partial<TUser> & {
   name?: string | null;
   [key: string]: unknown;
 };
-export type SessionPermission = Partial<TPermission> & {
-  code?: string;
-  [key: string]: unknown;
+
+/**
+ * Permisos por aplicación y recurso, más un array plano de todas las acciones
+ * para búsqueda rápida.
+ */
+export type SessionResourcePermission = {
+  resourceId: string;
+  resourceName: string;
+  actions: string[];
+};
+
+export type SessionApplicationPermission = {
+  applicationId: string;
+  applicationName: string;
+  resources: SessionResourcePermission[];
+};
+
+export type SessionPermission = {
+  /** Todas las acciones del usuario como array plano (para búsqueda rápida) */
+  actions: string[];
+  /** Permisos organizados por aplicación → recurso → acciones */
+  applications: SessionApplicationPermission[];
 };
 
 export type SessionMetadata = {

@@ -4,6 +4,8 @@ import { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
 import ChronoButton from "@chrono/chrono-button.component";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
 import { Eye, PenLine, Printer, RefreshCcw } from "lucide-react";
+import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import { IngresosSalidasAction } from "@/src/shared/enums/auth/permissions.enum";
 
 const formatDateTime = (value?: string) => {
   if (!value) return "-";
@@ -71,37 +73,41 @@ export const createInOutColumns = (
     cell: (row: IInOutEntity) => (
       <div className="flex justify-end gap-2">
         {options?.showChangePlate && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                size="icon-sm"
-                variant="outline"
-                aria-label="Cambiar placa"
-                onClick={() => options.onChangePlate?.(row)}
-              >
-                <PenLine className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Cambiar placa</TooltipContent>
-          </Tooltip>
+          <PermissionGuard action={IngresosSalidasAction.EDITAR_INGRESOS_SALIDAS} hidden>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ChronoButton
+                  type="button"
+                  size="icon-sm"
+                  variant="outline"
+                  aria-label="Cambiar placa"
+                  onClick={() => options.onChangePlate?.(row)}
+                >
+                  <PenLine className="h-4 w-4" />
+                </ChronoButton>
+              </TooltipTrigger>
+              <TooltipContent side="top">Cambiar placa</TooltipContent>
+            </Tooltip>
+          </PermissionGuard>
         )}
 
         {options?.showChangeRate && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                size="icon-sm"
-                variant="outline"
-                aria-label="Cambiar tarifa"
-                onClick={() => options.onChangeRate?.(row)}
-              >
-                <RefreshCcw className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Cambiar tarifa</TooltipContent>
-          </Tooltip>
+          <PermissionGuard action={IngresosSalidasAction.EDITAR_INGRESOS_SALIDAS} hidden>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ChronoButton
+                  type="button"
+                  size="icon-sm"
+                  variant="outline"
+                  aria-label="Cambiar tarifa"
+                  onClick={() => options.onChangeRate?.(row)}
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                </ChronoButton>
+              </TooltipTrigger>
+              <TooltipContent side="top">Cambiar tarifa</TooltipContent>
+            </Tooltip>
+          </PermissionGuard>
         )}
 
         <Tooltip>

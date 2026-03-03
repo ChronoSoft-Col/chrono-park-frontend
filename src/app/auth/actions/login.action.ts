@@ -63,7 +63,6 @@ export async function loginAction(
 
     await createSession({
       user: sessionUser,
-      permissions: null,
       tokens,
       role,
       applications,

@@ -3,23 +3,27 @@ import { QrSectionComponent } from "./components/qr-section.component";
 import { PaymentSectionComponent } from "./components/payment-section.component";
 import { ServicesCartDrawerComponent } from "./components/services-cart-drawer.component";
 import { SetupHeaderFilters } from "@/src/shared/components/layout/setup-header-filters.component";
+import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import { CobroAction } from "@/src/shared/enums/auth/permissions.enum";
 
 export default function Page() {
   return (
-    <section className="relative h-full max-h-full min-h-0">
-      <SetupHeaderFilters showDatePicker={false} showDateRangePicker={false} showSearch={false} />
-      <div className="absolute my-auto z-10 top-14 right-0">
-        <ServicesCartDrawerComponent />
-      </div>
-      
-      <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
-        <div className="flex h-full min-h-0 min-w-0 flex-col justify-center gap-4">
-          <QrSectionComponent className="h-min min-h-0 min-w-0" />
-          <PaymentSectionComponent className="h-min min-h-0 min-w-0" />
+    <PermissionGuard action={CobroAction.COBRAR_ESTACIONAMIENTO}>
+      <section className="relative h-full max-h-full min-h-0">
+        <SetupHeaderFilters showDatePicker={false} showDateRangePicker={false} showSearch={false} />
+        <div className="absolute my-auto z-10 top-14 right-0">
+          <ServicesCartDrawerComponent />
         </div>
+      
+        <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8">
+          <div className="flex h-full min-h-0 min-w-0 flex-col justify-center gap-4">
+            <QrSectionComponent className="h-min min-h-0 min-w-0" />
+            <PaymentSectionComponent className="h-min min-h-0 min-w-0" />
+          </div>
 
-        <QrDetailSectionComponent className="min-h-0 min-w-0 p-0.5" />
-      </div>
-    </section>
+          <QrDetailSectionComponent className="min-h-0 min-w-0 p-0.5" />
+        </div>
+      </section>
+    </PermissionGuard>
   );
 }

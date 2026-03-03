@@ -18,6 +18,7 @@ import { CreateCustomerDialogContent } from "./create-customer-dialog.component"
 import { setCustomerActiveAction } from "../actions/set-customer-active.action";
 import { deleteCustomerAction } from "../actions/delete-customer.action";
 import { EditCustomerDialogContent } from "./edit-customer-dialog.component";
+import { ClientesAction } from "@/src/shared/enums/auth/permissions.enum";
 
 interface Props {
   items: ICustomerEntity[];
@@ -197,6 +198,7 @@ export default function CustomersDataListComponent({
         label: "Crear cliente",
         icon: <Plus className="h-4 w-4" />,
         onClick: handleOpenCreateCustomer,
+        permission: ClientesAction.CREAR_CLIENTE,
       }}
       table={
         <ChronoDataTable

@@ -2,35 +2,15 @@ import type { SessionPayload } from "@/src/shared/types/auth/session.type";
 import type { AppAction } from "@/src/shared/enums/auth/permissions.enum";
 
 /**
- * Extrae todas las acciones (strings) de la sesión del usuario.
- * Recorre `applications → resources → actions` y `subresources → action`.
+ * Obtiene el array plano de acciones desde `session.permissions.actions`.
+ * Ya viene pre-calculado al crear la sesión.
  */
 export function getSessionActions(session: SessionPayload | null): Set<string> {
-  const actions = new Set<string>();
-
-  if (!session?.applications) {
-    return actions;
+  if (!session?.permissions?.actions) {
+    return new Set<string>();
   }
 
-  for (const app of session.applications) {
-    for (const resource of app.resources ?? []) {
-      // Acciones directas del recurso
-      for (const action of resource.actions ?? []) {
-        if (action.name) {
-          actions.add(action.name);
-        }
-      }
-
-      // Acciones dentro de sub-recursos
-      for (const sub of resource.subresources ?? []) {
-        if (sub.action?.name) {
-          actions.add(sub.action.name);
-        }
-      }
-    }
-  }
-
-  return actions;
+  return new Set(session.permissions.actions);
 }
 
 /**
@@ -40,7 +20,7 @@ export function hasPermission(
   session: SessionPayload | null,
   action: AppAction | string,
 ): boolean {
-  return getSessionActions(session).has(action);
+  return session?.permissions?.actions?.includes(action) ?? false;
 }
 
 /**
@@ -50,8 +30,9 @@ export function hasAllPermissions(
   session: SessionPayload | null,
   actions: (AppAction | string)[],
 ): boolean {
-  const userActions = getSessionActions(session);
-  return actions.every((a) => userActions.has(a));
+  const userActions = session?.permissions?.actions;
+  if (!userActions) return false;
+  return actions.every((a) => userActions.includes(a));
 }
 
 /**
@@ -61,6 +42,29 @@ export function hasAnyPermission(
   session: SessionPayload | null,
   actions: (AppAction | string)[],
 ): boolean {
-  const userActions = getSessionActions(session);
-  return actions.some((a) => userActions.has(a));
+  const userActions = session?.permissions?.actions;
+  if (!userActions) return false;
+  return actions.some((a) => userActions.includes(a));
+}
+
+/**
+ * Obtiene las acciones de un recurso específico dentro de una aplicación.
+ */
+export function getResourceActions(
+  session: SessionPayload | null,
+  applicationName: string,
+  resourceName: string,
+): string[] {
+  if (!session?.permissions?.applications) return [];
+
+  const app = session.permissions.applications.find(
+    (a) => a.applicationName === applicationName,
+  );
+  if (!app) return [];
+
+  const resource = app.resources.find(
+    (r) => r.resourceName === resourceName,
+  );
+
+  return resource?.actions ?? [];
 }

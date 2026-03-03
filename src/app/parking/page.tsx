@@ -104,6 +104,9 @@ export default function ParkingPage() {
               value={formatTimestamp(sessionExpiresAt)}
               icon={CalendarClock}
             />
+            <ChronoButton onClick={()=>{
+                console.log(session)
+            }}>Ver permisos</ChronoButton>
           </div>
         </div>
       </div>

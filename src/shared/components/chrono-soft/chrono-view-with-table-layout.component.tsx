@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/src/lib/utils";
 import ChronoButton from "@chrono/chrono-button.component";
+import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import type { AppAction } from "@/src/shared/enums/auth/permissions.enum";
 
 export type ChronoViewWithTableLayoutProps = {
   title?: ReactNode;
@@ -14,6 +16,8 @@ export type ChronoViewWithTableLayoutProps = {
     onClick: () => void;
     disabled?: boolean;
     loading?: boolean;
+    /** Si se especifica, el botón solo se muestra si el usuario tiene esta acción */
+    permission?: AppAction | string;
   };
   filters?: ReactNode;
   table: ReactNode;
@@ -48,18 +52,26 @@ export function ChronoViewWithTableLayout({
           <div className="flex flex-wrap items-center gap-3">
             {filters}
 
-            {action && (
-              <ChronoButton
-                type="button"
-                onClick={action.onClick}
-                icon={action.icon}
-                disabled={action.disabled}
-                loading={action.loading}
-                size={"lg"}
-              >
-                {action.label}
-              </ChronoButton>
-            )}
+            {action && (() => {
+              const btn = (
+                <ChronoButton
+                  type="button"
+                  onClick={action.onClick}
+                  icon={action.icon}
+                  disabled={action.disabled}
+                  loading={action.loading}
+                  size={"lg"}
+                >
+                  {action.label}
+                </ChronoButton>
+              );
+
+              return action.permission ? (
+                <PermissionGuard action={action.permission} hidden>
+                  {btn}
+                </PermissionGuard>
+              ) : btn;
+            })()}
           </div>
         </header>
       )}

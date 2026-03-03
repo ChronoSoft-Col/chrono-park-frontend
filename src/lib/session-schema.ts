@@ -4,6 +4,7 @@ import type {
   SessionPayload,
   SessionTokens,
   SessionPermission,
+  SessionApplicationPermission,
   SessionMetadata,
 } from "@/src/shared/types/auth/session.type";
 import type { TApplication } from "@/src/shared/types/auth/application.type";
@@ -34,10 +35,68 @@ export function normalizeApplications(apps?: unknown): TApplication[] {
   return apps as TApplication[];
 }
 
-export function normalizePermissions(
-  permissions: unknown
-): SessionPermission | null {
-  return (permissions as SessionPermission) ?? null;
+/**
+ * Extrae los permisos de las aplicaciones del backend.
+ * Recorre applications → resources → actions y subresources → action
+ * para construir una estructura organizada + un array plano para búsqueda rápida.
+ */
+export function buildPermissionsFromApplications(
+  applications: TApplication[]
+): SessionPermission {
+  const allActions: string[] = [];
+  const appPermissions: SessionApplicationPermission[] = [];
+
+  for (const app of applications) {
+    const resourcePermissions = [];
+
+    for (const resource of app.resources ?? []) {
+      const resourceActions: string[] = [];
+
+      // Acciones directas del recurso
+      for (const action of resource.actions ?? []) {
+        if (action && !resourceActions.includes(action)) {
+          resourceActions.push(action);
+        }
+      }
+
+      // Acciones dentro de sub-recursos
+      for (const sub of resource.subresources ?? []) {
+        for (const action of sub.action ?? []) {
+          if (action && !resourceActions.includes(action)) {
+            resourceActions.push(action);
+          }
+        }
+      }
+
+      if (resourceActions.length > 0) {
+        resourcePermissions.push({
+          resourceId: resource.id,
+          resourceName: resource.name,
+          actions: resourceActions,
+        });
+
+        // Agregar al array plano (sin duplicados)
+        for (const a of resourceActions) {
+          if (!allActions.includes(a)) {
+            allActions.push(a);
+          }
+        }
+      }
+    }
+
+    if (resourcePermissions.length > 0) {
+      appPermissions.push({
+        applicationId: app.id,
+        applicationName: app.name,
+        resources: resourcePermissions,
+      });
+    }
+  }
+
+  return {
+    actions: allActions,
+    applications: appPermissions,
+  };
 }
 
 export function ensureSessionPayload(
@@ -51,11 +110,13 @@ export function ensureSessionPayload(
     expiresAt: meta.expiresAt,
   };
 
+  const applications = normalizeApplications(payload.applications);
+
   return {
     ...payload,
     tokens: normalizeTokens(payload.tokens),
-    permissions: normalizePermissions(payload.permissions),
-    applications: normalizeApplications(payload.applications),
+    permissions: payload.permissions ?? buildPermissionsFromApplications(applications),
+    applications,
     metadata,
   };
 }
@@ -65,11 +126,12 @@ export function buildSessionPayload(
   meta: SessionMeta
 ): SessionPayload {
   const applications = normalizeApplications(input.applications ?? input.user?.applications);
+  const permissions = input.permissions ?? buildPermissionsFromApplications(applications);
 
   return ensureSessionPayload(
     {
       user: input.user,
-      permissions: input.permissions ?? normalizePermissions(input.user?.permissions),
+      permissions,
       tokens: normalizeTokens(input.tokens),
       role: input.role ?? (input.user?.role as { id: string; name: string } | null) ?? null,
       applications,

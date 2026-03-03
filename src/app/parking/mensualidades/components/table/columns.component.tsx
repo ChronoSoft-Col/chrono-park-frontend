@@ -11,6 +11,8 @@ import {
   TooltipTrigger,
 } from "@/src/shared/components/ui/tooltip";
 import { CreditCard, Eye, History, XCircle } from "lucide-react";
+import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import { MensualidadesAction } from "@/src/shared/enums/auth/permissions.enum";
 
 type ViewDetailHandler = (item: ISubscriptionEntity) => void;
 type ViewHistoryHandler = (item: ISubscriptionEntity) => void;
@@ -165,44 +167,48 @@ export const createSubscriptionColumns = (
 
       return (
         <div className="flex justify-end gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="default"
-                aria-label="Pagar mensualidad"
-                disabled={!canPay}
-                onClick={() => onPay?.(row)}
-              >
-                <CreditCard className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              {canPay
-                ? "Pagar"
-                : `No disponible: ${payDisabledReason ?? "Estado no permitido"}`}
-            </TooltipContent>
-          </Tooltip>
+          <PermissionGuard action={MensualidadesAction.PAGAR_MENSUALIDAD} hidden>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ChronoButton
+                  type="button"
+                  variant="default"
+                  aria-label="Pagar mensualidad"
+                  disabled={!canPay}
+                  onClick={() => onPay?.(row)}
+                >
+                  <CreditCard className="h-4 w-4" />
+                </ChronoButton>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                {canPay
+                  ? "Pagar"
+                  : `No disponible: ${payDisabledReason ?? "Estado no permitido"}`}
+              </TooltipContent>
+            </Tooltip>
+          </PermissionGuard>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="destructive"
-                aria-label="Cancelar mensualidad"
-                disabled={!canCancel || cancelLoading}
-                loading={cancelLoading}
-                onClick={() => onCancel?.(row)}
-              >
-                <XCircle className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              {canCancel
-                ? "Cancelar"
-                : `No disponible: ${cancelDisabledReason ?? "Estado no permitido"}`}
-            </TooltipContent>
-          </Tooltip>
+          <PermissionGuard action={MensualidadesAction.CANCELAR_MENSUALIDAD} hidden>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ChronoButton
+                  type="button"
+                  variant="destructive"
+                  aria-label="Cancelar mensualidad"
+                  disabled={!canCancel || cancelLoading}
+                  loading={cancelLoading}
+                  onClick={() => onCancel?.(row)}
+                >
+                  <XCircle className="h-4 w-4" />
+                </ChronoButton>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                {canCancel
+                  ? "Cancelar"
+                  : `No disponible: ${cancelDisabledReason ?? "Estado no permitido"}`}
+              </TooltipContent>
+            </Tooltip>
+          </PermissionGuard>
 
           <Tooltip>
             <TooltipTrigger asChild>

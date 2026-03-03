@@ -21,6 +21,7 @@ import { SubscriptionHistoryDialogContent } from "./subscription-history-dialog-
 import { CreateSubscriptionDialogContent } from "./create-subscription-dialog.component";
 import { PaySubscriptionDialogContent } from "./pay-subscription-dialog.component";
 import { cancelSubscriptionAction } from "../actions/cancel-subscription.action";
+import { MensualidadesAction } from "@/src/shared/enums/auth/permissions.enum";
 
 interface Props {
   items: ISubscriptionEntity[];
@@ -194,6 +195,7 @@ export default function SubscriptionsDataListComponent({
         label: "Crear mensualidad",
         icon: <Plus className="h-4 w-4" />,
         onClick: handleOpenCreateSubscription,
+        permission: MensualidadesAction.CREAR_MENSUALIDAD,
       }}
       table={
         <ChronoDataTable

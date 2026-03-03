@@ -6,6 +6,8 @@ import { Eye, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import ChronoButton from "@chrono/chrono-button.component";
+import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import { CierresAction } from "@/src/shared/enums/auth/permissions.enum";
 
 const formatDateTime = (value?: string | null) => {
   if (!value) return "-";
@@ -56,26 +58,30 @@ export const createClosureColumns = (
     cellClassName: "text-right",
     cell: (row) => (
       <div className="flex justify-end gap-2">
-        <ChronoButton
-          variant="outline"
-          size="sm"
-          onClick={() => onViewDetail?.(row)}
-          className="text-xs font-semibold"
-          icon={<Eye className="h-4 w-4" />}
-        >
-          Ver
-        </ChronoButton>
+        <PermissionGuard action={CierresAction.VER_DETALLE_CIERRE} hidden>
+          <ChronoButton
+            variant="outline"
+            size="sm"
+            onClick={() => onViewDetail?.(row)}
+            className="text-xs font-semibold"
+            icon={<Eye className="h-4 w-4" />}
+          >
+            Ver
+          </ChronoButton>
+        </PermissionGuard>
 
         {onPrint ? (
-          <ChronoButton
-            variant="default"
-            size="sm"
-            onClick={() => onPrint(row)}
-            className="text-xs font-semibold"
-            icon={<Printer className="h-4 w-4" />}
-          >
-            Imprimir
-          </ChronoButton>
+          <PermissionGuard action={CierresAction.VER_DETALLE_CIERRE} hidden>
+            <ChronoButton
+              variant="default"
+              size="sm"
+              onClick={() => onPrint(row)}
+              className="text-xs font-semibold"
+              icon={<Printer className="h-4 w-4" />}
+            >
+              Imprimir
+            </ChronoButton>
+          </PermissionGuard>
         ) : null}
       </div>
     ),
