@@ -6,6 +6,7 @@ import { cn } from "@/src/lib/utils";
 import ChronoButton from "@chrono/chrono-button.component";
 import PermissionGuard from "@/src/shared/components/permission-guard.component";
 import type { AppAction } from "@/src/shared/enums/auth/permissions.enum";
+import { PermissionButtonFallback } from "../chrono/permission-button-fallback.component";
 
 export type ChronoViewWithTableLayoutProps = {
   title?: ReactNode;
@@ -67,7 +68,7 @@ export function ChronoViewWithTableLayout({
               );
 
               return action.permission ? (
-                <PermissionGuard action={action.permission} hidden>
+                <PermissionGuard action={action.permission} fallback={<PermissionButtonFallback label={("Sin permiso para " + action.label).toLocaleUpperCase()} />}>
                   {btn}
                 </PermissionGuard>
               ) : btn;

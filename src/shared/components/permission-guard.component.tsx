@@ -1,12 +1,7 @@
 "use client";
 
-import { useClientSession } from "@/src/lib/session-client";
+import { usePermissionsContext } from "@/src/shared/context/permissions.context";
 import { type AppAction } from "@/src/shared/enums/auth/permissions.enum";
-import {
-  hasAllPermissions,
-  hasAnyPermission,
-  hasPermission,
-} from "@/src/shared/utils/permissions.util";
 import { ShieldX } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -88,24 +83,15 @@ export default function PermissionGuard({
   hidden = false,
   ...rest
 }: PermissionGuardProps) {
-  const { data: session, isLoading } = useClientSession();
+  const { can, canAll, canAny } = usePermissionsContext();
 
-  // Mientras carga la sesión no renderizamos nada
-  if (isLoading) {
-    return null;
-  }
-
-  // Evaluar permisos
   let allowed = false;
 
   if ("action" in rest && rest.action) {
-    allowed = hasPermission(session, rest.action);
+    allowed = can(rest.action);
   } else if ("actions" in rest && rest.actions) {
     const mode = rest.mode ?? "every";
-    allowed =
-      mode === "every"
-        ? hasAllPermissions(session, rest.actions)
-        : hasAnyPermission(session, rest.actions);
+    allowed = mode === "every" ? canAll(rest.actions) : canAny(rest.actions);
   }
 
   if (allowed) {

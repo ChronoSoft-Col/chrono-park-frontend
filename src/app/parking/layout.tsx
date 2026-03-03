@@ -5,21 +5,25 @@ import { PropsWithChildren } from "react";
 import { getSession } from "@/src/lib/session";
 import FooterComponent from "@/src/shared/components/layout/footer.component";
 import ParkingProviders from "./providers";
+import { PermissionsProvider } from "@/src/shared/context/permissions.context";
 
 export default async function ParkingLayout({ children }: PropsWithChildren) {
   const session = await getSession();
   const applications = session?.applications ?? [];
+  const actions = session?.permissions?.actions ?? [];
 
   return (
     <ParkingProviders>
-      <SidebarComponent applications={applications} />
-      <ChronoSidebarInset className="min-w-0 overflow-hidden grid grid-rows-[auto_1fr_auto] h-screen p-0">
-        <HeaderComponent />
-        <main className="overflow-y-auto overflow-x-hidden px-4 sm:px-6 md:px-8">
-          <section className="max-w-full mx-auto w-full h-full">{children}</section>
-        </main>
-        <FooterComponent />
-      </ChronoSidebarInset>
+      <PermissionsProvider actions={actions}>
+        <SidebarComponent applications={applications} />
+        <ChronoSidebarInset className="min-w-0 overflow-hidden grid grid-rows-[auto_1fr_auto] h-screen p-0">
+          <HeaderComponent />
+          <main className="overflow-y-auto overflow-x-hidden px-4 sm:px-6 md:px-8">
+            <section className="max-w-full mx-auto w-full h-full">{children}</section>
+          </main>
+          <FooterComponent />
+        </ChronoSidebarInset>
+      </PermissionsProvider>
     </ParkingProviders>
   );
 }

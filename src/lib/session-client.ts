@@ -98,8 +98,10 @@ type UseClientSessionResult = {
 
 export function useClientSession(options?: UseClientSessionOptions): UseClientSessionResult {
   const { refreshInterval, forceRefreshOnMount } = options ?? {};
-  const [session, setSession] = useState<SessionPayload | null>(null);
-  const [status, setStatus] = useState<SessionStatus>("loading");
+  const [session, setSession] = useState<SessionPayload | null>(() => cachedSession);
+  const [status, setStatus] = useState<SessionStatus>(() =>
+    cachedSession ? "authenticated" : "loading",
+  );
   const mountedRef = useRef(true);
 
   useEffect(() => {

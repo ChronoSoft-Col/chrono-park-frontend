@@ -1,17 +1,10 @@
 "use client";
 
-import { useClientSession } from "@/src/lib/session-client";
-import type { AppAction } from "@/src/shared/enums/auth/permissions.enum";
-import {
-  getSessionActions,
-  hasAllPermissions,
-  hasAnyPermission,
-  hasPermission,
-} from "@/src/shared/utils/permissions.util";
-import { useMemo } from "react";
+import { usePermissionsContext } from "@/src/shared/context/permissions.context";
 
 /**
  * Hook del lado del cliente para verificar permisos de forma imperativa.
+ * Delegado al PermissionsContext (alimentado desde el server layout).
  *
  * @example
  * ```tsx
@@ -23,21 +16,5 @@ import { useMemo } from "react";
  * ```
  */
 export function usePermissions() {
-  const { data: session, isLoading } = useClientSession();
-
-  const actions = useMemo(() => getSessionActions(session), [session]);
-
-  /** ¿Tiene esta acción? */
-  const can = (action: AppAction | string): boolean =>
-    hasPermission(session, action);
-
-  /** ¿Tiene todas estas acciones? */
-  const canAll = (list: (AppAction | string)[]): boolean =>
-    hasAllPermissions(session, list);
-
-  /** ¿Tiene al menos una de estas acciones? */
-  const canAny = (list: (AppAction | string)[]): boolean =>
-    hasAnyPermission(session, list);
-
-  return { can, canAll, canAny, actions, isLoading };
+  return usePermissionsContext();
 }
