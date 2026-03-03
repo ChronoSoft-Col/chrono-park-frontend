@@ -495,22 +495,22 @@ export class PrintUsecase {
     );
 
     // Cliente
-    if (ticket.customerIdentificationNumber) {
+    if (ticket.header?.customerIdentificationNumber) {
       this.pushLine(
         ops,
         this.lr(
           "NIT/CC:",
-          this.safe(ticket.customerIdentificationNumber),
+          this.safe(ticket.header?.customerIdentificationNumber),
           this.LINE_WIDTH,
         ),
       );
     }
-    if (ticket.customerName) {
+    if (ticket.header?.customerName) {
       this.pushLine(
         ops,
         this.lr(
           "Cliente:",
-          this.safe(ticket.customerName),
+          this.safe(ticket.header?.customerName),
           this.LINE_WIDTH,
         ),
       );
