@@ -51,7 +51,7 @@ export function CreateCustomerFormComponent({ onSubmit, onCancel }: Props) {
       email: "",
       phoneNumber: "",
       agreementId: "",
-      vehicles: [{ licensePlate: "", vehicleTypeId: "" }],
+      vehicles: [],
     },
   });
 
