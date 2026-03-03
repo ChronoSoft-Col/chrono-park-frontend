@@ -1,4 +1,3 @@
-import TUser from "./user.type";
 import { TApplication } from "./application.type";
 
 export type SessionTokens = {
@@ -6,34 +5,46 @@ export type SessionTokens = {
   refreshToken?: string;
 };
 
-export type SessionUser = Partial<TUser> & {
+export type SessionUser = {
   id: string;
   email?: string | null;
   name?: string | null;
-  [key: string]: unknown;
 };
 
 /**
- * Permisos por aplicación y recurso, más un array plano de todas las acciones
- * para búsqueda rápida.
+ * Permisos almacenados en la cookie de sesión.
+ * Solo se guarda el array plano de acciones para mantener la cookie por debajo de 4 KB.
  */
-export type SessionResourcePermission = {
-  resourceId: string;
-  resourceName: string;
-  actions: string[];
-};
-
-export type SessionApplicationPermission = {
-  applicationId: string;
-  applicationName: string;
-  resources: SessionResourcePermission[];
-};
-
 export type SessionPermission = {
-  /** Todas las acciones del usuario como array plano (para búsqueda rápida) */
+  /** Todas las acciones del usuario como array plano */
   actions: string[];
-  /** Permisos organizados por aplicación → recurso → acciones */
-  applications: SessionApplicationPermission[];
+};
+
+/**
+ * Versión ligera de TApplication para la sesión (sin actions/action).
+ * Solo contiene los datos necesarios para la navegación del sidebar.
+ */
+export type SessionApplication = {
+  id: string;
+  name: string;
+  path: string;
+  isActive: boolean;
+  resources: SessionResource[];
+};
+
+export type SessionResource = {
+  id: string;
+  name: string;
+  path: string;
+  icon: string;
+  subresources: SessionSubResource[];
+};
+
+export type SessionSubResource = {
+  id: string;
+  name: string;
+  path: string;
+  icon: string;
 };
 
 export type SessionMetadata = {
@@ -48,7 +59,7 @@ export type SessionPayload = {
   permissions: SessionPermission | null;
   tokens: SessionTokens;
   role?: { id: string; name: string } | null;
-  applications?: TApplication[];
+  applications?: SessionApplication[];
   metadata: SessionMetadata;
 };
 

@@ -51,7 +51,6 @@ export async function loginAction(
       id: (userRaw.id as string) || "",
       email: (userRaw.email as string) || undefined,
       name: (userRaw.name as string) || undefined,
-      ...userRaw,
     };
 
     const applications = (payload["applications"] as TApplication[]) || [];

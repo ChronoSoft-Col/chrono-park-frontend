@@ -47,24 +47,4 @@ export function hasAnyPermission(
   return actions.some((a) => userActions.includes(a));
 }
 
-/**
- * Obtiene las acciones de un recurso específico dentro de una aplicación.
- */
-export function getResourceActions(
-  session: SessionPayload | null,
-  applicationName: string,
-  resourceName: string,
-): string[] {
-  if (!session?.permissions?.applications) return [];
 
-  const app = session.permissions.applications.find(
-    (a) => a.applicationName === applicationName,
-  );
-  if (!app) return [];
-
-  const resource = app.resources.find(
-    (r) => r.resourceName === resourceName,
-  );
-
-  return resource?.actions ?? [];
-}

@@ -1,10 +1,10 @@
 import type { SessionMeta } from "@/src/lib/session-manager";
 import type {
   CreateSessionInput,
+  SessionApplication,
   SessionPayload,
   SessionTokens,
   SessionPermission,
-  SessionApplicationPermission,
   SessionMetadata,
 } from "@/src/shared/types/auth/session.type";
 import type { TApplication } from "@/src/shared/types/auth/application.type";
@@ -36,66 +36,57 @@ export function normalizeApplications(apps?: unknown): TApplication[] {
 }
 
 /**
+ * Crea una versión ligera de las aplicaciones para la cookie de sesión.
+ * Elimina `actions` de recursos y `action` de subrecursos para reducir el tamaño.
+ * El sidebar solo necesita: id, name, path, icon para la navegación.
+ */
+export function slimApplications(apps: TApplication[]): SessionApplication[] {
+  return apps.map((app) => ({
+    id: app.id,
+    name: app.name,
+    path: app.path,
+    isActive: app.isActive,
+    resources: (app.resources ?? []).map((res) => ({
+      id: res.id,
+      name: res.name,
+      path: res.path,
+      icon: res.icon,
+      subresources: (res.subresources ?? []).map((sub) => ({
+        id: sub.id,
+        name: sub.name,
+        path: sub.path,
+        icon: sub.icon,
+      })),
+    })),
+  }));
+}
+
+/**
  * Extrae los permisos de las aplicaciones del backend.
  * Recorre applications → resources → actions y subresources → action
- * para construir una estructura organizada + un array plano para búsqueda rápida.
+ * para construir un array plano de acciones únicas.
  */
 export function buildPermissionsFromApplications(
   applications: TApplication[]
 ): SessionPermission {
-  const allActions: string[] = [];
-  const appPermissions: SessionApplicationPermission[] = [];
+  const actionSet = new Set<string>();
 
   for (const app of applications) {
-    const resourcePermissions = [];
-
     for (const resource of app.resources ?? []) {
-      const resourceActions: string[] = [];
-
-      // Acciones directas del recurso
       for (const action of resource.actions ?? []) {
-        if (action && !resourceActions.includes(action)) {
-          resourceActions.push(action);
-        }
+        if (action) actionSet.add(action);
       }
 
-      // Acciones dentro de sub-recursos
       for (const sub of resource.subresources ?? []) {
         for (const action of sub.action ?? []) {
-          if (action && !resourceActions.includes(action)) {
-            resourceActions.push(action);
-          }
+          if (action) actionSet.add(action);
         }
       }
-
-      if (resourceActions.length > 0) {
-        resourcePermissions.push({
-          resourceId: resource.id,
-          resourceName: resource.name,
-          actions: resourceActions,
-        });
-
-        // Agregar al array plano (sin duplicados)
-        for (const a of resourceActions) {
-          if (!allActions.includes(a)) {
-            allActions.push(a);
-          }
-        }
-      }
-    }
-
-    if (resourcePermissions.length > 0) {
-      appPermissions.push({
-        applicationId: app.id,
-        applicationName: app.name,
-        resources: resourcePermissions,
-      });
     }
   }
 
   return {
-    actions: allActions,
-    applications: appPermissions,
+    actions: [...actionSet],
   };
 }
 
@@ -110,13 +101,11 @@ export function ensureSessionPayload(
     expiresAt: meta.expiresAt,
   };
 
-  const applications = normalizeApplications(payload.applications);
-
   return {
     ...payload,
     tokens: normalizeTokens(payload.tokens),
-    permissions: payload.permissions ?? buildPermissionsFromApplications(applications),
-    applications,
+    permissions: payload.permissions ?? null,
+    applications: payload.applications,
     metadata,
   };
 }
@@ -125,16 +114,16 @@ export function buildSessionPayload(
   input: CreateSessionInput,
   meta: SessionMeta
 ): SessionPayload {
-  const applications = normalizeApplications(input.applications ?? input.user?.applications);
-  const permissions = input.permissions ?? buildPermissionsFromApplications(applications);
+  const fullApps = normalizeApplications(input.applications);
+  const permissions = input.permissions ?? buildPermissionsFromApplications(fullApps);
 
   return ensureSessionPayload(
     {
-      user: input.user,
+      user: { id: input.user.id, email: input.user.email, name: input.user.name },
       permissions,
       tokens: normalizeTokens(input.tokens),
-      role: input.role ?? (input.user?.role as { id: string; name: string } | null) ?? null,
-      applications,
+      role: input.role ?? null,
+      applications: slimApplications(fullApps),
       metadata: {
         ...(input.metadata ?? {}),
         maxAge: meta.maxAge,
