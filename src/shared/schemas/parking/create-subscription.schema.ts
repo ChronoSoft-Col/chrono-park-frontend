@@ -34,7 +34,7 @@ export const PaySubscriptionSchema = z.object({
     z.enum(["PERCENTAGE", "FIXED_AMOUNT"]).optional()
   ),
   discountValue: z
-    .number({ invalid_type_error: "El valor del descuento debe ser un número" })
+    .number({ error: "El valor del descuento debe ser un número" })
     .min(0, "No se aceptan valores negativos")
     .optional(),
 }).superRefine((data, ctx) => {
