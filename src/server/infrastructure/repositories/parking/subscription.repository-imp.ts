@@ -80,9 +80,11 @@ export class SubscriptionRepositoryImp implements SubscriptionRepository {
 
   calculatePrice(
     id: string,
-    monthsCount?: number
+    monthsCount?: number,
+    discountType?: "PERCENTAGE" | "FIXED_AMOUNT",
+    discountValue?: number
   ): Promise<IGeneralResponse<IPriceCalculation>> {
-    return this.datasource.calculatePrice(id, monthsCount);
+    return this.datasource.calculatePrice(id, monthsCount, discountType, discountValue);
   }
 
   listMonthlyPlans(

@@ -14,6 +14,8 @@ export interface IPaySubscriptionParamsEntity {
   paymentMethodId: string;
   paymentPointId?: string;
   amountReceived?: number;
+  discountType?: "PERCENTAGE" | "FIXED_AMOUNT";
+  discountValue?: number;
 }
 
 // Parámetros para cancelar una suscripción

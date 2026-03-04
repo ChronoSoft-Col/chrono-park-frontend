@@ -111,9 +111,21 @@ export class SubscriptionDatasourceService
 
   async calculatePrice(
     id: string,
-    monthsCount?: number
+    monthsCount?: number,
+    discountType?: "PERCENTAGE" | "FIXED_AMOUNT",
+    discountValue?: number
   ): Promise<IGeneralResponse<IPriceCalculation>> {
-    const params = monthsCount ? { monthsCount } : {};
+    const params: Record<string, string | number> = {};
+
+    if (monthsCount) {
+      params.monthsCount = monthsCount;
+    }
+
+    if (discountType && discountValue !== undefined) {
+      params.discountType = discountType;
+      params.discountValue = discountValue;
+    }
+
     return this.api
       .get<IGeneralResponse<IPriceCalculation>>(
         `/subscriptions/${id}/calculate-price`,

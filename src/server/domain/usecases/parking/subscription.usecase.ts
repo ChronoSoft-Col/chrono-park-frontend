@@ -80,9 +80,11 @@ export class SubscriptionUsecase implements SubscriptionRepository {
 
   calculatePrice(
     id: string,
-    monthsCount?: number
+    monthsCount?: number,
+    discountType?: "PERCENTAGE" | "FIXED_AMOUNT",
+    discountValue?: number
   ): Promise<IGeneralResponse<IPriceCalculation>> {
-    return this.subscriptionRepository.calculatePrice(id, monthsCount);
+    return this.subscriptionRepository.calculatePrice(id, monthsCount, discountType, discountValue);
   }
 
   listMonthlyPlans(

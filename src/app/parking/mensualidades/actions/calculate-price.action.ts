@@ -15,13 +15,20 @@ type CalculatePriceActionResponse = Promise<
 
 export async function calculatePriceAction(
   subscriptionId: string,
-  monthsCount?: number
+  monthsCount?: number,
+  discountType?: "PERCENTAGE" | "FIXED_AMOUNT",
+  discountValue?: number
 ): CalculatePriceActionResponse {
   try {
     const useCase = serverContainer.resolve<SubscriptionUsecase>(
       SERVER_TOKENS.SubscriptionUsecase
     );
-    const response = await useCase.calculatePrice(subscriptionId, monthsCount);
+    const response = await useCase.calculatePrice(
+      subscriptionId,
+      monthsCount,
+      discountType,
+      discountValue
+    );
     return { success: true, data: response };
   } catch (error) {
     rethrowNextNavigationErrors(error);

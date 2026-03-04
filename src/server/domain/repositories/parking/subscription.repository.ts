@@ -56,7 +56,9 @@ export abstract class SubscriptionRepository {
 
   abstract calculatePrice(
     id: string,
-    monthsCount?: number
+    monthsCount?: number,
+    discountType?: "PERCENTAGE" | "FIXED_AMOUNT",
+    discountValue?: number
   ): Promise<IGeneralResponse<IPriceCalculation>>;
 
   // Planes mensuales

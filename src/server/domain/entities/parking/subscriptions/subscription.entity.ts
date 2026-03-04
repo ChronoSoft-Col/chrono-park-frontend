@@ -82,6 +82,10 @@ export interface IPriceCalculation {
   proratedAmount?: number;
   fullMonthsCount: number;
   fullMonthsAmount: number;
+  /** Solo se incluye cuando se aplica descuento */
+  originalAmount?: number;
+  /** Solo se incluye cuando se aplica descuento */
+  discountApplied?: number;
   totalAmount: number;
   periodStart: Date | string;
   periodEnd: Date | string;

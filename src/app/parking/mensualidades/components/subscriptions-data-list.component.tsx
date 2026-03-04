@@ -19,7 +19,11 @@ import { createSubscriptionColumns } from "./table/columns.component";
 import { SubscriptionDetailDialogContent } from "./subscription-detail-dialog-content";
 import { SubscriptionHistoryDialogContent } from "./subscription-history-dialog-content";
 import { CreateSubscriptionDialogContent } from "./create-subscription-dialog.component";
-import { PaySubscriptionDialogContent } from "./pay-subscription-dialog.component";
+import {
+  PaySubscriptionDialogContent,
+  PAY_SUBSCRIPTION_DIALOG_FORM_ID,
+} from "./pay-subscription-dialog.component";
+import { PaySubscriptionDialogFooter } from "./pay-subscription-dialog-footer.component";
 import { cancelSubscriptionAction } from "../actions/cancel-subscription.action";
 import { MensualidadesAction } from "@/src/shared/enums/auth/permissions.enum";
 
@@ -128,7 +132,9 @@ export default function SubscriptionsDataListComponent({
       openDialog({
         title: "Pagar Suscripción",
         description: "Complete el pago para activar la suscripción",
+        dialogClassName: "w-full sm:max-w-5xl",
         content: <PaySubscriptionDialogContent subscription={item} />,
+        footer: <PaySubscriptionDialogFooter formId={PAY_SUBSCRIPTION_DIALOG_FORM_ID} />,
       });
     },
     [openDialog]
