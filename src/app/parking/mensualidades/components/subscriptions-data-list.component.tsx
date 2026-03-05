@@ -39,7 +39,7 @@ export default function SubscriptionsDataListComponent({
   error,
 }: Props) {
   const router = useRouter();
-  const { openDialog, closeDialog } = UseDialogContext();
+  const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const errorShownRef = React.useRef(false);
   const [cancellingId, setCancellingId] = React.useState<string | null>(null);
 
@@ -135,32 +135,39 @@ export default function SubscriptionsDataListComponent({
   );
 
   const handleCancelSubscription = React.useCallback(
-    async (item: ISubscriptionEntity) => {
+    (item: ISubscriptionEntity) => {
       if (cancellingId) return;
-      if (!confirm("¿Está seguro de cancelar esta suscripción?")) return;
 
-      setCancellingId(item.id);
-      const toastId = toast.loading("Cancelando suscripción...");
-      try {
-        const result = await cancelSubscriptionAction(item.id, {
-          reason: "Cancelado por el usuario",
-        });
-        if (result.success && result.data?.success) {
-          toast.success("Suscripción cancelada", { id: toastId });
-          router.refresh();
-        } else {
-          toast.error(result.error || "Error al cancelar la suscripción", {
-            id: toastId,
-          });
-        }
-      } catch (error) {
-        console.error("Error cancelling subscription:", error);
-        toast.error("Error al cancelar la suscripción", { id: toastId });
-      } finally {
-        setCancellingId(null);
-      }
+      showYesNoDialog({
+        title: "Cancelar suscripción",
+        description: "¿Está seguro de cancelar esta suscripción?",
+        iconVariant: "alert",
+        handleYes: async () => {
+          setCancellingId(item.id);
+          const toastId = toast.loading("Cancelando suscripción...");
+          try {
+            const result = await cancelSubscriptionAction(item.id, {
+              reason: "Cancelado por el usuario",
+            });
+            if (result.success && result.data?.success) {
+              toast.success("Suscripción cancelada", { id: toastId });
+              router.refresh();
+            } else {
+              toast.error(result.error || "Error al cancelar la suscripción", {
+                id: toastId,
+              });
+            }
+          } catch (error) {
+            console.error("Error cancelling subscription:", error);
+            toast.error("Error al cancelar la suscripción", { id: toastId });
+          } finally {
+            setCancellingId(null);
+          }
+        },
+        handleNo: () => {},
+      });
     },
-    [cancellingId, router]
+    [cancellingId, router, showYesNoDialog]
   );
 
   const columns = React.useMemo(
