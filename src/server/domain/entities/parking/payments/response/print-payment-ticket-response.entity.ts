@@ -6,6 +6,8 @@ export type IPaymentTicketHeaderEntity = {
   paymentMethod: string;
   paymentPoint: string;
   status: string;
+  customerName: string;
+  customerIdentificationNumber: string;
 };
 
 export type IPaymentTicketDetailEntity = {
@@ -39,8 +41,6 @@ export type IPrintPaymentTicketContentEntity = {
   company: ICompanyInfoEntity;
   headerMessage?: string;
   header: IPaymentTicketHeaderEntity;
-  customerName?: string;
-  customerIdentificationNumber?: string;
   details: IPaymentTicketDetailEntity[];
   totals: IPaymentTicketTotalEntity;
   bodyMessage?: string;
