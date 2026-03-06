@@ -1,18 +1,22 @@
-import { Boxes, ChartColumnBig, PackageOpen, User } from "lucide-react";
+import { Boxes, CalendarCheck, CarFront, CircleDollarSign, ListChecks, LogIn, SlidersHorizontal, UserStarIcon, Wallet, X } from "lucide-react";
 import { EIconNames } from "../enums/icon-names.enum";
 
 export default function AppIcons({iconName}: {iconName: EIconNames}) {
   switch (iconName) {
-    case EIconNames.SUPPLIERS:
-      return (<Boxes/>);
+    case EIconNames.MANUAL_CONTROL:
+      return (<SlidersHorizontal/>);
+    case EIconNames.IN_OUT:
+      return (<LogIn/>);
+    case EIconNames.PARKING_PAYMENT:
+      return (<CarFront/>);
+    case EIconNames.CLOSURES:
+      return (<ListChecks/>);
     case EIconNames.CUSTOMERS:
-      return (<User/>);
-    case EIconNames.PRODUCTS:
-      return (<PackageOpen/>);
-    case EIconNames.SALES:
-      return (<Boxes/>);
-    case EIconNames.DASHBOARD:
-      return (<ChartColumnBig/>);
+      return (<UserStarIcon/>);
+    case EIconNames.PAYMENTS:
+      return (<CircleDollarSign/>);
+    case EIconNames.MONTHLY_PAYMENTS:
+      return (<CalendarCheck/>);
     default:
       return (<Boxes/>);
   }

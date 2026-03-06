@@ -1,8 +1,9 @@
 export enum EIconNames {
-  SUPPLIERS = "suppliers",
-  PRODUCTS = "products",
-  SALES = "sales",
-  DASHBOARD = "dashboard",
-  CUSTOMERS = "clients",
-  INVOICES = "invoices",
+  MANUAL_CONTROL = "control_manual",
+  IN_OUT = "ingresos_salidas",
+  PARKING_PAYMENT = "cobro_de_estacionamiento",
+  CLOSURES = "cierres",
+  CUSTOMERS = "clientes",
+  PAYMENTS = "pagos",
+  MONTHLY_PAYMENTS = "mensualidades"
 }
