@@ -1,4 +1,4 @@
-import { Boxes, CalendarCheck, CarFront, CircleDollarSign, ListChecks, LogIn, SlidersHorizontal, UserStarIcon, Wallet, X } from "lucide-react";
+import { Boxes, CalendarCheck, CarFront, ChartColumn, CircleDollarSign, ListChecks, LogIn, SlidersHorizontal, UserStarIcon, Wallet, X } from "lucide-react";
 import { EIconNames } from "../enums/icon-names.enum";
 
 export default function AppIcons({iconName}: {iconName: EIconNames}) {
@@ -17,6 +17,8 @@ export default function AppIcons({iconName}: {iconName: EIconNames}) {
       return (<CircleDollarSign/>);
     case EIconNames.MONTHLY_PAYMENTS:
       return (<CalendarCheck/>);
+    case EIconNames.DASHBOARD:
+      return <ChartColumn/>
     default:
       return (<Boxes/>);
   }

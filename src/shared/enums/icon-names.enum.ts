@@ -5,5 +5,6 @@ export enum EIconNames {
   CLOSURES = "cierres",
   CUSTOMERS = "clientes",
   PAYMENTS = "pagos",
-  MONTHLY_PAYMENTS = "mensualidades"
+  MONTHLY_PAYMENTS = "mensualidades",
+  DASHBOARD = "dashboard",
 }
