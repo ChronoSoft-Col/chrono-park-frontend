@@ -16,7 +16,8 @@ const paymentsSearchParamsSchema = z.object({
   page: z.coerce.number().int().positive().default(DEFAULT_PAGE),
   limit: z.coerce.number().int().positive().default(DEFAULT_LIMIT),
   search: z.string().optional(),
-  date: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
 });
 
 export async function listPaymentsAction(
@@ -25,7 +26,9 @@ export async function listPaymentsAction(
   try {
     const params = buildSearchParams(paymentsSearchParamsSchema, searchParams);
 
-    const startEnd = params.date ? { startDate: params.date, endDate: params.date } : {};
+    const startEnd = params.startDate || params.endDate
+      ? { startDate: params.startDate, endDate: params.endDate }
+      : {};
 
     const useCase = serverContainer.resolve<PaymentUsecase>(SERVER_TOKENS.PaymentUsecase);
     const response = await useCase.listPayments({

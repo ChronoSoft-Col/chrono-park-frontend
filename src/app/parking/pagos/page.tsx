@@ -11,7 +11,7 @@ export default async function PaymentsPage({
 
   return (
     <div className="space-y-6">
-      <SetupHeaderFilters showDatePicker={true} showSearch={true} />
+      <SetupHeaderFilters showDateRangePicker={true} showSearch={true} />
       <PaymentsDataFetchComponent searchParams={resolvedSearchParams} />
     </div>
   );
