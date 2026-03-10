@@ -13,6 +13,9 @@ import {
   SubscriptionUsecase,
   SessionServiceUsecase,
   DashboardUsecase,
+  WhiteListUsecase,
+  BlackListUsecase,
+  MasterKeysUsecase,
 } from "@/server/domain";
 import {
   CommonDatasourceService,
@@ -29,6 +32,12 @@ import {
   PaymentRepositoryImp,
   DashboardDatasourceService,
   DashboardRepositoryImp,
+  WhiteListDatasourceService,
+  WhiteListRepositoryImp,
+  BlackListDatasourceService,
+  BlackListRepositoryImp,
+  MasterKeysDatasourceService,
+  MasterKeysRepositoryImp,
 } from "@/server/infrastructure";
 import { ClosureDatasourceService } from "@/server/infrastructure/datasources/parking/closure-datasource.service";
 import { ClosureRepositoryImpl } from "@/server/infrastructure/repositories/parking/closure.repository-imp";
@@ -189,5 +198,56 @@ if (!container.isRegistered(SERVER_TOKENS.DashboardUsecase)) {
 }
 
 // set-company bindings removed (companies flow deprecated)
+
+// White List
+if (!container.isRegistered(SERVER_TOKENS.WhiteListDatasourceService)) {
+  container.register(SERVER_TOKENS.WhiteListDatasourceService, {
+    useClass: WhiteListDatasourceService,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.WhiteListRepository)) {
+  container.register(SERVER_TOKENS.WhiteListRepository, {
+    useClass: WhiteListRepositoryImp,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.WhiteListUsecase)) {
+  container.register(SERVER_TOKENS.WhiteListUsecase, { useClass: WhiteListUsecase });
+}
+
+// Black List
+if (!container.isRegistered(SERVER_TOKENS.BlackListDatasourceService)) {
+  container.register(SERVER_TOKENS.BlackListDatasourceService, {
+    useClass: BlackListDatasourceService,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.BlackListRepository)) {
+  container.register(SERVER_TOKENS.BlackListRepository, {
+    useClass: BlackListRepositoryImp,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.BlackListUsecase)) {
+  container.register(SERVER_TOKENS.BlackListUsecase, { useClass: BlackListUsecase });
+}
+
+// Master Keys
+if (!container.isRegistered(SERVER_TOKENS.MasterKeysDatasourceService)) {
+  container.register(SERVER_TOKENS.MasterKeysDatasourceService, {
+    useClass: MasterKeysDatasourceService,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.MasterKeysRepository)) {
+  container.register(SERVER_TOKENS.MasterKeysRepository, {
+    useClass: MasterKeysRepositoryImp,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.MasterKeysUsecase)) {
+  container.register(SERVER_TOKENS.MasterKeysUsecase, { useClass: MasterKeysUsecase });
+}
 
 export { container as serverContainer };

@@ -33,7 +33,7 @@ export async function loginAction(
   try {
     const useCase = serverContainer.resolve<LoginUseCase>(SERVER_TOKENS.LoginUseCase);
     const response = await useCase.execute(params);
-
+    console.log(JSON.stringify(response))
     if (!response.success || !response.data) {
       return {
         success: false,
@@ -78,7 +78,7 @@ export async function loginAction(
   } catch (error) {
     rethrowNextNavigationErrors(error);
     const axiosError = error as AxiosError<IErrorResponse>;
-    console.error("Error en loginAction:", axiosError);
+    console.error("Error en loginAction:", JSON.stringify(axiosError.response?.data || axiosError.message || error));
     const message =
       axiosError.response?.data?.message ??
       axiosError.message ??

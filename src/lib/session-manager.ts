@@ -10,6 +10,7 @@ import {
   createHash,
   randomBytes,
 } from "crypto";
+import { deflateSync, inflateSync } from "zlib";
 import { ENVIRONMENT } from "../shared/constants/environment";
 
 const ALGORITHM = "aes-256-gcm";
@@ -72,10 +73,11 @@ function resolveSecretKey(secret: string): Buffer {
 }
 
 function encrypt(value: string, key: Buffer): string {
+  const compressed = deflateSync(Buffer.from(value, "utf8"));
   const iv = randomBytes(IV_LENGTH);
   const cipher = createCipheriv(ALGORITHM, key, iv);
   const ciphertext = Buffer.concat([
-    cipher.update(value, "utf8"),
+    cipher.update(compressed),
     cipher.final(),
   ]);
   const authTag = cipher.getAuthTag();
@@ -96,7 +98,7 @@ function decrypt(value: string, key: Buffer): string {
     decipher.update(ciphertext),
     decipher.final(),
   ]);
-  return decrypted.toString("utf8");
+  return inflateSync(decrypted).toString("utf8");
 }
 
 async function getMutableCookies(): Promise<ResponseCookies> {

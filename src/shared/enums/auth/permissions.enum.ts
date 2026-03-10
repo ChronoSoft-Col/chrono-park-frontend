@@ -68,6 +68,33 @@ export enum MensualidadesAction {
   CANCELAR_MENSUALIDAD = "CANCELAR_MENSUALIDAD",
 }
 
+// ─── Lista Blanca ────────────────────────────────────────────────────────────
+
+export enum ListaBlancaAction {
+  VER_LISTA_BLANCA = "VER_LISTA_BLANCA",
+  CREAR_LISTA_BLANCA = "CREAR_LISTA_BLANCA",
+  EDITAR_LISTA_BLANCA = "EDITAR_LISTA_BLANCA",
+  INACTIVAR_LISTA_BLANCA = "INACTIVAR_LISTA_BLANCA",
+}
+
+// ─── Lista Negra ─────────────────────────────────────────────────────────────
+
+export enum ListaNegraAction {
+  VER_LISTA_NEGRA = "VER_LISTA_NEGRA",
+  CREAR_LISTA_NEGRA = "CREAR_LISTA_NEGRA",
+  EDITAR_LISTA_NEGRA = "EDITAR_LISTA_NEGRA",
+  INACTIVAR_LISTA_NEGRA = "INACTIVAR_LISTA_NEGRA",
+}
+
+// ─── Llaves Maestras ─────────────────────────────────────────────────────────
+
+export enum LlavesMaestrasAction {
+  VER_LLAVES_MAESTRAS = "VER_LLAVES_MAESTRAS",
+  CREAR_LLAVE_MAESTRA = "CREAR_LLAVE_MAESTRA",
+  EDITAR_LLAVE_MAESTRA = "EDITAR_LLAVE_MAESTRA",
+  INACTIVAR_LLAVE_MAESTRA = "INACTIVAR_LLAVE_MAESTRA",
+}
+
 // ─── Tipo unificado de todas las acciones ────────────────────────────────────
 
 export type AppAction =
@@ -78,4 +105,7 @@ export type AppAction =
   | CierresAction
   | ClientesAction
   | PagosAction
-  | MensualidadesAction;
+  | MensualidadesAction
+  | ListaBlancaAction
+  | ListaNegraAction
+  | LlavesMaestrasAction;

@@ -10,6 +10,9 @@ export const SERVER_TOKENS = {
   SubscriptionUsecase: Symbol.for("server:SubscriptionUsecase"),
   SessionServiceUsecase: Symbol.for("server:SessionServiceUsecase"),
   DashboardUsecase: Symbol.for("server:DashboardUsecase"),
+  WhiteListUsecase: Symbol.for("server:WhiteListUsecase"),
+  BlackListUsecase: Symbol.for("server:BlackListUsecase"),
+  MasterKeysUsecase: Symbol.for("server:MasterKeysUsecase"),
 
   // Repositories
   LoginRepository: Symbol.for("server:LoginRepository"),
@@ -22,6 +25,9 @@ export const SERVER_TOKENS = {
   SubscriptionRepository: Symbol.for("server:SubscriptionRepository"),
   SessionServiceRepository: Symbol.for("server:SessionServiceRepository"),
   DashboardRepository: Symbol.for("server:DashboardRepository"),
+  WhiteListRepository: Symbol.for("server:WhiteListRepository"),
+  BlackListRepository: Symbol.for("server:BlackListRepository"),
+  MasterKeysRepository: Symbol.for("server:MasterKeysRepository"),
 
   // Datasources
   LoginDatasourceService: Symbol.for("server:LoginDatasourceService"),
@@ -34,4 +40,7 @@ export const SERVER_TOKENS = {
   SubscriptionDatasourceService: Symbol.for("server:SubscriptionDatasourceService"),
   SessionServiceDatasource: Symbol.for("server:SessionServiceDatasource"),
   DashboardDatasourceService: Symbol.for("server:DashboardDatasourceService"),
+  WhiteListDatasourceService: Symbol.for("server:WhiteListDatasourceService"),
+  BlackListDatasourceService: Symbol.for("server:BlackListDatasourceService"),
+  MasterKeysDatasourceService: Symbol.for("server:MasterKeysDatasourceService"),
 } as const;
