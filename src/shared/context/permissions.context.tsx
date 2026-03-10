@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useMemo, type PropsWithChildren } from "react";
 import type { AppAction } from "@/src/shared/enums/auth/permissions.enum";
+import { useAuthStore } from "@/src/shared/stores/auth.store";
 
 type PermissionsContextValue = {
   /** Set de acciones para búsqueda O(1) */
@@ -22,13 +23,12 @@ const PermissionsContext = createContext<PermissionsContextValue>({
 });
 
 /**
- * Provider que recibe las acciones del usuario (desde el server layout)
+ * Provider que lee las acciones del usuario desde el Zustand auth store
  * y las expone via contexto a todos los componentes hijos.
  */
-export function PermissionsProvider({
-  actions: actionList,
-  children,
-}: PropsWithChildren<{ actions: string[] }>) {
+export function PermissionsProvider({ children }: PropsWithChildren) {
+  const actionList = useAuthStore((s) => s.actions);
+
   const value = useMemo<PermissionsContextValue>(() => {
     const set = new Set(actionList);
     return {

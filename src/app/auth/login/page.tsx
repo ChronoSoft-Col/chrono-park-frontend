@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { loginAction } from "@/src/app/auth/actions/login.action";
 import { ILoginParams } from "@/server/domain/index";
 import { signOut } from "@/src/lib/session-client";
+import { useAuthStore } from "@/src/shared/stores/auth.store";
 import ChronoButton from "@chrono/chrono-button.component";
 import {
   ChronoCard,
@@ -80,6 +81,13 @@ export default function LoginPage() {
         });
         return;
       }
+
+      // Guardar permissions y applications en Zustand (persiste en localStorage)
+      useAuthStore.getState().setAuth(
+        response.data.applications ?? [],
+        response.data.permissions ?? [],
+      );
+
       // If the login was requested because router redirected with a `from` param, respect it
       if (fromPath) {
         toast.success("Sesión iniciada correctamente", { id: loadingToast });

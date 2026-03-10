@@ -2,6 +2,7 @@
 
 import type { SessionPayload } from "@/src/shared/types/auth/session.type";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAuthStore } from "@/src/shared/stores/auth.store";
 
 let cachedSession: SessionPayload | null = null;
 let lastFetch = 0;
@@ -78,6 +79,7 @@ export async function signOut(): Promise<void> {
     console.error("No se pudo cerrar la sesión", error);
   } finally {
     clearSessionCache();
+    useAuthStore.getState().clearAuth();
   }
 }
 

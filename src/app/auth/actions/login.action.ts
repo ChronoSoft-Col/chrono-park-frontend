@@ -8,15 +8,16 @@ import { ILoginParams, LoginUseCase } from "@/server/domain/index";
 import { SERVER_TOKENS } from "@/server/di/server-tokens";
 import type { TApplication } from "@/shared/types/auth/application.type";
 import type IActionResponse from "@/shared/interfaces/generic/action-response";
-// TUser is not used directly here
-import type { SessionTokens, SessionUser } from "@/shared/types/auth/session.type";
+import type { SessionApplication, SessionTokens, SessionUser } from "@/shared/types/auth/session.type";
 import type IErrorResponse from "@/shared/interfaces/generic/error-response.interface";
 import { createSession } from "@/lib/session";
+import { slimApplications, buildPermissionsFromApplications } from "@/lib/session-schema";
 import { rethrowNextNavigationErrors } from "@/lib/next-navigation-errors";
 
 export type LoginActionResult = {
   user: SessionUser;
-  applications?: TApplication[];
+  applications: SessionApplication[];
+  permissions: string[];
   role?: { id: string; name: string } | null;
 };
 
@@ -56,22 +57,23 @@ export async function loginAction(
     const applications = (payload["applications"] as TApplication[]) || [];
     const role = (payload["role"] as { id: string; name: string }) || null;
 
-    console.log("Login exitoso, creando sesión para usuario:", sessionUser);
-    console.log("Tokens obtenidos:", tokens);
-    console.log("Aplicaciones del usuario:", applications);
-
+    // Cookie slim: solo user, tokens y role (sin applications ni permissions)
     await createSession({
       user: sessionUser,
       tokens,
       role,
-      applications,
     });
+
+    // Retornar permissions y applications para que el cliente las guarde en Zustand
+    const slimApps = slimApplications(applications);
+    const permissions = buildPermissionsFromApplications(applications);
 
     return {
       success: true,
       data: {
         user: sessionUser,
-        applications,
+        applications: slimApps,
+        permissions: permissions.actions,
         role,
       },
     };

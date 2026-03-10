@@ -1,7 +1,7 @@
 "use client";
 import { User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { SessionApplication, SessionResource } from "../../types/auth/session.type";
+import { SessionResource } from "../../types/auth/session.type";
 import {
   ChronoSidebar,
   ChronoSidebarContent,
@@ -27,15 +27,13 @@ import AppIcons from "../icons.component";
 import { EIconNames } from "../../enums/icon-names.enum";
 import Image from "next/image";
 import { useClientSession } from "@/src/lib/session-client";
+import { useAuthStore } from "@/src/shared/stores/auth.store";
 
-export default function SidebarComponent({
-  applications,
-}: {
-  applications: SessionApplication[];
-}) {
+export default function SidebarComponent() {
   const pathname = usePathname();
   const router = useRouter();
-  const {data} = useClientSession()
+  const {data} = useClientSession();
+  const applications = useAuthStore((s) => s.applications);
 
   const isResourceWithoutSubresources = (resource: SessionResource) => {
     return resource.subresources.length === 0;

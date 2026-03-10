@@ -2,24 +2,17 @@ import { Boxes, CalendarCheck, CarFront, ChartColumn, CircleDollarSign, ListChec
 import { EIconNames } from "../enums/icon-names.enum";
 
 export default function AppIcons({iconName}: {iconName: EIconNames}) {
-  switch (iconName) {
-    case EIconNames.MANUAL_CONTROL:
-      return (<SlidersHorizontal/>);
-    case EIconNames.IN_OUT:
-      return (<LogIn/>);
-    case EIconNames.PARKING_PAYMENT:
-      return (<CarFront/>);
-    case EIconNames.CLOSURES:
-      return (<ListChecks/>);
-    case EIconNames.CUSTOMERS:
-      return (<UserStarIcon/>);
-    case EIconNames.PAYMENTS:
-      return (<CircleDollarSign/>);
-    case EIconNames.MONTHLY_PAYMENTS:
-      return (<CalendarCheck/>);
-    case EIconNames.DASHBOARD:
-      return <ChartColumn/>
-    default:
-      return (<Boxes/>);
+
+  const iconLabelValue = {
+    [EIconNames.MANUAL_CONTROL]: <SlidersHorizontal/>,
+    [EIconNames.IN_OUT]: <LogIn/>,
+    [EIconNames.PARKING_PAYMENT]: <CarFront/>,
+    [EIconNames.CLOSURES]: <ListChecks/>,
+    [EIconNames.CUSTOMERS]: <UserStarIcon/>,
+    [EIconNames.PAYMENTS]: <CircleDollarSign/>,
+    [EIconNames.MONTHLY_PAYMENTS]: <CalendarCheck/>,
+    [EIconNames.DASHBOARD]: <ChartColumn/>
   }
+
+  return iconLabelValue[iconName] || <Boxes/>;
 }
