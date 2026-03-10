@@ -64,7 +64,7 @@ export default function MasterKeyLogsDataListComponent({
     [openDialog, closeDialog],
   );
 
-  const columns = React.useMemo(() => createMasterKeyLogColumns(), []);
+  const columns = React.useMemo(() => createMasterKeyLogColumns(handleViewDetail), [handleViewDetail]);
 
   const safeTotalPages = Math.max(1, totalPages || Math.ceil(total / pageSize) || 1);
 
@@ -79,7 +79,6 @@ export default function MasterKeyLogsDataListComponent({
           caption={`${total} registros`}
           getRowKey={(row) => row.id}
           emptyMessage="Sin registros de uso de llaves maestras"
-          onRowClick={handleViewDetail}
         />
       }
       paginator={
