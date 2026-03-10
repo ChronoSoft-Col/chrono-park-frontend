@@ -14,8 +14,6 @@ import { UseDialogContext } from "@/shared/context/dialog.context";
 import { useCommonStore } from "@/src/shared/stores/common.store";
 import { usePrint } from "@/shared/hooks/common/use-print.hook";
 import { ISubscriptionEntity, IPriceCalculation } from "@/server/domain";
-import { useClientSession } from "@/src/lib/session-client";
-import { hasPermission } from "@/src/shared/utils/permissions.util";
 import { MensualidadesAction } from "@/src/shared/enums/auth/permissions.enum";
 import { usePaySubscriptionDialogUiStore } from "../stores/pay-subscription-dialog-ui.store";
 import {
@@ -35,6 +33,7 @@ import {
   ChronoSelectTrigger,
   ChronoSelectValue,
 } from "@chrono/chrono-select.component";
+import { usePermissionsContext } from "@/src/shared/context/permissions.context";
 
 const fieldContainerClasses =
   "rounded-lg border border-border bg-card/80 p-4 shadow-sm transition-colors focus-within:border-primary data-[invalid=true]:border-destructive min-w-0";
@@ -52,8 +51,8 @@ export function PaySubscriptionDialogContent({ subscription }: Props) {
   const { closeDialog, showYesNoDialog } = UseDialogContext();
   const { paymentMethods } = useCommonStore();
   const { printPaymentTicketByPaymentId } = usePrint();
-  const { data: session } = useClientSession();
-  const canApplyDiscount = hasPermission(session ?? null, MensualidadesAction.APLICAR_DESCUENTO);
+  const { can } = usePermissionsContext();
+  const canApplyDiscount = can(MensualidadesAction.APLICAR_DESCUENTO);
 
   const { setUi, reset } = usePaySubscriptionDialogUiStore();
 

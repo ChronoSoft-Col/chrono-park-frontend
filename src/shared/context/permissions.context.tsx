@@ -25,6 +25,10 @@ const PermissionsContext = createContext<PermissionsContextValue>({
 /**
  * Provider que lee las acciones del usuario desde el Zustand auth store
  * y las expone via contexto a todos los componentes hijos.
+ *
+ * Las acciones se sincronizan al store desde el Server Component
+ * (ParkingLayout) vía AuthStoreInitializer, por lo que están
+ * disponibles desde el primer render sin esperar hidratación de localStorage.
  */
 export function PermissionsProvider({ children }: PropsWithChildren) {
   const actionList = useAuthStore((s) => s.actions);

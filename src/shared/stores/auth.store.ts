@@ -11,7 +11,8 @@ type AuthState = {
 };
 
 type AuthActions = {
-  setAuth: (applications: SessionApplication[], actions: string[]) => void;
+  setApplications: (applications: SessionApplication[]) => void;
+  setActions: (actions: string[]) => void;
   clearAuth: () => void;
   setHasHydrated: (value: boolean) => void;
 };
@@ -23,7 +24,8 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       actions: [],
       _hasHydrated: false,
 
-      setAuth: (applications, actions) => set({ applications, actions }),
+      setApplications: (applications) => set({ applications }),
+      setActions: (actions) => set({ actions }),
       clearAuth: () => set({ applications: [], actions: [] }),
       setHasHydrated: (value) => set({ _hasHydrated: value }),
     }),
@@ -32,7 +34,6 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         applications: state.applications,
-        actions: state.actions,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

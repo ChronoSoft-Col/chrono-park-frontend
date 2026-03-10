@@ -57,16 +57,17 @@ export async function loginAction(
     const applications = (payload["applications"] as TApplication[]) || [];
     const role = (payload["role"] as { id: string; name: string }) || null;
 
-    // Cookie slim: solo user, tokens y role (sin applications ni permissions)
+    // Cookie: user, tokens, role y permissions (sin applications)
+    const permissions = buildPermissionsFromApplications(applications);
     await createSession({
       user: sessionUser,
       tokens,
       role,
+      permissions,
     });
 
-    // Retornar permissions y applications para que el cliente las guarde en Zustand
+    // Retornar applications para que el cliente las guarde en Zustand (sidebar)
     const slimApps = slimApplications(applications);
-    const permissions = buildPermissionsFromApplications(applications);
 
     return {
       success: true,

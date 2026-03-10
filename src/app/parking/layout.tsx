@@ -2,15 +2,19 @@ import HeaderComponent from "@/src/shared/components/layout/header.component";
 import SidebarComponent from "@/src/shared/components/layout/sidebar.component";
 import { ChronoSidebarInset } from "@chrono/chrono-sidebar.component";
 import { PropsWithChildren } from "react";
+import { getSession } from "@/src/lib/session";
 import FooterComponent from "@/src/shared/components/layout/footer.component";
 import ParkingProviders from "./providers";
-import { PermissionsProvider } from "@/src/shared/context/permissions.context";
+import { AuthStoreInitializer } from "@/src/shared/components/auth-store-initializer.component";
 
 export default async function ParkingLayout({ children }: PropsWithChildren) {
+  const session = await getSession();
+  const actions = session?.permissions?.actions ?? [];
+
   return (
     <ParkingProviders>
-      <PermissionsProvider>
-        <SidebarComponent />
+      <AuthStoreInitializer actions={actions} />
+      <SidebarComponent />
         <ChronoSidebarInset className="min-w-0 overflow-hidden grid grid-rows-[auto_1fr_auto] h-screen p-0">
           <HeaderComponent />
           <main className="overflow-y-auto overflow-x-hidden px-4 sm:px-6 md:px-8">
@@ -18,7 +22,6 @@ export default async function ParkingLayout({ children }: PropsWithChildren) {
           </main>
           <FooterComponent />
         </ChronoSidebarInset>
-      </PermissionsProvider>
     </ParkingProviders>
   );
 }

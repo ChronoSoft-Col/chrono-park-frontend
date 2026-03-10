@@ -82,11 +82,10 @@ export default function LoginPage() {
         return;
       }
 
-      // Guardar permissions y applications en Zustand (persiste en localStorage)
-      useAuthStore.getState().setAuth(
-        response.data.applications ?? [],
-        response.data.permissions ?? [],
-      );
+      // Guardar applications y permissions en Zustand
+      const store = useAuthStore.getState();
+      store.setApplications(response.data.applications ?? []);
+      store.setActions(response.data.permissions ?? []);
 
       // If the login was requested because router redirected with a `from` param, respect it
       if (fromPath) {
