@@ -42,7 +42,7 @@ export function ChronoViewWithTableLayout({
   paginatorWrapperClassName,
 }: ChronoViewWithTableLayoutProps) {
   return (
-    <section className={cn("space-y-6", className)}>
+    <section className={cn("space-y-6", "h-full", "overflow-y-auto", className)}>
       {(title || description || action) && (
         <header className={cn("flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between", headerClassName)}>
           <div className="space-y-1">

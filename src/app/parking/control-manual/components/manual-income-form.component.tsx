@@ -34,7 +34,7 @@ import {
 import { TRateProfile } from "@/shared/types/common/rate-profile.type";
 import { TVehicleType } from "@/shared/types/common/vehicle-types.type";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, LoaderCircle } from "lucide-react";
+import { Check, LoaderCircle, ShieldX } from "lucide-react";
 import { useState } from "react";
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -42,6 +42,9 @@ import { generateManualIncomeAction } from "../actions/generate-manual-income.ac
 import { IGenerateManualIncomeParamsEntity } from "@/server/domain";
 import { usePrint } from "@/shared/hooks/common/use-print.hook";
 import { IGenerateManualIncomeResponse } from "@/server/domain/entities/parking/manual-income/response/generate-manual-income-response.entity";
+import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import { ControlManualAction } from "@/src/shared/enums/auth/permissions.enum";
+import EmptyState from "@/src/shared/components/empty-state.component";
 
 export default function ManualIncomeFormComponent() {
   const { vehicleTypes } = useCommonStore();
@@ -82,7 +85,38 @@ export default function ManualIncomeFormComponent() {
   };
 
   return (
-    <IncomeForm vehicleTypes={vehicleTypes} onSubmit={onManualIncomeSubmit} />
+    <PermissionGuard
+      action={ControlManualAction.CREAR_INGRESO_MANUAL}
+      fallback={
+        <ChronoCard className="flex h-full w-full flex-col">
+          <ChronoCardHeader>
+            <div className="flex flex-wrap items-center gap-2">
+              <ChronoBadge variant="outline" className="text-[11px] font-medium text-muted-foreground">
+                Control manual
+              </ChronoBadge>
+            </div>
+            <div>
+              <ChronoCardTitle className="text-2xl font-semibold text-foreground">
+                Registrar ingreso manual
+              </ChronoCardTitle>
+              <ChronoCardDescription className="text-sm text-muted-foreground">
+                No tienes permisos para crear ingresos manuales.
+              </ChronoCardDescription>
+            </div>
+          </ChronoCardHeader>
+          <ChronoCardContent className="flex min-h-0 flex-1 items-center justify-center">
+            <EmptyState
+              icon={<ShieldX className="h-12 w-12 text-muted-foreground" />}
+              title="Acceso restringido"
+              description="Contacta a un administrador para obtener el permiso de crear ingresos manuales."
+              className="py-10"
+            />
+          </ChronoCardContent>
+        </ChronoCard>
+      }
+    >
+      <IncomeForm vehicleTypes={vehicleTypes} onSubmit={onManualIncomeSubmit} />
+    </PermissionGuard>
   );
 }
 
