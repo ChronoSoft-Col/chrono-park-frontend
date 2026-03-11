@@ -9,7 +9,7 @@ let lastFetch = 0;
 let pendingFetch: Promise<SessionPayload | null> | null = null;
 const CACHE_TTL = 30 * 1000; // 30 seconds
 
-const SESSION_ENDPOINT = "/api/session";
+const SESSION_ENDPOINT = "/api-cs/session";
 
 function shouldReuseCache(): boolean {
   if (!cachedSession) {

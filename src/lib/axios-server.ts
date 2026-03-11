@@ -67,7 +67,7 @@ export function getServerApi(queryParams?: Record<string, unknown>) {
         // Nota: en Server Components no se pueden modificar cookies.
         // Redirigimos a un Route Handler que sí puede destruir la cookie y luego mandar al login.
         redirect(
-          `/api/session/logout?next=${encodeURIComponent("/auth/login?reason=expired")}`
+          `/api-cs/session/logout?next=${encodeURIComponent("/auth/login?reason=expired")}`
         );
       }
 
