@@ -40,9 +40,9 @@ export class ClosureDatasourceService extends AxiosServerInstance implements Clo
       .then((response) => this.unwrapGeneralResponse<IClosureEntity>(response.data));
   }
 
-  async sendReport(id: string): Promise<{ message: string }> {
+  async sendReport(id: string, emails: string): Promise<{ message: string }> {
     return this.api
-      .post<{ message: string }>(`/closures/${id}/send-report`)
+      .post<{ message: string }>(`/closures/${id}/send-report`, { emails })
       .then((response) => response.data);
   }
 }

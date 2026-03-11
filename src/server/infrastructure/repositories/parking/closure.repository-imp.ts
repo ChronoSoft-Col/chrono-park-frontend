@@ -23,7 +23,7 @@ export class ClosureRepositoryImpl implements ClosureRepository {
     return this.closureDatasource.getClosureById(id);
   }
 
-  async sendReport(id: string): Promise<{ message: string }> {
-    return this.closureDatasource.sendReport(id);
+  async sendReport(id: string, emails: string): Promise<{ message: string }> {
+    return this.closureDatasource.sendReport(id, emails);
   }
 }

@@ -9,13 +9,14 @@ import { AxiosError } from "axios";
 import { rethrowNextNavigationErrors } from "@/lib/next-navigation-errors";
 
 export async function sendClosureReportAction(
-  id: string
+  id: string,
+  emails: string
 ): Promise<IActionResponse<{ message: string }>> {
   try {
     const closureUsecase = serverContainer.resolve<ClosureUsecase>(
       SERVER_TOKENS.ClosureUsecase
     );
-    const result = await closureUsecase.sendReport(id);
+    const result = await closureUsecase.sendReport(id, emails);
 
     return {
       success: true,
