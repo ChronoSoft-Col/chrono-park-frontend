@@ -88,7 +88,7 @@ export default function ManualIncomeFormComponent() {
     <PermissionGuard
       action={ControlManualAction.CREAR_INGRESO_MANUAL}
       fallback={
-        <ChronoCard className="flex h-full w-full flex-col">
+        <ChronoCard className="flex flex-col">
           <ChronoCardHeader>
             <div className="flex flex-wrap items-center gap-2">
               <ChronoBadge variant="outline" className="text-[11px] font-medium text-muted-foreground">
@@ -104,7 +104,7 @@ export default function ManualIncomeFormComponent() {
               </ChronoCardDescription>
             </div>
           </ChronoCardHeader>
-          <ChronoCardContent className="flex min-h-0 flex-1 items-center justify-center">
+          <ChronoCardContent className="flex flex-1 items-center justify-center">
             <EmptyState
               icon={<ShieldX className="h-12 w-12 text-muted-foreground" />}
               title="Acceso restringido"
@@ -189,8 +189,8 @@ const IncomeForm = ({
   });
 
   return (
-    <form onSubmit={handleFormSubmit} className="flex h-full w-full">
-      <ChronoCard className="flex h-full w-full flex-col">
+    <form onSubmit={handleFormSubmit}>
+      <ChronoCard>
         <ChronoCardHeader>
           <div className="flex flex-wrap items-center gap-2">
             <ChronoBadge
@@ -217,67 +217,65 @@ const IncomeForm = ({
         </ChronoCardHeader>
 
         <ChronoCardContent className="space-y-4">
-          <div className="grid gap-3 lg:grid-cols-2">
-            <div className="grid gap-3 lg:col-span-2 lg:grid-cols-2">
-              <Controller
-                control={control}
-                name="licensePlate"
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Controller
+              control={control}
+              name="licensePlate"
                 render={({ field, fieldState }) => (
-                  <ChronoField
-                    data-invalid={fieldState.invalid}
-                    className={`${fieldContainerClasses} min-w-0`}
+                <ChronoField
+                  data-invalid={fieldState.invalid}
+                  className={`${fieldContainerClasses} min-w-0`}
+                >
+                  <ChronoFieldLabel
+                    htmlFor="licensePlate"
+                    className={fieldLabelClasses}
                   >
-                    <ChronoFieldLabel
-                      htmlFor="licensePlate"
-                      className={fieldLabelClasses}
-                    >
-                      Placa
-                    </ChronoFieldLabel>
-                    <ChronoPlateInput
-                      {...field}
-                      id="licensePlate"
-                      placeholder="QJJ15G"
-                      className="mt-1"
-                    />
-                    {fieldState.invalid && (
-                      <ChronoFieldError errors={[fieldState.error]} />
-                    )}
-                  </ChronoField>
-                )}
-              />
+                    Placa
+                  </ChronoFieldLabel>
+                  <ChronoPlateInput
+                    {...field}
+                    id="licensePlate"
+                    placeholder="QJJ15G"
+                    className="mt-1"
+                  />
+                  {fieldState.invalid && (
+                    <ChronoFieldError errors={[fieldState.error]} />
+                  )}
+                </ChronoField>
+              )}
+            />
 
-              <Controller
-                name="vehicleTypeId"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <ChronoField
-                    data-invalid={fieldState.invalid}
-                    className={`${fieldContainerClasses} min-w-0`}
+            <Controller
+              name="vehicleTypeId"
+              control={control}
+              render={({ field, fieldState }) => (
+                <ChronoField
+                  data-invalid={fieldState.invalid}
+                  className={`${fieldContainerClasses} min-w-0`}
+                >
+                  <ChronoFieldLabel
+                    htmlFor="vehicleTypeId"
+                    className={fieldLabelClasses}
                   >
-                    <ChronoFieldLabel
-                      htmlFor="vehicleTypeId"
-                      className={fieldLabelClasses}
-                    >
-                      Tipo de vehículo
-                    </ChronoFieldLabel>
+                    Tipo de vehículo
+                  </ChronoFieldLabel>
 
-                    <ChronoVehicleTypeSelect
-                      value={field.value ?? ""}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        vehicleTypeChanged(value);
-                      }}
-                      options={vehicleTypes ?? []}
-                      className="mt-1"
-                    />
+                  <ChronoVehicleTypeSelect
+                    value={field.value ?? ""}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      vehicleTypeChanged(value);
+                    }}
+                    options={vehicleTypes ?? []}
+                    className="mt-1"
+                  />
 
-                    {fieldState.invalid && (
-                      <ChronoFieldError errors={[fieldState.error]} />
-                    )}
-                  </ChronoField>
-                )}
-              />
-            </div>
+                  {fieldState.invalid && (
+                    <ChronoFieldError errors={[fieldState.error]} />
+                  )}
+                </ChronoField>
+              )}
+            />
 
             <Controller
               name="entryTime"
@@ -353,7 +351,7 @@ const IncomeForm = ({
             type="submit"
             size="lg"
             disabled={isSubmitting || !isValid}
-            className="min-w-[200px]"
+            className="w-full sm:w-auto sm:min-w-[200px]"
           >
             {isSubmitting ? (
               <>

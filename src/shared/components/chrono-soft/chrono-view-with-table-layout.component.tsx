@@ -50,7 +50,7 @@ export function ChronoViewWithTableLayout({
             {description && <p className="text-xs text-muted-foreground">{description}</p>}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
             {filters}
 
             {action && (() => {
