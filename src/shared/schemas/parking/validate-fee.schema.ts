@@ -15,10 +15,6 @@ export const ValidateFeeSchema = z.object({
     .refine((v) => v === "" || isValidColombianPlate(v), {
       message: "Placa inválida (CO)",
     }),
-  // ChronoDateTimePicker provides a Date; avoid coercion to keep types aligned.
-  exitTime: z.date({
-    error: "La fecha y hora de salida son inválidas",
-  }),
 }).superRefine((data, ctx) => {
   const hasQr = Boolean(data.parkingSessionId);
   const hasPlate = Boolean(data.licensePlate);

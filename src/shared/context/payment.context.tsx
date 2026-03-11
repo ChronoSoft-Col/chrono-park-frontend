@@ -145,7 +145,6 @@ export const PaymentProvider = ({ children }: { children: React.ReactNode }) => 
     const params: IValidateAmountParamsEntity = {
       parkingSessionId: currentData.parkingSessionId,
       licensePlate: currentData.vehicle?.licensePlate,
-      exitTime: new Date(currentData.exitTime),
       rateId,
     };
 

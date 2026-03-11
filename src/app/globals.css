@@ -140,9 +140,9 @@
 /* ── Responsive UI scale ─────────────────────────────────────
    Adjust the global rem multiplier based on viewport width so
    the interface feels natural on small laptops and large monitors alike. */
-@media (min-width: 1440px) {
-  :root { --ui-scale: 0.8; }
+@media (max-width: 1366px) {
+  :root { --ui-scale: 0.9; }
 }
 @media (min-width: 1920px) {
-  :root { --ui-scale: 1.1; }
+  :root { --ui-scale: 1.05; }
 }
