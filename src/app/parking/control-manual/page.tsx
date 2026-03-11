@@ -1,5 +1,5 @@
 import ManualIncomeFormComponent from "./components/manual-income-form.component";
-import ManualExitPlaceholderComponent from "./components/manual-exit-placeholder.component";
+import ManualExitFormComponent from "./components/manual-exit-form.component";
 import { SetupHeaderFilters } from "@/src/shared/components/layout/setup-header-filters.component";
 import { ChronoViewLayout } from "@chrono/chrono-view-layout.component";
 import PermissionGuard from "@/src/shared/components/permission-guard.component";
@@ -17,7 +17,7 @@ export default function ManualControlPage() {
         className="h-full overflow-y-auto"
       >
         <ManualIncomeFormComponent />
-        <ManualExitPlaceholderComponent />
+        <ManualExitFormComponent />
       </ChronoViewLayout>
     </PermissionGuard>
   );

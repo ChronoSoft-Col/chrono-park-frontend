@@ -68,6 +68,9 @@ export * from "./entities/parking/payments/response/print-payment-ticket-respons
 export * from "./entities/parking/manual-income/params/generate-manual-income-params.entity"
 export * from "./entities/parking/manual-income/response/generate-manual-income-response.entity"
 
+export * from "./entities/parking/manual-exit/params/generate-manual-exit-params.entity"
+export * from "./entities/parking/manual-exit/response/generate-manual-exit-response.entity"
+
 export * from "./entities/parking/common/amount-detail.entity"
 export * from "./entities/parking/common/rule-applied.entity"
 

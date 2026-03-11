@@ -5,6 +5,8 @@ import {
   IGenerateManualIncomeParamsEntity,
   IGenerateManualIncomeResponse,
   IEditParkingSessionParamsEntity,
+  IGenerateManualExitParamsEntity,
+  IGenerateManualExitResponse,
   ManualControlRepository,
 } from "@/server/domain/index";
 import { ManualControlDatasourceService } from "@/server/infrastructure/index";
@@ -33,5 +35,11 @@ export class ManualControlRepositoryImp implements ManualControlRepository {
     params: IEditParkingSessionParamsEntity,
   ): Promise<void> {
     return this.manualControlDatasourceService.editParkingSession(parkingSessionId, params);
+  }
+
+  generateManualExit(
+    params: IGenerateManualExitParamsEntity,
+  ): Promise<IGenerateManualExitResponse> {
+    return this.manualControlDatasourceService.generateManualExit(params);
   }
 }

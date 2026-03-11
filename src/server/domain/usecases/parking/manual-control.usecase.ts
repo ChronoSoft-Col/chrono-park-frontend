@@ -2,6 +2,8 @@ import {
   IGenerateManualIncomeParamsEntity,
   IGenerateManualIncomeResponse,
   IEditParkingSessionParamsEntity,
+  IGenerateManualExitParamsEntity,
+  IGenerateManualExitResponse,
   ManualControlRepository,
 } from "@/server/domain";
 import { SERVER_TOKENS } from "@/server/di/server-tokens";
@@ -31,5 +33,11 @@ export class ManualControlUseCase implements ManualControlRepository {
     params: IEditParkingSessionParamsEntity,
   ): Promise<void> {
     return this.manualControlRepository.editParkingSession(parkingSessionId, params);
+  }
+
+  generateManualExit(
+    params: IGenerateManualExitParamsEntity,
+  ): Promise<IGenerateManualExitResponse> {
+    return this.manualControlRepository.generateManualExit(params);
   }
 }

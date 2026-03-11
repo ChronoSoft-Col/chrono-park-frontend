@@ -2,6 +2,8 @@ import {
   IGenerateManualIncomeParamsEntity,
   IGenerateManualIncomeResponse,
   IEditParkingSessionParamsEntity,
+  IGenerateManualExitParamsEntity,
+  IGenerateManualExitResponse,
 } from "@/server/domain/index";
 
 export abstract class ManualControlRepository {
@@ -15,4 +17,7 @@ export abstract class ManualControlRepository {
     parkingSessionId: string,
     params: IEditParkingSessionParamsEntity,
   ): Promise<void>;
+  abstract generateManualExit(
+    params: IGenerateManualExitParamsEntity,
+  ): Promise<IGenerateManualExitResponse>;
 }
