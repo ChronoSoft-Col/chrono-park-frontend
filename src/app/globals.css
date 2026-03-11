@@ -44,7 +44,7 @@
 }
 
 :root {
-  --ui-scale: 1.1;
+  --ui-scale: 1;
   --radius: 0.875rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.147 0.004 49.25);
@@ -82,7 +82,6 @@
 }
 
 .dark {
-  --ui-scale: 1.1;
   --background: oklch(0.147 0.004 49.25);
   --foreground: oklch(0.985 0.001 106.423);
   --card: oklch(0.216 0.006 56.043);
@@ -136,4 +135,14 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ── Responsive UI scale ─────────────────────────────────────
+   Adjust the global rem multiplier based on viewport width so
+   the interface feels natural on small laptops and large monitors alike. */
+@media (min-width: 1440px) {
+  :root { --ui-scale: 1; }
+}
+@media (min-width: 1920px) {
+  :root { --ui-scale: 1; }
 }

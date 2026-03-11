@@ -72,7 +72,7 @@ const benefits = [
 const navLinks = [
   { label: "Características", href: "#features" },
   { label: "Beneficios", href: "#benefits" },
-  { label: "Soporte", href: "mailto:soporte@chronopark.com" },
+  { label: "Soporte", href: "mailto:info@chronosoft.com.co" },
 ];
 
 export default function Home() {

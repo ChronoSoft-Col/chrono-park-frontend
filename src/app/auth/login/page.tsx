@@ -201,7 +201,7 @@ export default function LoginPage() {
             ¿No tienes acceso? Comunícate con tu administrador para solicitar una cuenta.
           </p>
           <ChronoButton variant="link" asChild>
-            <Link href="mailto:soporte@chronopark.com">Escríbenos a soporte@chronopark.com</Link>
+            <Link href="mailto:info@chronosoft.com.co">Escríbenos a info@chronosoft.com.co</Link>
           </ChronoButton>
         </ChronoCardFooter>
       </ChronoCard>
