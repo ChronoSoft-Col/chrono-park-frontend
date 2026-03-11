@@ -4,6 +4,12 @@ export * from "./datasources/axios-server.intance"
 export * from "./repositories/auth/login.repository-imp";
 export * from "./datasources/auth/login-datasource.service";
 
+export * from "./datasources/auth/user-datasource.service"
+export * from "./repositories/auth/user.repository-imp"
+
+export * from "./datasources/auth/role-datasource.service"
+export * from "./repositories/auth/role.repository-imp"
+
 export * from "./datasources/parking/manual-control-datasource.service"
 export * from "./repositories/parking/manual-control.repository-imp"
 

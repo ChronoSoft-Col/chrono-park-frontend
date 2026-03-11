@@ -16,6 +16,8 @@ import {
   WhiteListUsecase,
   BlackListUsecase,
   MasterKeysUsecase,
+  UserUsecase,
+  RoleUsecase,
 } from "@/server/domain";
 import {
   CommonDatasourceService,
@@ -38,6 +40,10 @@ import {
   BlackListRepositoryImp,
   MasterKeysDatasourceService,
   MasterKeysRepositoryImp,
+  UserDatasourceService,
+  UserRepositoryImp,
+  RoleDatasourceService,
+  RoleRepositoryImp,
 } from "@/server/infrastructure";
 import { ClosureDatasourceService } from "@/server/infrastructure/datasources/parking/closure-datasource.service";
 import { ClosureRepositoryImpl } from "@/server/infrastructure/repositories/parking/closure.repository-imp";
@@ -248,6 +254,40 @@ if (!container.isRegistered(SERVER_TOKENS.MasterKeysRepository)) {
 
 if (!container.isRegistered(SERVER_TOKENS.MasterKeysUsecase)) {
   container.register(SERVER_TOKENS.MasterKeysUsecase, { useClass: MasterKeysUsecase });
+}
+
+// Users
+if (!container.isRegistered(SERVER_TOKENS.UserDatasourceService)) {
+  container.register(SERVER_TOKENS.UserDatasourceService, {
+    useClass: UserDatasourceService,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.UserRepository)) {
+  container.register(SERVER_TOKENS.UserRepository, {
+    useClass: UserRepositoryImp,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.UserUsecase)) {
+  container.register(SERVER_TOKENS.UserUsecase, { useClass: UserUsecase });
+}
+
+// Roles
+if (!container.isRegistered(SERVER_TOKENS.RoleDatasourceService)) {
+  container.register(SERVER_TOKENS.RoleDatasourceService, {
+    useClass: RoleDatasourceService,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.RoleRepository)) {
+  container.register(SERVER_TOKENS.RoleRepository, {
+    useClass: RoleRepositoryImp,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.RoleUsecase)) {
+  container.register(SERVER_TOKENS.RoleUsecase, { useClass: RoleUsecase });
 }
 
 export { container as serverContainer };

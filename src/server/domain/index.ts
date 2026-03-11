@@ -1,5 +1,7 @@
 //REPOSITORIES
 export * from "./repositories/auth/login.repository";
+export * from "./repositories/auth/user.repository";
+export * from "./repositories/auth/role.repository";
 export * from "./repositories/parking/manual-control.repository"
 export * from "./repositories/parking/common.repository"
 export * from "./repositories/parking/payment.repository"
@@ -15,6 +17,8 @@ export * from "./repositories/parking/master-keys.repository"
 
 //USE CASES
 export * from "./usecases/auth/login.usecase";
+export * from "./usecases/auth/user.usecase";
+export * from "./usecases/auth/role.usecase";
 export * from "./usecases/parking/manual-control.usecase"
 export * from "./usecases/parking/common.usecase";
 export * from "./usecases/parking/payment.usecase";
@@ -33,6 +37,20 @@ export * from "./entities/auth/response/get-permissions-response.entity";
 export * from "./entities/auth/params/get-permissions-params.entity";
 export * from "./entities/auth/response/login-response.entity";
 export * from "./entities/auth/params/login-params.entity";
+
+export * from "./entities/auth/users/user.entity"
+export * from "./entities/auth/users/params/list-users-params.entity"
+export * from "./entities/auth/users/params/create-user-params.entity"
+export * from "./entities/auth/users/params/update-user-params.entity"
+export * from "./entities/auth/users/response/list-users-response.entity"
+export * from "./entities/auth/users/response/get-user-response.entity"
+
+export * from "./entities/auth/roles/role.entity"
+export * from "./entities/auth/roles/params/list-roles-params.entity"
+export * from "./entities/auth/roles/params/create-role-params.entity"
+export * from "./entities/auth/roles/params/update-role-params.entity"
+export * from "./entities/auth/roles/response/list-roles-response.entity"
+export * from "./entities/auth/roles/response/get-role-response.entity"
 
 export * from "./entities/parking/validation/params/validate-amount-params.entity";
 export * from "./entities/parking/validation/response/validate-amount-response.entity";

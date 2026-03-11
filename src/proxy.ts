@@ -44,7 +44,6 @@ export async function proxy(request: NextRequest): Promise<NextResponse | null> 
   }
 
   const session = await getSessionFromRequest(request);
-  console.log(`Proxy middleware: pathname=${pathname}, sessionUserId=${session?.user.id}`);
   if (session) {
     return null;
   }

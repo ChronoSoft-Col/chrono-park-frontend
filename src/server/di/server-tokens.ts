@@ -13,6 +13,8 @@ export const SERVER_TOKENS = {
   WhiteListUsecase: Symbol.for("server:WhiteListUsecase"),
   BlackListUsecase: Symbol.for("server:BlackListUsecase"),
   MasterKeysUsecase: Symbol.for("server:MasterKeysUsecase"),
+  UserUsecase: Symbol.for("server:UserUsecase"),
+  RoleUsecase: Symbol.for("server:RoleUsecase"),
 
   // Repositories
   LoginRepository: Symbol.for("server:LoginRepository"),
@@ -28,6 +30,8 @@ export const SERVER_TOKENS = {
   WhiteListRepository: Symbol.for("server:WhiteListRepository"),
   BlackListRepository: Symbol.for("server:BlackListRepository"),
   MasterKeysRepository: Symbol.for("server:MasterKeysRepository"),
+  UserRepository: Symbol.for("server:UserRepository"),
+  RoleRepository: Symbol.for("server:RoleRepository"),
 
   // Datasources
   LoginDatasourceService: Symbol.for("server:LoginDatasourceService"),
@@ -43,4 +47,6 @@ export const SERVER_TOKENS = {
   WhiteListDatasourceService: Symbol.for("server:WhiteListDatasourceService"),
   BlackListDatasourceService: Symbol.for("server:BlackListDatasourceService"),
   MasterKeysDatasourceService: Symbol.for("server:MasterKeysDatasourceService"),
+  UserDatasourceService: Symbol.for("server:UserDatasourceService"),
+  RoleDatasourceService: Symbol.for("server:RoleDatasourceService"),
 } as const;
