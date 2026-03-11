@@ -79,11 +79,11 @@ export default function SidebarComponent() {
             <ChronoSidebarMenuItem>
               <ChronoSidebarMenuButton
                 className={`cursor-pointer ${
-                  pathname === "/parking/dashboard"
+                  pathname === "/parking/admin/dashboard"
                     ? "bg-accent text-accent-foreground"
                     : ""
                 }`}
-                onClick={() => handleRedirect("/parking/dashboard")}
+                onClick={() => handleRedirect("/parking/admin/dashboard")}
               >
                 <AppIcons iconName={EIconNames.DASHBOARD} />
                 Dashboard

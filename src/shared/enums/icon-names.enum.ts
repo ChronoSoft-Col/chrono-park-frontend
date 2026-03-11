@@ -11,4 +11,5 @@ export enum EIconNames {
   WHITELIST = "lista_blanca",
   MASTERKEYS = "llaves_maestras",
   USERS = "usuarios",
+  ROLES = "roles",
 }

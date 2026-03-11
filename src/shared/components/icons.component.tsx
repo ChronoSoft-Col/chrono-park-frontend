@@ -1,4 +1,4 @@
-import { Boxes, CalendarCheck, CarFront, ChartColumn, Check, CircleDollarSign, Key, ListChecks, LogIn, SlidersHorizontal, UserCheck, Users, UserStarIcon, UserX } from "lucide-react";
+import { Boxes, CalendarCheck, CarFront, ChartColumn, CircleDollarSign, Key, ListChecks, LogIn, SlidersHorizontal, UserCheck, Users, UserStarIcon, UserX, Crown } from "lucide-react";
 import { EIconNames } from "../enums/icon-names.enum";
 
 export default function AppIcons({iconName}: {iconName: EIconNames}) {
@@ -15,7 +15,8 @@ export default function AppIcons({iconName}: {iconName: EIconNames}) {
     [EIconNames.BLACKLIST]: <UserX/>,
     [EIconNames.WHITELIST]: <UserCheck/>,
     [EIconNames.MASTERKEYS]: <Key/>,
-    [EIconNames.USERS]: <Users/>
+    [EIconNames.USERS]: <Users/>,
+    [EIconNames.ROLES]: <Crown/>,
   }
 
   return iconLabelValue[iconName] || <Boxes/>;
