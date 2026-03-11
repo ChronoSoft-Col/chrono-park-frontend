@@ -147,7 +147,6 @@ export function ServicesCartDrawerComponent({
         await validateFee({
           licensePlate: validateRaw.data.vehicle.licensePlate,
           parkingSessionId: sessionId,
-          exitTime: new Date(),
         });
       }
     } catch {
@@ -183,7 +182,6 @@ export function ServicesCartDrawerComponent({
         await validateFee({
           licensePlate: validateRaw.data.vehicle.licensePlate,
           parkingSessionId: sessionId,
-          exitTime: new Date(),
         });
       }
     } catch (error) {
