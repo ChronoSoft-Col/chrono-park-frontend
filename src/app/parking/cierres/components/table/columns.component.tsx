@@ -6,6 +6,7 @@ import { Eye, Mail, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import ChronoButton from "@chrono/chrono-button.component";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
 import PermissionGuard from "@/src/shared/components/permission-guard.component";
 import { CierresAction } from "@/src/shared/enums/auth/permissions.enum";
 
@@ -61,42 +62,54 @@ export const createClosureColumns = (
     cell: (row) => (
       <div className="flex justify-end gap-2">
         <PermissionGuard action={CierresAction.VER_DETALLE_CIERRE} hidden>
-          <ChronoButton
-            variant="outline"
-            size="sm"
-            onClick={() => onViewDetail?.(row)}
-            className="text-xs font-semibold"
-            icon={<Eye className="h-4 w-4" />}
-          >
-            Ver
-          </ChronoButton>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                variant="default"
+                aria-label="Ver detalle"
+                onClick={() => onViewDetail?.(row)}
+              >
+                <Eye className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">Ver detalle</TooltipContent>
+          </Tooltip>
         </PermissionGuard>
 
         {onPrint ? (
           <PermissionGuard action={CierresAction.VER_DETALLE_CIERRE} hidden>
-            <ChronoButton
-              variant="default"
-              size="sm"
-              onClick={() => onPrint(row)}
-              className="text-xs font-semibold"
-              icon={<Printer className="h-4 w-4" />}
-            >
-              Imprimir
-            </ChronoButton>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ChronoButton
+                  type="button"
+                  variant="outline"
+                  aria-label="Imprimir cierre"
+                  onClick={() => onPrint(row)}
+                >
+                  <Printer className="h-4 w-4" />
+                </ChronoButton>
+              </TooltipTrigger>
+              <TooltipContent side="top">Imprimir</TooltipContent>
+            </Tooltip>
           </PermissionGuard>
         ) : null}
 
         {onSendEmail ? (
           <PermissionGuard action={CierresAction.VER_DETALLE_CIERRE} hidden>
-            <ChronoButton
-              variant="outline"
-              size="sm"
-              onClick={() => onSendEmail(row)}
-              className="text-xs font-semibold"
-              icon={<Mail className="h-4 w-4" />}
-            >
-              Enviar
-            </ChronoButton>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ChronoButton
+                  type="button"
+                  variant="outline"
+                  aria-label="Enviar por correo"
+                  onClick={() => onSendEmail(row)}
+                >
+                  <Mail className="h-4 w-4" />
+                </ChronoButton>
+              </TooltipTrigger>
+              <TooltipContent side="top">Enviar</TooltipContent>
+            </Tooltip>
           </PermissionGuard>
         ) : null}
       </div>

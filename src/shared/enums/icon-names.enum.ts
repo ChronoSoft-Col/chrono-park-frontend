@@ -7,4 +7,8 @@ export enum EIconNames {
   PAYMENTS = "pagos",
   MONTHLY_PAYMENTS = "mensualidades",
   DASHBOARD = "dashboard",
+  BLACKLIST = "lista_negra",
+  WHITELIST = "lista_blanca",
+  MASTERKEYS = "llaves_maestras",
+  USERS = "usuarios",
 }
