@@ -6,7 +6,7 @@ import { cn } from "@/src/lib/utils";
 import ChronoButton from "@chrono/chrono-button.component";
 import PermissionGuard from "@/src/shared/components/permission-guard.component";
 import type { AppAction } from "@/src/shared/enums/auth/permissions.enum";
-import { PermissionButtonFallback } from "../chrono/permission-button-fallback.component";
+import { PermissionButtonFallback } from "./permission-button-fallback.component";
 
 export type ChronoViewWithTableLayoutProps = {
   title?: ReactNode;
