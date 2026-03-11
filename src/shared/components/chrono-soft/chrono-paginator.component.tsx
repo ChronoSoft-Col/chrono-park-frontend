@@ -53,7 +53,7 @@ export function ChronoPaginator({
   const startTransition = withTransition ?? localStartTransition;
 
   const safeTotalPages = Math.max(1, Number.isFinite(totalPages) ? totalPages : 1);
-  const fallbackLimit = limitOptions[0] ?? DEFAULT_LIMIT_OPTIONS[1];
+  const fallbackLimit = limitOptions[1] ?? DEFAULT_LIMIT_OPTIONS[1];
 
   const currentPage = useMemo(() => {
     const raw = Number(searchParams.get(pageParam) ?? "1");

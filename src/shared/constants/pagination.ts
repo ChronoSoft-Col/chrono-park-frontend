@@ -1,3 +1,3 @@
 export const DEFAULT_PAGE = 1;
-export const DEFAULT_LIMIT = 10;
-export const DEFAULT_LIMIT_OPTIONS = [5, 10, 20, 50];
+export const DEFAULT_LIMIT = 9;
+export const DEFAULT_LIMIT_OPTIONS = [3, 9, 12, 24, 48, 96];
