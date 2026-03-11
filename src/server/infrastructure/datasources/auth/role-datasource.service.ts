@@ -4,12 +4,12 @@ import {
     IListRolesParamsEntity,
     IListRolesResponseEntity,
     ICreateRoleParamsEntity,
+    ICreateRoleResponseEntity,
     IUpdateRoleParamsEntity,
     IGetRoleResponseEntity,
     IActionGroupEntity,
     RoleRepository,
 } from "@/server/domain/index";
-import IEmptyResponse from "@/src/shared/interfaces/generic/empty-response";
 
 @injectable()
 export class RoleDatasourceService extends AxiosServerInstance implements RoleRepository {
@@ -25,9 +25,9 @@ export class RoleDatasourceService extends AxiosServerInstance implements RoleRe
             .then(response => response.data);
     }
 
-    async createRole(params: ICreateRoleParamsEntity): Promise<IEmptyResponse> {
+    async createRole(params: ICreateRoleParamsEntity): Promise<ICreateRoleResponseEntity> {
         return this.api
-            .post<IEmptyResponse>("/roles", params)
+            .post<ICreateRoleResponseEntity>("/roles", params)
             .then(response => response.data);
     }
 

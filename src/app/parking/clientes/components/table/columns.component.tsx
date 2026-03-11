@@ -63,8 +63,8 @@ export const createCustomerColumns = (
     cellClassName: "text-center",
     cell: (row) => (
       <ChronoBadge
-        variant="outline"
-        className={row.isActive ? "border-emerald-500/40 bg-emerald-50 text-emerald-700" : "border-border/60 bg-muted/40 text-muted-foreground"}
+        variant={row.isActive ? "default" : "destructive"}
+        tone="soft"
       >
         {row.isActive ? "Activo" : "Inactivo"}
       </ChronoBadge>

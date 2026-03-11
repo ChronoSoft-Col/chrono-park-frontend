@@ -51,6 +51,7 @@ export * from "./entities/auth/roles/params/create-role-params.entity"
 export * from "./entities/auth/roles/params/update-role-params.entity"
 export * from "./entities/auth/roles/response/list-roles-response.entity"
 export * from "./entities/auth/roles/response/get-role-response.entity"
+export * from "./entities/auth/roles/response/create-role-response.entity"
 
 export * from "./entities/parking/validation/params/validate-amount-params.entity";
 export * from "./entities/parking/validation/response/validate-amount-response.entity";

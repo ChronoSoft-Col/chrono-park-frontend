@@ -7,13 +7,21 @@ export interface IRoleEntity {
 }
 
 export interface IRoleDetailEntity extends IRoleEntity {
-    actions: IRoleActionEntity[];
+    roleActions: IRoleActionJunction[];
+}
+
+export interface IRoleActionJunction {
+    id: string;
+    actionId: string;
+    action: IRoleActionEntity;
 }
 
 export interface IRoleActionEntity {
     id: string;
     name: string;
-    resource: {
+    resourceId?: string;
+    dependsOnId?: string | null;
+    resource?: {
         id: string;
         name: string;
         icon: string;

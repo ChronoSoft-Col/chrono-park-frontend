@@ -48,12 +48,8 @@ export const createBlackListColumns = (
     cellClassName: "text-center",
     cell: (row) => (
       <ChronoBadge
-        variant="outline"
-        className={
-          row.isActive
-            ? "border-rose-500/40 bg-rose-50 text-rose-700"
-            : "border-border/60 bg-muted/40 text-muted-foreground"
-        }
+        variant={row.isActive ? "default" : "destructive"}
+        tone="soft"
       >
         {row.isActive ? "Activo" : "Inactivo"}
       </ChronoBadge>

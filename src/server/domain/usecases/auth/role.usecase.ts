@@ -6,10 +6,10 @@ import {
     ICreateRoleParamsEntity,
     IUpdateRoleParamsEntity,
     IGetRoleResponseEntity,
+    ICreateRoleResponseEntity,
     IActionGroupEntity,
     RoleRepository,
 } from "@/server/domain";
-import IEmptyResponse from "@/shared/interfaces/generic/empty-response";
 
 @injectable()
 export class RoleUsecase implements RoleRepository {
@@ -23,7 +23,7 @@ export class RoleUsecase implements RoleRepository {
         return this.roleRepository.getRoleById(roleId);
     }
 
-    createRole(params: ICreateRoleParamsEntity): Promise<IEmptyResponse> {
+    createRole(params: ICreateRoleParamsEntity): Promise<ICreateRoleResponseEntity> {
         return this.roleRepository.createRole(params);
     }
 

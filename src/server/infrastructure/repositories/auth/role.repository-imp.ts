@@ -4,13 +4,13 @@ import { RoleDatasourceService } from "@/server/infrastructure/datasources/auth/
 import {
     RoleRepository,
     ICreateRoleParamsEntity,
+    ICreateRoleResponseEntity,
     IListRolesParamsEntity,
     IListRolesResponseEntity,
     IUpdateRoleParamsEntity,
     IGetRoleResponseEntity,
     IActionGroupEntity,
 } from "@/server/domain";
-import IEmptyResponse from "@/shared/interfaces/generic/empty-response";
 
 @injectable()
 export class RoleRepositoryImp implements RoleRepository {
@@ -24,7 +24,7 @@ export class RoleRepositoryImp implements RoleRepository {
         return this.roleDatasourceService.getRoleById(roleId);
     }
 
-    createRole(params: ICreateRoleParamsEntity): Promise<IEmptyResponse> {
+    createRole(params: ICreateRoleParamsEntity): Promise<ICreateRoleResponseEntity> {
         return this.roleDatasourceService.createRole(params);
     }
 

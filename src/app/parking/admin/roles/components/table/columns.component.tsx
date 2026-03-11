@@ -1,18 +1,22 @@
 "use client";
 
-import type { IMasterKeyEntity } from "@/server/domain";
 import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
+import type { IRoleEntity } from "@/server/domain";
 
 import ChronoButton from "@chrono/chrono-button.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
-import { Eye, Ban, Pencil } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/src/shared/components/ui/tooltip";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import PermissionGuard from "@/src/shared/components/permission-guard.component";
-import { LlavesMaestrasAction } from "@/src/shared/enums/auth/permissions.enum";
+import { UsuariosAction } from "@/src/shared/enums/auth/permissions.enum";
 
-type ViewDetailHandler = (item: IMasterKeyEntity) => void;
-type EditHandler = (item: IMasterKeyEntity) => void;
-type DeactivateHandler = (item: IMasterKeyEntity) => void;
+type ViewDetailHandler = (item: IRoleEntity) => void;
+type EditHandler = (item: IRoleEntity) => void;
+type DeleteHandler = (item: IRoleEntity) => void;
 
 const formatDate = (value?: Date | string) => {
   if (!value) return "-";
@@ -20,28 +24,30 @@ const formatDate = (value?: Date | string) => {
   return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(date);
 };
 
-export const createMasterKeyColumns = (
+export const createRoleColumns = (
   onViewDetail?: ViewDetailHandler,
   onEdit?: EditHandler,
-  onDeactivate?: DeactivateHandler,
-): ChronoDataTableColumn<IMasterKeyEntity>[] => [
+  onDelete?: DeleteHandler,
+): ChronoDataTableColumn<IRoleEntity>[] => [
   {
-    id: "key",
-    header: "Llave",
-    accessorFn: (row) => row.key,
+    id: "name",
+    header: "Nombre",
+    accessorFn: (row) => row.name,
+  },
+  {
+    id: "description",
+    header: "Descripción",
+    accessorFn: (row) => row.description ?? "-",
   },
   {
     id: "status",
     header: "Estado",
-    align: "center",
-    headerClassName: "text-center",
-    cellClassName: "text-center",
     cell: (row) => (
       <ChronoBadge
         variant={row.isActive ? "default" : "destructive"}
         tone="soft"
       >
-        {row.isActive ? "Activa" : "Inactiva"}
+        {row.isActive ? "Activo" : "Inactivo"}
       </ChronoBadge>
     ),
   },
@@ -51,11 +57,6 @@ export const createMasterKeyColumns = (
     accessorFn: (row) => formatDate(row.createdAt),
   },
   {
-    id: "updated-at",
-    header: "Actualizado",
-    accessorFn: (row) => formatDate(row.updatedAt),
-  },
-  {
     id: "actions",
     header: "Acciones",
     align: "right",
@@ -63,7 +64,7 @@ export const createMasterKeyColumns = (
     cellClassName: "text-right",
     cell: (row) => (
       <div className="flex justify-end gap-2">
-        <PermissionGuard action={LlavesMaestrasAction.VER_LLAVES_MAESTRAS} hidden>
+        <PermissionGuard action={UsuariosAction.VER_USUARIOS} hidden>
           <Tooltip>
             <TooltipTrigger asChild>
               <ChronoButton
@@ -79,13 +80,13 @@ export const createMasterKeyColumns = (
           </Tooltip>
         </PermissionGuard>
 
-        <PermissionGuard action={LlavesMaestrasAction.EDITAR_LLAVE_MAESTRA} hidden>
+        <PermissionGuard action={UsuariosAction.EDITAR_USUARIOS} hidden>
           <Tooltip>
             <TooltipTrigger asChild>
               <ChronoButton
                 type="button"
                 variant="outline"
-                aria-label="Editar llave"
+                aria-label="Editar rol"
                 onClick={() => onEdit?.(row)}
               >
                 <Pencil className="h-4 w-4" />
@@ -95,22 +96,20 @@ export const createMasterKeyColumns = (
           </Tooltip>
         </PermissionGuard>
 
-        <PermissionGuard action={LlavesMaestrasAction.INACTIVAR_LLAVE_MAESTRA} hidden>
-          {row.isActive && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  variant="destructive"
-                  aria-label="Desactivar llave"
-                  onClick={() => onDeactivate?.(row)}
-                >
-                  <Ban className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">Desactivar</TooltipContent>
-            </Tooltip>
-          )}
+        <PermissionGuard action={UsuariosAction.INACTIVAR_USUARIOS} hidden>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <ChronoButton
+                type="button"
+                variant="destructive"
+                aria-label="Eliminar rol"
+                onClick={() => onDelete?.(row)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </ChronoButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">Eliminar</TooltipContent>
+          </Tooltip>
         </PermissionGuard>
       </div>
     ),
