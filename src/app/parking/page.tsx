@@ -153,11 +153,11 @@ type SummaryTileProps = {
 
 function SummaryTile({ label, value, icon: Icon }: SummaryTileProps) {
   return (
-    <div className="rounded-2xl border border-border/70 bg-muted/10 p-4">
+    <div className="min-w-0 rounded-2xl border border-border/70 bg-muted/10 p-4">
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
       <div className="mt-2 flex items-center gap-2">
         {Icon && <Icon className="h-4 w-4 text-primary" />}
-        <p className="text-sm font-semibold text-foreground">{value}</p>
+        <p className="truncate text-sm font-semibold text-foreground" title={value}>{value}</p>
       </div>
     </div>
   );

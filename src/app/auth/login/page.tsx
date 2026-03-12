@@ -142,14 +142,13 @@ export default function LoginPage() {
                 name="identifier"
                 render={({ field }) => (
                   <ChronoFormItem>
-                    <ChronoFormLabel>Correo electrónico</ChronoFormLabel>
+                    <ChronoFormLabel>Correo electrónico o cédula</ChronoFormLabel>
                     <ChronoFormControl>
                       <ChronoInput
                         {...field}
                         autoComplete="username"
-                        inputMode="email"
-                        placeholder="nombre@empresa.com"
-                        type="email"
+                        placeholder="nombre@empresa.com o cédula"
+                        type="text"
                       />
                     </ChronoFormControl>
                     <ChronoFormMessage />
