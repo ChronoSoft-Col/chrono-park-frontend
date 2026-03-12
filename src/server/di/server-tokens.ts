@@ -15,6 +15,7 @@ export const SERVER_TOKENS = {
   MasterKeysUsecase: Symbol.for("server:MasterKeysUsecase"),
   UserUsecase: Symbol.for("server:UserUsecase"),
   RoleUsecase: Symbol.for("server:RoleUsecase"),
+  ReportUsecase: Symbol.for("server:ReportUsecase"),
 
   // Repositories
   LoginRepository: Symbol.for("server:LoginRepository"),
@@ -32,6 +33,7 @@ export const SERVER_TOKENS = {
   MasterKeysRepository: Symbol.for("server:MasterKeysRepository"),
   UserRepository: Symbol.for("server:UserRepository"),
   RoleRepository: Symbol.for("server:RoleRepository"),
+  ReportRepository: Symbol.for("server:ReportRepository"),
 
   // Datasources
   LoginDatasourceService: Symbol.for("server:LoginDatasourceService"),
@@ -49,4 +51,5 @@ export const SERVER_TOKENS = {
   MasterKeysDatasourceService: Symbol.for("server:MasterKeysDatasourceService"),
   UserDatasourceService: Symbol.for("server:UserDatasourceService"),
   RoleDatasourceService: Symbol.for("server:RoleDatasourceService"),
+  ReportDatasourceService: Symbol.for("server:ReportDatasourceService"),
 } as const;

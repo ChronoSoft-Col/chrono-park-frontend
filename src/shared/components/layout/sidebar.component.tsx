@@ -73,24 +73,6 @@ export default function SidebarComponent() {
         {/* CompanySwitcher removed: companies are not part of the session anymore */}
       </ChronoSidebarHeader>
       <ChronoSidebarContent>
-        <ChronoSidebarGroup>
-          <ChronoSidebarGroupLabel>General</ChronoSidebarGroupLabel>
-          <ChronoSidebarMenu>
-            <ChronoSidebarMenuItem>
-              <ChronoSidebarMenuButton
-                className={`cursor-pointer ${
-                  pathname === "/parking/admin/dashboard"
-                    ? "bg-accent text-accent-foreground"
-                    : ""
-                }`}
-                onClick={() => handleRedirect("/parking/admin/dashboard")}
-              >
-                <AppIcons iconName={EIconNames.DASHBOARD} />
-                Dashboard
-              </ChronoSidebarMenuButton>
-            </ChronoSidebarMenuItem>
-          </ChronoSidebarMenu>
-        </ChronoSidebarGroup>
         {applications.map((app) => (
           <ChronoSidebarGroup key={app.id}>
             <ChronoSidebarGroupLabel>{app.name}</ChronoSidebarGroupLabel>

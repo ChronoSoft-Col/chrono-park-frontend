@@ -18,6 +18,7 @@ import {
   MasterKeysUsecase,
   UserUsecase,
   RoleUsecase,
+  ReportUsecase,
 } from "@/server/domain";
 import {
   CommonDatasourceService,
@@ -44,6 +45,8 @@ import {
   UserRepositoryImp,
   RoleDatasourceService,
   RoleRepositoryImp,
+  ReportDatasourceService,
+  ReportRepositoryImp,
 } from "@/server/infrastructure";
 import { ClosureDatasourceService } from "@/server/infrastructure/datasources/parking/closure-datasource.service";
 import { ClosureRepositoryImpl } from "@/server/infrastructure/repositories/parking/closure.repository-imp";
@@ -288,6 +291,23 @@ if (!container.isRegistered(SERVER_TOKENS.RoleRepository)) {
 
 if (!container.isRegistered(SERVER_TOKENS.RoleUsecase)) {
   container.register(SERVER_TOKENS.RoleUsecase, { useClass: RoleUsecase });
+}
+
+// Reports
+if (!container.isRegistered(SERVER_TOKENS.ReportDatasourceService)) {
+  container.register(SERVER_TOKENS.ReportDatasourceService, {
+    useClass: ReportDatasourceService,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.ReportRepository)) {
+  container.register(SERVER_TOKENS.ReportRepository, {
+    useClass: ReportRepositoryImp,
+  });
+}
+
+if (!container.isRegistered(SERVER_TOKENS.ReportUsecase)) {
+  container.register(SERVER_TOKENS.ReportUsecase, { useClass: ReportUsecase });
 }
 
 export { container as serverContainer };

@@ -14,6 +14,7 @@ export * from "./repositories/parking/dashboard.repository"
 export * from "./repositories/parking/white-list.repository"
 export * from "./repositories/parking/black-list.repository"
 export * from "./repositories/parking/master-keys.repository"
+export * from "./repositories/parking/report.repository"
 
 //USE CASES
 export * from "./usecases/auth/login.usecase";
@@ -31,6 +32,7 @@ export * from "./usecases/parking/dashboard.usecase";
 export * from "./usecases/parking/white-list.usecase";
 export * from "./usecases/parking/black-list.usecase";
 export * from "./usecases/parking/master-keys.usecase";
+export * from "./usecases/parking/report.usecase";
 
 //ENTITIES
 export * from "./entities/auth/response/get-permissions-response.entity";
