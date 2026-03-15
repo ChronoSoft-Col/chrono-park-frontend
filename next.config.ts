@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     domains: ["avatars.githubusercontent.com", "*"],
   },
   cacheComponents: false,
+  reactStrictMode:false 
 };
 
 export default nextConfig;
