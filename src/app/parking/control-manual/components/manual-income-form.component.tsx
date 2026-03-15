@@ -4,6 +4,7 @@ import { getRateProfileAction } from "@/app/global-actions/get-common.action";
 import { ChronoDateTimePicker } from "@chrono/chrono-date-time-picker.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import ChronoButton from "@chrono/chrono-button.component";
+import { ChronoSwitch } from "@chrono/chrono-switch.component";
 import {
   ChronoCard,
   ChronoCardContent,
@@ -35,7 +36,7 @@ import { TRateProfile } from "@/shared/types/common/rate-profile.type";
 import { TVehicleType } from "@/shared/types/common/vehicle-types.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, LoaderCircle, ShieldX } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { generateManualIncomeAction } from "../actions/generate-manual-income.action";
@@ -45,6 +46,8 @@ import { IGenerateManualIncomeResponse } from "@/server/domain/entities/parking/
 import PermissionGuard from "@/src/shared/components/permission-guard.component";
 import { ControlManualAction } from "@/src/shared/enums/auth/permissions.enum";
 import EmptyState from "@/src/shared/components/empty-state.component";
+import { usePermissions } from "@/src/shared/hooks/use-permissions";
+import ControllerFallback from "./controller-fallback.component";
 
 export default function ManualIncomeFormComponent() {
   const { vehicleTypes } = useCommonStore();
@@ -133,6 +136,11 @@ const IncomeForm = ({
   onSubmit: (params: ManualIncomeForm) => Promise<boolean>;
 }) => {
   const [rateProfiles, setRateProfiles] = useState<TRateProfile[]>([]);
+  const { can } = usePermissions();
+
+  const canAssignEntryTime = can(ControlManualAction.ASIGNAR_FECHA_INGRESO);
+  const [manualEntryTimeEnabled, setManualEntryTimeEnabled] = useState(false);
+  const isManualEntryTimeEnabled = canAssignEntryTime && manualEntryTimeEnabled;
 
   const incomeForm = useForm<ManualIncomeForm>({
     resolver: zodResolver(ManualIncomeSchema) as Resolver<ManualIncomeForm>,
@@ -150,8 +158,22 @@ const IncomeForm = ({
     handleSubmit,
     reset,
     resetField,
+    setValue,
     formState: { isSubmitting, isValid },
   } = incomeForm;
+
+  useEffect(() => {
+    // Modo auto: mantener sincronizado el campo con la hora actual.
+    if (isManualEntryTimeEnabled) return;
+
+    setValue("entryTime", new Date(), { shouldDirty: false, shouldValidate: false });
+
+    const intervalId = window.setInterval(() => {
+      setValue("entryTime", new Date(), { shouldDirty: false, shouldValidate: false });
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [isManualEntryTimeEnabled, setValue]);
 
   const vehicleTypeChanged = async (vehicleTypeId: string) => {
     resetField("rateProfileId", { defaultValue: "" });
@@ -221,7 +243,7 @@ const IncomeForm = ({
             <Controller
               control={control}
               name="licensePlate"
-                render={({ field, fieldState }) => (
+              render={({ field, fieldState }) => (
                 <ChronoField
                   data-invalid={fieldState.invalid}
                   className={`${fieldContainerClasses} min-w-0`}
@@ -277,32 +299,59 @@ const IncomeForm = ({
               )}
             />
 
-            <Controller
-              name="entryTime"
-              control={control}
-              render={({ field, fieldState }) => (
-                <ChronoField
-                  data-invalid={fieldState.invalid}
-                  className={fieldContainerClasses}
-                >
-                  <ChronoFieldLabel
-                    htmlFor="entryTime"
-                    className={fieldLabelClasses}
+            <PermissionGuard
+              action={ControlManualAction.ASIGNAR_FECHA_INGRESO}
+              fallback={<ControllerFallback />}
+            >
+              <Controller
+                name="entryTime"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <ChronoField
+                    data-invalid={fieldState.invalid}
+                    className={fieldContainerClasses}
                   >
-                    Fecha y hora de ingreso
-                  </ChronoFieldLabel>
+                    <ChronoFieldLabel
+                      htmlFor="entryTime"
+                      className={fieldLabelClasses}
+                    >
+                      Fecha y hora de ingreso
+                    </ChronoFieldLabel>
 
-                  <ChronoDateTimePicker
-                    date={field.value as Date | undefined}
-                    setDate={(value) => field.onChange(value)}
-                  />
+                    <div className="mt-2 flex justify-end">
+                      <ChronoSwitch
+                        label="Fecha manual"
+                        checked={isManualEntryTimeEnabled}
+                        disabled={!canAssignEntryTime}
+                        onCheckedChange={(checked) => {
+                          if (!canAssignEntryTime) return;
+                          const nextValue = Boolean(checked);
+                          setManualEntryTimeEnabled(nextValue);
 
-                  {fieldState.invalid && (
-                    <ChronoFieldError errors={[fieldState.error]} />
-                  )}
-                </ChronoField>
-              )}
-            />
+                          // Al volver a modo auto, sincronizar inmediatamente con ahora.
+                          if (!nextValue) {
+                            setValue("entryTime", new Date(), {
+                              shouldDirty: false,
+                              shouldValidate: false,
+                            });
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <ChronoDateTimePicker
+                      date={field.value as Date | undefined}
+                      setDate={(value) => field.onChange(value)}
+                      disabled={!isManualEntryTimeEnabled}
+                    />
+
+                    {fieldState.invalid && (
+                      <ChronoFieldError errors={[fieldState.error]} />
+                    )}
+                  </ChronoField>
+                )}
+              />
+            </PermissionGuard>
 
             <Controller
               name="rateProfileId"

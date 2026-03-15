@@ -4,6 +4,8 @@ import { useState } from "react";
 import EmptyState from "@/src/shared/components/empty-state.component";
 import { usePaymentContext } from "@/src/shared/context/payment.context";
 import { useCommonStore } from "@/src/shared/stores/common.store";
+import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import { CobroAction } from "@/src/shared/enums/auth/permissions.enum";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoValue } from "@chrono/chrono-value.component";
@@ -246,103 +248,105 @@ export function QrDetailSectionComponent({ className }: QrDetailSectionProps) {
                     </div>
 
                     {/* Cambiar tarifa */}
-                    {showRateSelector ? (
-                        <div className="flex flex-col gap-2 p-3 rounded-lg border border-primary/20 bg-primary/5 items-end w-full">
-                            <div className="flex items-center justify-between ml-0 auto w-full">
-                                <span className="text-sm font-medium">Seleccionar nueva tarifa</span>
+                    <PermissionGuard action={CobroAction.ASIGNAR_TARIFA_PAGO} hidden>
+                        {showRateSelector ? (
+                            <div className="flex flex-col gap-2 p-3 rounded-lg border border-primary/20 bg-primary/5 items-end w-full">
+                                <div className="flex items-center justify-between ml-0 auto w-full">
+                                    <span className="text-sm font-medium">Seleccionar nueva tarifa</span>
+                                    <ChronoButton
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6"
+                                        onClick={handleToggleRateSelector}
+                                        disabled={isValidating}
+                                        title="Cancelar"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </ChronoButton>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2 w-full">
+                                    <div className="flex flex-col gap-1">
+                                        <ChronoLabel className="text-xs text-muted-foreground">
+                                            Tipo vehículo
+                                        </ChronoLabel>
+                                        <ChronoSelect
+                                            value={selectedVehicleTypeId ?? undefined}
+                                            onValueChange={handleVehicleTypeChange}
+                                            disabled={isValidating}
+                                        >
+                                            <ChronoSelectTrigger className="w-full">
+                                                <ChronoSelectValue placeholder="Tipo" />
+                                            </ChronoSelectTrigger>
+                                            <ChronoSelectContent>
+                                                {vehicleTypes.map((vt) => (
+                                                    <ChronoSelectItem key={vt.value} value={vt.value}>
+                                                        {vt.label}
+                                                    </ChronoSelectItem>
+                                                ))}
+                                            </ChronoSelectContent>
+                                        </ChronoSelect>
+                                    </div>
+
+                                    <div className="flex flex-col gap-1">
+                                        <ChronoLabel className="text-xs text-muted-foreground">
+                                            Tarifa
+                                        </ChronoLabel>
+                                        <ChronoSelect
+                                            value={selectedRateId ?? undefined}
+                                            onValueChange={handleRateSelect}
+                                            disabled={isLoadingRates || isValidating || !selectedVehicleTypeId}
+                                        >
+                                            <ChronoSelectTrigger className="w-full">
+                                                <ChronoSelectValue
+                                                    placeholder={
+                                                        isLoadingRates
+                                                            ? "Cargando..."
+                                                            : availableRates.length === 0
+                                                                ? "Sin tarifas"
+                                                                : "Tarifa"
+                                                    }
+                                                />
+                                            </ChronoSelectTrigger>
+                                            <ChronoSelectContent>
+                                                {availableRates.map((rate) => (
+                                                    <ChronoSelectItem key={rate.id} value={rate.id}>
+                                                        {rate.name}
+                                                    </ChronoSelectItem>
+                                                ))}
+                                            </ChronoSelectContent>
+                                        </ChronoSelect>
+                                    </div>
+                                </div>
+
                                 <ChronoButton
                                     type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6"
-                                    onClick={handleToggleRateSelector}
-                                    disabled={isValidating}
-                                    title="Cancelar"
+                                    variant="default"
+                                    onClick={handleRevalidate}
+                                    className="w-28 mr-0"
+                                    disabled={isValidating || !selectedRateId}
                                 >
-                                    <X className="h-4 w-4" />
+                                    <RefreshCw className={cn("h-3.5 w-3.5 mr-1", isValidating && "animate-spin")} />
+                                    Revalidar
                                 </ChronoButton>
                             </div>
-
-                            <div className="grid grid-cols-2 gap-2 w-full">
-                                <div className="flex flex-col gap-1">
-                                    <ChronoLabel className="text-xs text-muted-foreground">
-                                        Tipo vehículo
-                                    </ChronoLabel>
-                                    <ChronoSelect
-                                        value={selectedVehicleTypeId ?? undefined}
-                                        onValueChange={handleVehicleTypeChange}
-                                        disabled={isValidating}
-                                    >
-                                        <ChronoSelectTrigger className="w-full">
-                                            <ChronoSelectValue placeholder="Tipo" />
-                                        </ChronoSelectTrigger>
-                                        <ChronoSelectContent>
-                                            {vehicleTypes.map((vt) => (
-                                                <ChronoSelectItem key={vt.value} value={vt.value}>
-                                                    {vt.label}
-                                                </ChronoSelectItem>
-                                            ))}
-                                        </ChronoSelectContent>
-                                    </ChronoSelect>
-                                </div>
-
-                                <div className="flex flex-col gap-1">
-                                    <ChronoLabel className="text-xs text-muted-foreground">
-                                        Tarifa
-                                    </ChronoLabel>
-                                    <ChronoSelect
-                                        value={selectedRateId ?? undefined}
-                                        onValueChange={handleRateSelect}
-                                        disabled={isLoadingRates || isValidating || !selectedVehicleTypeId}
-                                    >
-                                        <ChronoSelectTrigger className="w-full">
-                                            <ChronoSelectValue
-                                                placeholder={
-                                                    isLoadingRates
-                                                        ? "Cargando..."
-                                                        : availableRates.length === 0
-                                                            ? "Sin tarifas"
-                                                            : "Tarifa"
-                                                }
-                                            />
-                                        </ChronoSelectTrigger>
-                                        <ChronoSelectContent>
-                                            {availableRates.map((rate) => (
-                                                <ChronoSelectItem key={rate.id} value={rate.id}>
-                                                    {rate.name}
-                                                </ChronoSelectItem>
-                                            ))}
-                                        </ChronoSelectContent>
-                                    </ChronoSelect>
-                                </div>
+                        ) : (
+                            <div className="flex justify-end">
+                                <ChronoButton
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-36 mt-2"
+                                    onClick={handleToggleRateSelector}
+                                    disabled={isValidating}
+                                >
+                                    <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                                    Cambiar tarifa
+                                </ChronoButton>
                             </div>
-
-                            <ChronoButton
-                                type="button"
-                                variant="default"
-                                onClick={handleRevalidate}
-                                className="w-28 mr-0"
-                                disabled={isValidating || !selectedRateId}
-                            >
-                                <RefreshCw className={cn("h-3.5 w-3.5 mr-1", isValidating && "animate-spin")} />
-                                Revalidar
-                            </ChronoButton>
-                        </div>
-                    ) : (
-                        <div className="flex justify-end">
-                            <ChronoButton
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="w-36 mt-2"
-                                onClick={handleToggleRateSelector}
-                                disabled={isValidating}
-                            >
-                                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
-                                Cambiar tarifa
-                            </ChronoButton>
-                        </div>
-                    )}
+                        )}
+                    </PermissionGuard>
                 </ChronoCardContent>
             </ChronoCard>
 

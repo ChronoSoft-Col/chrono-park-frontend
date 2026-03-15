@@ -18,6 +18,7 @@ export enum ControlManualAction {
   VER_INGRESO_MANUAL = "VER_INGRESO_MANUAL",
   CREAR_INGRESO_MANUAL = "CREAR_INGRESO_MANUAL",
   EDITAR_INGRESO_MANUAL = "EDITAR_INGRESO_MANUAL",
+  ASIGNAR_FECHA_INGRESO = "ASIGNAR_FECHA_INGRESO",
 }
 
 // ─── Cobro de Estacionamiento ────────────────────────────────────────────────
@@ -25,6 +26,7 @@ export enum ControlManualAction {
 export enum CobroAction {
   COBRAR_ESTACIONAMIENTO = "COBRAR_ESTACIONAMIENTO",
   VER_TARIFAS = "VER_TARIFAS",
+  ASIGNAR_TARIFA_PAGO = "ASIGNAR_TARIFA_PAGO",
 }
 
 // ─── Ingresos y Salidas ──────────────────────────────────────────────────────

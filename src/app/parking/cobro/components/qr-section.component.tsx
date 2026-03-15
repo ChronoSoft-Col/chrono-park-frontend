@@ -30,6 +30,8 @@ import { Settings2, X, Check } from "lucide-react";
 
 import { usePaymentContext } from "@/src/shared/context/payment.context";
 import { useCommonStore } from "@/src/shared/stores/common.store";
+import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import { CobroAction } from "@/src/shared/enums/auth/permissions.enum";
 import { cn } from "@/src/lib/utils";
 import { useDebouncedCallback } from "use-debounce";
 import { getRateProfileAction } from "@/src/app/global-actions/get-common.action";
@@ -172,124 +174,130 @@ export function QrSectionComponent({ className }: QrSectionProps) {
               Validar tarifa
             </ChronoCardTitle>
             {configMode === "scan" && !validateRaw?.data && (
-              <ChronoButton
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => setConfigMode("rate")}
-                disabled={isValidating}
-              >
-                <Settings2 className="h-3 w-3 mr-1" />
-                Configurar tarifa
-              </ChronoButton>
+              <PermissionGuard action={CobroAction.ASIGNAR_TARIFA_PAGO} hidden>
+                <ChronoButton
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => setConfigMode("rate")}
+                  disabled={isValidating}
+                >
+                  <Settings2 className="h-3 w-3 mr-1" />
+                  Configurar tarifa
+                </ChronoButton>
+              </PermissionGuard>
             )}
           </div>
         </ChronoCardHeader>
 
         {/* Selected config summary in scan mode */}
         {configMode === "scan" && !validateRaw?.data && selectedRateId && (
-          <div className="flex items-center gap-2 text-sm mb-2">
-            <ChronoBadge variant="secondary" className="text-xs">
-              {selectedVehicleTypeName}
-            </ChronoBadge>
-            <span className="text-muted-foreground">→</span>
-            <ChronoBadge variant="default" className="text-xs">
-              {selectedRateName}
-            </ChronoBadge>
-            <ChronoButton
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-5 w-5"
-              onClick={handleClearAllSelections}
-              title="Limpiar tarifa"
-            >
-              <X className="h-3 w-3" />
-            </ChronoButton>
-          </div>
+          <PermissionGuard action={CobroAction.ASIGNAR_TARIFA_PAGO} hidden>
+            <div className="flex items-center gap-2 text-sm mb-2">
+              <ChronoBadge variant="secondary" className="text-xs">
+                {selectedVehicleTypeName}
+              </ChronoBadge>
+              <span className="text-muted-foreground">→</span>
+              <ChronoBadge variant="default" className="text-xs">
+                {selectedRateName}
+              </ChronoBadge>
+              <ChronoButton
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5"
+                onClick={handleClearAllSelections}
+                title="Limpiar tarifa"
+              >
+                <X className="h-3 w-3" />
+              </ChronoButton>
+            </div>
+          </PermissionGuard>
         )}
 
         {/* Rate Configuration Panel */}
         {configMode === "rate" && (
-          <div className="flex flex-col gap-2 p-2 rounded-md border border-primary/20 bg-primary/5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tarifa manual</span>
-              {selectedRateId && (
+          <PermissionGuard action={CobroAction.ASIGNAR_TARIFA_PAGO} hidden>
+            <div className="flex flex-col gap-2 p-2 rounded-md border border-primary/20 bg-primary/5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tarifa manual</span>
+                {selectedRateId && (
+                  <ChronoButton
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-5 px-1.5 text-[10px]"
+                    onClick={handleClearAllSelections}
+                    title="Limpiar selección"
+                  >
+                    <X className="h-3 w-3 mr-0.5" />
+                    Limpiar
+                  </ChronoButton>
+                )}
+              </div>
+
+              <div className="flex gap-1.5">
+                {vehicleTypes.map((vt) => {
+                  const vtData = ratesByVehicleType[vt.value];
+                  const isLoading = vtData?.isLoading ?? true;
+                  const rates = vtData?.rates ?? [];
+                  const currentSelection = vtData?.selectedRateId ?? null;
+                  const hasSelection = currentSelection !== null;
+
+                  return (
+                    <div key={vt.value} className="flex-1 min-w-0">
+                      <ChronoSelect
+                        value={currentSelection ?? ""}
+                        onValueChange={(rateId) => handleRateSelect(vt.value, rateId)}
+                        disabled={isValidating || isLoading}
+                      >
+                        <ChronoSelectTrigger className={cn(
+                          "h-7 text-xs px-2 transition-all",
+                          hasSelection
+                            ? "ring-1 ring-primary border-primary bg-primary/10"
+                            : "opacity-70"
+                        )}>
+                          <ChronoSelectValue
+                            placeholder={isLoading ? "..." : vt.label}
+                          />
+                        </ChronoSelectTrigger>
+                        <ChronoSelectContent>
+                          <div className="px-2 py-1 text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
+                            {vt.label}
+                          </div>
+                          {rates.length === 0 ? (
+                            <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                              Sin tarifas
+                            </div>
+                          ) : (
+                            rates.map((rate) => (
+                              <ChronoSelectItem key={rate.id} value={rate.id} className="text-xs">
+                                {rate.name}
+                              </ChronoSelectItem>
+                            ))
+                          )}
+                        </ChronoSelectContent>
+                      </ChronoSelect>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex justify-end mt-1">
                 <ChronoButton
                   type="button"
-                  variant="ghost"
+                  variant="default"
                   size="sm"
-                  className="h-5 px-1.5 text-[10px]"
-                  onClick={handleClearAllSelections}
-                  title="Limpiar selección"
+                  className="h-7 text-xs"
+                  onClick={() => setConfigMode("scan")}
                 >
-                  <X className="h-3 w-3 mr-0.5" />
-                  Limpiar
+                  <Check className="h-3 w-3 mr-1" />
+                  Aceptar
                 </ChronoButton>
-              )}
+              </div>
             </div>
-
-            <div className="flex gap-1.5">
-              {vehicleTypes.map((vt) => {
-                const vtData = ratesByVehicleType[vt.value];
-                const isLoading = vtData?.isLoading ?? true;
-                const rates = vtData?.rates ?? [];
-                const currentSelection = vtData?.selectedRateId ?? null;
-                const hasSelection = currentSelection !== null;
-
-                return (
-                  <div key={vt.value} className="flex-1 min-w-0">
-                    <ChronoSelect
-                      value={currentSelection ?? ""}
-                      onValueChange={(rateId) => handleRateSelect(vt.value, rateId)}
-                      disabled={isValidating || isLoading}
-                    >
-                      <ChronoSelectTrigger className={cn(
-                        "h-7 text-xs px-2 transition-all",
-                        hasSelection
-                          ? "ring-1 ring-primary border-primary bg-primary/10"
-                          : "opacity-70"
-                      )}>
-                        <ChronoSelectValue
-                          placeholder={isLoading ? "..." : vt.label}
-                        />
-                      </ChronoSelectTrigger>
-                      <ChronoSelectContent>
-                        <div className="px-2 py-1 text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
-                          {vt.label}
-                        </div>
-                        {rates.length === 0 ? (
-                          <div className="px-2 py-1.5 text-xs text-muted-foreground">
-                            Sin tarifas
-                          </div>
-                        ) : (
-                          rates.map((rate) => (
-                            <ChronoSelectItem key={rate.id} value={rate.id} className="text-xs">
-                              {rate.name}
-                            </ChronoSelectItem>
-                          ))
-                        )}
-                      </ChronoSelectContent>
-                    </ChronoSelect>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex justify-end mt-1">
-              <ChronoButton
-                type="button"
-                variant="default"
-                size="sm"
-                className="h-7 text-xs"
-                onClick={() => setConfigMode("scan")}
-              >
-                <Check className="h-3 w-3 mr-1" />
-                Aceptar
-              </ChronoButton>
-            </div>
-          </div>
+          </PermissionGuard>
         )}
 
         <QrFormComponent
