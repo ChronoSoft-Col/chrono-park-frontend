@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,8 +46,6 @@ const getErrorMessage = (error: unknown, fallback: string): string => {
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const fromPath = searchParams.get("from") ?? undefined;
 
   useEffect(() => {
     // Si llegamos al login con una cookie vencida/invalidada, la limpiamos desde el cliente.
@@ -87,24 +85,7 @@ export default function LoginPage() {
       store.setApplications(response.data.applications ?? []);
       store.setActions(response.data.permissions ?? []);
 
-      // If the login was requested because router redirected with a `from` param, respect it
-      if (fromPath) {
-        toast.success("Sesión iniciada correctamente", { id: loadingToast });
-        router.replace(fromPath);
-        return;
-      }
-
-      // If backend returned applications, redirect to first application's path
-      const apps = (response.data.applications ?? []) as { path?: string }[];
-      if (apps.length > 0 && apps[0].path) {
-        toast.success("Sesión iniciada correctamente", { id: loadingToast });
-        // Normalize the path and redirect
-        const appPath = apps[0].path.startsWith("/") ? apps[0].path : `/${apps[0].path}`;
-        router.replace(appPath);
-        return;
-      }
-
-      // Fallback: redirect to /parking
+      // Redirect fijo post-login
       toast.success("Sesión iniciada correctamente", { id: loadingToast });
       router.replace("/parking");
     } catch (error) {
