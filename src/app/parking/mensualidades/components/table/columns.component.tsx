@@ -20,11 +20,6 @@ type PayHandler = (item: ISubscriptionEntity) => void;
 type CancelHandler = (item: ISubscriptionEntity) => void;
 type IsCancellingHandler = (item: ISubscriptionEntity) => boolean;
 
-const formatDate = (value?: Date | string) => {
-  if (!value) return "-";
-  const date = value instanceof Date ? value : new Date(value);
-  return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(date);
-};
 
 const isExpiredSubscription = (row: ISubscriptionEntity) => {
   if (!row.endDate) return false;
@@ -109,12 +104,12 @@ export const createSubscriptionColumns = (
   {
     id: "start-date",
     header: "Inicio",
-    accessorFn: (row) => formatDate(row.startDate),
+    accessorFn: (row) => <>{row.startDate}</>,
   },
   {
     id: "end-date",
     header: "Vencimiento",
-    accessorFn: (row) => formatDate(row.endDate),
+    accessorFn: (row) => <>{row.endDate}</>,
   },
   {
     id: "status",

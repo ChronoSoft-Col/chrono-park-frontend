@@ -37,6 +37,7 @@ export class SubscriptionDatasourceService
   async getSubscriptionById(
     id: string
   ): Promise<IGeneralResponse<ISubscriptionEntity>> {
+    console.log("Fetching subscription details for ID:", id);
     return this.api
       .get<IGeneralResponse<ISubscriptionEntity>>(`/subscriptions/${id}`)
       .then((response) => response.data);
@@ -92,6 +93,7 @@ export class SubscriptionDatasourceService
   async getPaymentHistory(
     id: string
   ): Promise<IGeneralResponse<ISubscriptionPayment, false>> {
+    console.log("Fetching payment history for subscription ID:", id);
     return this.api
       .get<IGeneralResponse<ISubscriptionPayment, false>>(
         `/subscriptions/${id}/payments`

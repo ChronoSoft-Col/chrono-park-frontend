@@ -19,12 +19,6 @@ interface SubscriptionDetailDialogContentProps {
   fallback: ISubscriptionEntity;
 }
 
-const formatDate = (value?: Date | string) => {
-  if (!value) return "-";
-  const date = value instanceof Date ? value : new Date(value);
-  return new Intl.DateTimeFormat("es-CO", { dateStyle: "long" }).format(date);
-};
-
 
 const formatDateTime = (value?: Date | string) => {
   if (!value) return "-";
@@ -163,8 +157,8 @@ export function SubscriptionDetailDialogContent({
         </ChronoSectionLabel>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <InfoRow label="Fecha de inicio" value={formatDate(item.startDate)} />
-          <InfoRow label="Fecha de vencimiento" value={formatDate(item.endDate)} />
+          <InfoRow label="Fecha de inicio" value={`${item.startDate}`} />
+          <InfoRow label="Fecha de vencimiento" value={`${item.endDate}`} />
         </div>
       </div>
 
