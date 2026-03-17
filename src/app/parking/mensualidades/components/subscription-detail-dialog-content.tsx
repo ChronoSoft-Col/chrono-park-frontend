@@ -1,11 +1,8 @@
 "use client";
 
-import * as React from "react";
-import { Loader2 } from "lucide-react";
 
 import type {
   ISubscriptionEntity,
-  ISubscriptionStatusLog,
   SubscriptionStatus,
 } from "@/server/domain";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
@@ -13,21 +10,12 @@ import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoSeparator } from "@chrono/chrono-separator.component";
 import { ChronoValue } from "@chrono/chrono-value.component";
 import { getSubscriptionByIdAction } from "../actions/get-subscription-detail.action";
+import { useEffect, useState } from "react";
 
 interface SubscriptionDetailDialogContentProps {
   subscriptionId: string;
   fallback: ISubscriptionEntity;
 }
-
-
-const formatDateTime = (value?: Date | string) => {
-  if (!value) return "-";
-  const date = value instanceof Date ? value : new Date(value);
-  return new Intl.DateTimeFormat("es-CO", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
-};
 
 const formatPrice = (price?: number) => {
   if (price === undefined || price === null) return "-";
@@ -76,10 +64,10 @@ export function SubscriptionDetailDialogContent({
   subscriptionId,
   fallback,
 }: SubscriptionDetailDialogContentProps) {
-  const [item, setItem] = React.useState<ISubscriptionEntity>(fallback);
-  const [loading, setLoading] = React.useState(true);
+  const [item, setItem] = useState<ISubscriptionEntity>(fallback);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let cancelled = false;
 
     getSubscriptionByIdAction(subscriptionId).then((res) => {
