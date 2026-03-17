@@ -1,8 +1,8 @@
 "use client";
 
-import { Controller, type Resolver, useForm } from "react-hook-form";
+import { Controller, type Resolver, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Save, X } from "lucide-react";
+import { Plus, Save, Trash2, X } from "lucide-react";
 
 import ChronoButton from "@chrono/chrono-button.component";
 import {
@@ -11,12 +11,15 @@ import {
   ChronoFieldLabel,
 } from "@chrono/chrono-field.component";
 import { ChronoInput } from "@chrono/chrono-input.component";
+import ChronoPlateInput from "@chrono/chrono-plate-input.component";
+import ChronoVehicleTypeSelect from "@chrono/chrono-vehicle-type-select.component";
 
 import type { ICustomerEntity } from "@/server/domain";
 import {
   UpdateCustomerForm,
   UpdateCustomerSchema,
 } from "@/src/shared/schemas/parking/update-customer.schema";
+import { useCommonStore } from "@/src/shared/stores/common.store";
 
 const fieldContainerClasses =
   "rounded-lg border border-border bg-card/80 p-4 shadow-sm transition-colors focus-within:border-primary data-[invalid=true]:border-destructive min-w-0";
@@ -30,6 +33,8 @@ type Props = {
 };
 
 export function EditCustomerFormComponent({ customer, onSubmit, onCancel }: Props) {
+  const { vehicleTypes } = useCommonStore();
+
   const form = useForm<UpdateCustomerForm>({
     resolver: zodResolver(UpdateCustomerSchema) as Resolver<UpdateCustomerForm>,
     mode: "onChange",
@@ -39,6 +44,7 @@ export function EditCustomerFormComponent({ customer, onSubmit, onCancel }: Prop
       email: customer.email ?? "",
       phoneNumber: customer.phoneNumber ?? "",
       agreementId: customer.agreementId ?? "",
+      vehicles: [],
     },
   });
 
@@ -47,6 +53,11 @@ export function EditCustomerFormComponent({ customer, onSubmit, onCancel }: Prop
     handleSubmit,
     formState: { isSubmitting, isValid },
   } = form;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "vehicles",
+  });
 
   const handleFormSubmit = handleSubmit(async (data) => {
     await onSubmit(data);
@@ -124,6 +135,98 @@ export function EditCustomerFormComponent({ customer, onSubmit, onCancel }: Prop
             </ChronoField>
           )}
         />
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold">Vehículos</p>
+            <p className="text-xs text-muted-foreground">
+              Agrega nuevas placas para asociarlas al cliente.
+            </p>
+          </div>
+
+          <ChronoButton
+            type="button"
+            variant="outline"
+            onClick={() => append({ licensePlate: "", vehicleTypeId: "" })}
+            icon={<Plus className="h-4 w-4" />}
+          >
+            Agregar
+          </ChronoButton>
+        </div>
+
+        <div className="space-y-3">
+          {fields.map((row, index) => (
+            <div key={row.id} className="grid gap-3 md:grid-cols-2">
+              <Controller
+                control={control}
+                name={`vehicles.${index}.licensePlate`}
+                render={({ field, fieldState }) => (
+                  <ChronoField
+                    data-invalid={fieldState.invalid}
+                    className={fieldContainerClasses}
+                  >
+                    <ChronoFieldLabel
+                      htmlFor={`vehicles.${index}.licensePlate`}
+                      className={fieldLabelClasses}
+                    >
+                      Placa
+                    </ChronoFieldLabel>
+                    <ChronoPlateInput
+                      {...field}
+                      id={`vehicles.${index}.licensePlate`}
+                      value={(field.value as string) ?? ""}
+                      placeholder="Placa"
+                      className="mt-1"
+                    />
+                    {fieldState.invalid && (
+                      <ChronoFieldError errors={[fieldState.error]} />
+                    )}
+                  </ChronoField>
+                )}
+              />
+
+              <Controller
+                control={control}
+                name={`vehicles.${index}.vehicleTypeId`}
+                render={({ field, fieldState }) => (
+                  <ChronoField
+                    data-invalid={fieldState.invalid}
+                    className={fieldContainerClasses}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <ChronoFieldLabel
+                        htmlFor={`vehicles.${index}.vehicleTypeId`}
+                        className={fieldLabelClasses}
+                      >
+                        Tipo de vehículo
+                      </ChronoFieldLabel>
+                      <ChronoButton
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => remove(index)}
+                        icon={<Trash2 className="h-4 w-4" />}
+                      />
+                    </div>
+
+                    <ChronoVehicleTypeSelect
+                      value={field.value ?? ""}
+                      onValueChange={field.onChange}
+                      options={vehicleTypes}
+                      className="mt-1"
+                    />
+
+                    {fieldState.invalid && (
+                      <ChronoFieldError errors={[fieldState.error]} />
+                    )}
+                  </ChronoField>
+                )}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex justify-end gap-2">
