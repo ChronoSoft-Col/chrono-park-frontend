@@ -12,4 +12,5 @@ export enum EIconNames {
   MASTERKEYS = "llaves_maestras",
   USERS = "usuarios",
   ROLES = "roles",
+  REPORTS = "reportes",
 }

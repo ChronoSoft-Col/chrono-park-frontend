@@ -137,9 +137,7 @@ export const createSubscriptionColumns = (
       const canPay = Boolean(onPay) && row.status !== "CANCELADA";
       const canCancel =
         Boolean(onCancel) &&
-        (row.status === "PENDIENTE" ||
-          row.status === "ACTIVA" ||
-          row.status === "PERIODO_GRACIA");
+        (row.status !== "CANCELADA");
       const cancelLoading = isCancelling?.(row) ?? false;
 
       const payDisabledReason = !onPay

@@ -165,7 +165,7 @@ export function SubscriptionDetailDialogContent({
       <ChronoSeparator />
 
       {/* Status History */}
-      <div className="space-y-3">
+      {/* <div className="space-y-3">
         <div className="flex items-center gap-2">
           <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
             Historial de estado
@@ -186,7 +186,7 @@ export function SubscriptionDetailDialogContent({
             {loading ? "Cargando historial..." : "Sin cambios de estado."}
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
