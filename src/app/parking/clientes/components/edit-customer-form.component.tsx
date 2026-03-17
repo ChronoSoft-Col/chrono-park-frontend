@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Controller, type Resolver, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Save, Trash2, X } from "lucide-react";
@@ -44,20 +45,42 @@ export function EditCustomerFormComponent({ customer, onSubmit, onCancel }: Prop
       email: customer.email ?? "",
       phoneNumber: customer.phoneNumber ?? "",
       agreementId: customer.agreementId ?? "",
-      vehicles: [],
+      vehicles: (customer.vehicles ?? []).map((v) => ({
+        licensePlate: v.licensePlate,
+        vehicleTypeId: v.vehicleTypeId,
+      })),
     },
   });
 
   const {
     control,
     handleSubmit,
-    formState: { isSubmitting, isValid },
+    reset,
+    formState: { isSubmitting, isValid, isDirty },
   } = form;
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "vehicles",
   });
+
+  // When the dialog loads the full customer by ID, refresh the form values
+  // (but don't clobber user edits if they've already started typing).
+  useEffect(() => {
+    if (isDirty) return;
+
+    reset({
+      firstName: customer.firstName ?? "",
+      lastName: customer.lastName ?? "",
+      email: customer.email ?? "",
+      phoneNumber: customer.phoneNumber ?? "",
+      agreementId: customer.agreementId ?? "",
+      vehicles: (customer.vehicles ?? []).map((v) => ({
+        licensePlate: v.licensePlate,
+        vehicleTypeId: v.vehicleTypeId,
+      })),
+    });
+  }, [customer, isDirty, reset]);
 
   const handleFormSubmit = handleSubmit(async (data) => {
     await onSubmit(data);
@@ -141,9 +164,7 @@ export function EditCustomerFormComponent({ customer, onSubmit, onCancel }: Prop
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold">Vehículos</p>
-            <p className="text-xs text-muted-foreground">
-              Agrega nuevas placas para asociarlas al cliente.
-            </p>
+            <p className="text-xs text-muted-foreground">Agrega, edita o quita vehículos del cliente.</p>
           </div>
 
           <ChronoButton
@@ -157,6 +178,12 @@ export function EditCustomerFormComponent({ customer, onSubmit, onCancel }: Prop
         </div>
 
         <div className="space-y-3">
+          {fields.length === 0 && (
+            <div className="rounded-lg border border-border bg-card/50 p-3 text-xs text-muted-foreground">
+              Este cliente no tiene vehículos asociados.
+            </div>
+          )}
+
           {fields.map((row, index) => (
             <div key={row.id} className="grid gap-3 md:grid-cols-2">
               <Controller

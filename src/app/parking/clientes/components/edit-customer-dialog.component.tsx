@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -11,11 +12,39 @@ import {
 } from "@/src/shared/schemas/parking/update-customer.schema";
 
 import { updateCustomerAction } from "../actions/update-customer.action";
+import { getCustomerByIdAction } from "../actions/get-customer-by-id.action";
 import { EditCustomerFormComponent } from "./edit-customer-form.component";
 
 export function EditCustomerDialogContent({ customer }: { customer: ICustomerEntity }) {
   const router = useRouter();
   const { closeDialog } = UseDialogContext();
+
+  const [resolvedCustomer, setResolvedCustomer] = useState<ICustomerEntity>(customer);
+  const [isLoadingCustomer, setIsLoadingCustomer] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      setIsLoadingCustomer(true);
+      const result = await getCustomerByIdAction(customer.id);
+      if (cancelled) return;
+
+      if (result.success && result.data?.success && result.data.data) {
+        setResolvedCustomer(result.data.data);
+      }
+      setIsLoadingCustomer(false);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [customer.id]);
+
+  const customerToEdit = useMemo(
+    () => (isLoadingCustomer ? customer : resolvedCustomer),
+    [customer, isLoadingCustomer, resolvedCustomer],
+  );
 
   const handleSubmit = async (data: UpdateCustomerForm) => {
     const parsed = UpdateCustomerSchema.safeParse(data);
@@ -50,5 +79,11 @@ export function EditCustomerDialogContent({ customer }: { customer: ICustomerEnt
     }
   };
 
-  return <EditCustomerFormComponent customer={customer} onSubmit={handleSubmit} onCancel={closeDialog} />;
+  return (
+    <EditCustomerFormComponent
+      customer={customerToEdit}
+      onSubmit={handleSubmit}
+      onCancel={closeDialog}
+    />
+  );
 }

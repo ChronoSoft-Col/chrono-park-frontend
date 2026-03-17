@@ -5,6 +5,7 @@ import {
     IListCustomersResponseEntity,
     CustomerRepository,
     ICreateCustomerParamsEntity,
+    IGetCustomerResponseEntity,
     IUpdateCustomerParamsEntity,
     IUpdateCustomerResponseEntity
 } from "@/server/domain";
@@ -16,6 +17,10 @@ export class CustomerUsecase implements CustomerRepository {
 
     listCustomers(params: IListCustomersParamsEntity): Promise<IListCustomersResponseEntity> {
         return this.customerRepository.listCustomers(params);
+    }
+
+    getCustomerById(customerId: string): Promise<IGetCustomerResponseEntity> {
+        return this.customerRepository.getCustomerById(customerId);
     }
 
     createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse> {

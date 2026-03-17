@@ -3,7 +3,7 @@ import { SERVER_TOKENS } from "@/server/di/server-tokens";
 import {
     CustomerDatasourceService
 } from "@/server/infrastructure/index"
-import { CustomerRepository, ICreateCustomerParamsEntity, IListCustomersParamsEntity, IListCustomersResponseEntity, IUpdateCustomerParamsEntity, IUpdateCustomerResponseEntity } from "@/server/domain";
+import { CustomerRepository, ICreateCustomerParamsEntity, IGetCustomerResponseEntity, IListCustomersParamsEntity, IListCustomersResponseEntity, IUpdateCustomerParamsEntity, IUpdateCustomerResponseEntity } from "@/server/domain";
 import IEmptyResponse from "@/shared/interfaces/generic/empty-response";
 
 @injectable()
@@ -13,6 +13,10 @@ export class CustomerRepositoryImp implements CustomerRepository {
 
     listCustomers(params: IListCustomersParamsEntity): Promise<IListCustomersResponseEntity> {
         return this.customerDatasourceService.listCustomers(params);
+    }
+
+    getCustomerById(customerId: string): Promise<IGetCustomerResponseEntity> {
+        return this.customerDatasourceService.getCustomerById(customerId);
     }
 
     createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse> {

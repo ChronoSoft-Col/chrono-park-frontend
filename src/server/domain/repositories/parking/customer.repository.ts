@@ -1,6 +1,7 @@
 import {
     IListCustomersParamsEntity,
     IListCustomersResponseEntity,
+    IGetCustomerResponseEntity,
     ICreateCustomerParamsEntity,
     IUpdateCustomerParamsEntity,
     IUpdateCustomerResponseEntity,
@@ -9,6 +10,7 @@ import IEmptyResponse from "@/src/shared/interfaces/generic/empty-response";
 
 export abstract class CustomerRepository {
     abstract listCustomers(params: IListCustomersParamsEntity): Promise<IListCustomersResponseEntity>;
+    abstract getCustomerById(customerId: string): Promise<IGetCustomerResponseEntity>;
     abstract createCustomer(params: ICreateCustomerParamsEntity): Promise<IEmptyResponse>;
     abstract updateCustomer(customerId: string, params: IUpdateCustomerParamsEntity): Promise<IUpdateCustomerResponseEntity>;
     abstract setCustomerActive(customerId: string, isActive: boolean): Promise<IEmptyResponse | void>;
