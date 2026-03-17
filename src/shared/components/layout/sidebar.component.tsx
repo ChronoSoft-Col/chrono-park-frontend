@@ -1,5 +1,5 @@
 "use client";
-import { User } from "lucide-react";
+import { ChevronRight, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { SessionResource } from "../../types/auth/session.type";
 import {
@@ -10,6 +10,7 @@ import {
   ChronoSidebarGroupLabel,
   ChronoSidebarHeader,
   ChronoSidebarMenu,
+  ChronoSidebarMenuAction,
   ChronoSidebarMenuButton,
   ChronoSidebarMenuItem,
   ChronoSidebarMenuSub,
@@ -51,6 +52,14 @@ export default function SidebarComponent() {
     return `/parking/${clean}`;
   };
 
+  const renderResourceIcon = (icon: unknown) => {
+    if (typeof icon === "string" && icon.length > 0) {
+      return <AppIcons iconName={icon as EIconNames} />;
+    }
+
+    return <User />;
+  };
+
   return (
     <ChronoSidebar collapsible="icon">
       <ChronoSidebarHeader className="mx-auto">
@@ -72,7 +81,7 @@ export default function SidebarComponent() {
         />{" "}
         {/* CompanySwitcher removed: companies are not part of the session anymore */}
       </ChronoSidebarHeader>
-      <ChronoSidebarContent>
+      <ChronoSidebarContent> 
         {applications.map((app) => (
           <ChronoSidebarGroup key={app.id}>
             <ChronoSidebarGroupLabel>{app.name}</ChronoSidebarGroupLabel>
@@ -94,42 +103,56 @@ export default function SidebarComponent() {
                     </ChronoSidebarMenuButton>
                   </ChronoSidebarMenuItem>
                 ) : (
-                  <ChronoCollapsible key={res.id} defaultOpen={isActive}>
-                    <ChronoCollapsibleTrigger asChild>
-                      <ChronoSidebarMenuButton
-                        className={
-                          isActive ? "bg-accent text-accent-foreground" : ""
-                        }
-                      >
-                        <User />
-                        {res.name}
-                      </ChronoSidebarMenuButton>
-                    </ChronoCollapsibleTrigger>
-                    <ChronoCollapsibleContent>
-                      <ChronoSidebarMenuSub>
-                        {res.subresources.map((subresource) => {
-                          const subPath = normalizeToAbsolutePath(
-                            subresource.path
-                          );
-                          const isSubActive = pathname.startsWith(subPath);
-                          return (
-                            <ChronoSidebarMenuSubItem key={subresource.id}>
-                              <ChronoSidebarMenuSubButton
-                                className={
-                                  isSubActive
-                                    ? "bg-accent text-accent-foreground"
-                                    : ""
-                                }
-                                onClick={() => handleRedirect(subPath)}
-                              >
-                                {subresource.name}
-                              </ChronoSidebarMenuSubButton>
-                            </ChronoSidebarMenuSubItem>
-                          );
-                        })}
-                      </ChronoSidebarMenuSub>
-                    </ChronoCollapsibleContent>
-                  </ChronoCollapsible>
+                  <ChronoSidebarMenuItem key={res.id}>
+                    <ChronoCollapsible defaultOpen={isActive}>
+                      <div className="relative">
+                        <ChronoSidebarMenuButton
+                          className={`cursor-pointer ${
+                            isActive ? "bg-accent text-accent-foreground" : ""
+                          }`}
+                          onClick={() => handleRedirect(resPath)}
+                        >
+                          {renderResourceIcon(res.icon)}
+                          {res.name}
+                        </ChronoSidebarMenuButton>
+
+                        <ChronoCollapsibleTrigger asChild>
+                          <ChronoSidebarMenuAction
+                            className="group size-5"
+                            aria-label={`Desplegar ${res.name}`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ChevronRight className="size-5 transition-transform group-data-[state=open]:rotate-90" />
+                          </ChronoSidebarMenuAction>
+                        </ChronoCollapsibleTrigger>
+                      </div>
+
+                      <ChronoCollapsibleContent>
+                        <ChronoSidebarMenuSub>
+                          {res.subresources.map((subresource) => {
+                            const subPath = normalizeToAbsolutePath(
+                              subresource.path
+                            );
+                            const isSubActive = pathname.startsWith(subPath);
+                            return (
+                              <ChronoSidebarMenuSubItem key={subresource.id}>
+                                <ChronoSidebarMenuSubButton
+                                  className={
+                                    isSubActive
+                                      ? "bg-accent text-accent-foreground"
+                                      : ""
+                                  }
+                                  onClick={() => handleRedirect(subPath)}
+                                >
+                                  {subresource.name}
+                                </ChronoSidebarMenuSubButton>
+                              </ChronoSidebarMenuSubItem>
+                            );
+                          })}
+                        </ChronoSidebarMenuSub>
+                      </ChronoCollapsibleContent>
+                    </ChronoCollapsible>
+                  </ChronoSidebarMenuItem>
                 );
               })}
             </ChronoSidebarMenu>
