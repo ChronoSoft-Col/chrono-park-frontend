@@ -202,36 +202,36 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function StatusLogRow({ log }: { log: ISubscriptionStatusLog }) {
-  return (
-    <div className="flex items-center gap-3 px-4 py-3">
-      <div className="flex items-center gap-2 min-w-0 flex-1">
-        {log.previousStatus && (
-          <>
-            <ChronoBadge
-              variant="outline"
-              className={`text-[10px] ${getStatusBadgeStyles(log.previousStatus)}`}
-            >
-              {getStatusLabel(log.previousStatus)}
-            </ChronoBadge>
-            <span className="text-xs text-muted-foreground">→</span>
-          </>
-        )}
-        <ChronoBadge
-          variant="outline"
-          className={`text-[10px] ${getStatusBadgeStyles(log.newStatus)}`}
-        >
-          {getStatusLabel(log.newStatus)}
-        </ChronoBadge>
-      </div>
-      <div className="text-right shrink-0">
-        <p className="text-[11px] text-muted-foreground">
-          {formatDateTime(log.changedAt)}
-        </p>
-        {log.reason && (
-          <p className="text-[11px] text-muted-foreground italic">{log.reason}</p>
-        )}
-      </div>
-    </div>
-  );
-}
+// function StatusLogRow({ log }: { log: ISubscriptionStatusLog }) {
+//   return (
+//     <div className="flex items-center gap-3 px-4 py-3">
+//       <div className="flex items-center gap-2 min-w-0 flex-1">
+//         {log.previousStatus && (
+//           <>
+//             <ChronoBadge
+//               variant="outline"
+//               className={`text-[10px] ${getStatusBadgeStyles(log.previousStatus)}`}
+//             >
+//               {getStatusLabel(log.previousStatus)}
+//             </ChronoBadge>
+//             <span className="text-xs text-muted-foreground">→</span>
+//           </>
+//         )}
+//         <ChronoBadge
+//           variant="outline"
+//           className={`text-[10px] ${getStatusBadgeStyles(log.newStatus)}`}
+//         >
+//           {getStatusLabel(log.newStatus)}
+//         </ChronoBadge>
+//       </div>
+//       <div className="text-right shrink-0">
+//         <p className="text-[11px] text-muted-foreground">
+//           {formatDateTime(log.changedAt)}
+//         </p>
+//         {log.reason && (
+//           <p className="text-[11px] text-muted-foreground italic">{log.reason}</p>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
