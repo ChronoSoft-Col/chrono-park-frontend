@@ -27,37 +27,26 @@ const formatPrice = (price?: number) => {
 };
 
 const getStatusBadgeStyles = (status: SubscriptionStatus | string) => {
-  switch (status) {
-    case "PENDIENTE":
-      return "border-yellow-500/40 bg-yellow-50 text-yellow-700";
-    case "ACTIVA":
-      return "border-emerald-500/40 bg-emerald-50 text-emerald-700";
-    case "PERIODO_GRACIA":
-      return "border-amber-500/40 bg-amber-50 text-amber-700";
-    case "INACTIVA":
-      return "border-red-500/40 bg-red-50 text-red-700";
-    case "CANCELADA":
-      return "border-gray-500/40 bg-gray-50 text-gray-700";
-    default:
-      return "border-border/60 bg-muted/40 text-muted-foreground";
+
+  const statusStyles = {
+    PENDIENTE: "border-yellow-500/40 bg-yellow-50 text-yellow-700",
+    ACTIVA: "border-emerald-500/40 bg-emerald-50 text-emerald-700",
+    PERIODO_GRACIA: "border-amber-500/40 bg-amber-50 text-amber-700",
+    INACTIVA: "border-red-500/40 bg-red-50 text-red-700",
+    CANCELADA: "border-gray-500/40 bg-gray-50 text-gray-700",
   }
+  return statusStyles[status as SubscriptionStatus] || "border-border/60 bg-muted/40 text-muted-foreground";
 };
 
 const getStatusLabel = (status: SubscriptionStatus | string) => {
-  switch (status) {
-    case "PENDIENTE":
-      return "Pendiente de Pago";
-    case "ACTIVA":
-      return "Activa";
-    case "PERIODO_GRACIA":
-      return "Período de Gracia";
-    case "INACTIVA":
-      return "Inactiva";
-    case "CANCELADA":
-      return "Cancelada";
-    default:
-      return status;
+  const statusLabel = {
+    PENDIENTE: "Pendiente de Pago",
+    ACTIVA: "Activa",
+    PERIODO_GRACIA: "Período de Gracia",
+    INACTIVA: "Inactiva",
+    CANCELADA: "Cancelada",
   }
+  return statusLabel[status as SubscriptionStatus] || status;
 };
 
 export function SubscriptionDetailDialogContent({
