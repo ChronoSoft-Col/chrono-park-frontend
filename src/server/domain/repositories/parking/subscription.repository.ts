@@ -4,6 +4,8 @@ import {
   ICreateSubscriptionParamsEntity,
   IPaySubscriptionParamsEntity,
   ICancelSubscriptionParamsEntity,
+  IEditSubscriptionEndDateParamsEntity,
+  IActivateSubscriptionParamsEntity,
   IUpdateBillingConfigParamsEntity,
   ISubscriptionEntity,
   IMonthlyPlanEntity,
@@ -44,6 +46,16 @@ export abstract class SubscriptionRepository {
   abstract cancelSubscription(
     id: string,
     params: ICancelSubscriptionParamsEntity
+  ): Promise<IGeneralResponse<ISubscriptionEntity>>;
+
+  abstract editSubscriptionEndDate(
+    id: string,
+    params: IEditSubscriptionEndDateParamsEntity
+  ): Promise<IGeneralResponse<ISubscriptionEntity>>;
+
+  abstract activateSubscription(
+    id: string,
+    params: IActivateSubscriptionParamsEntity
   ): Promise<IGeneralResponse<ISubscriptionEntity>>;
 
   abstract getPaymentHistory(

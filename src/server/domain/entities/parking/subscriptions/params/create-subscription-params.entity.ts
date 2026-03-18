@@ -23,6 +23,17 @@ export interface ICancelSubscriptionParamsEntity {
   reason?: string;
 }
 
+// Parámetros para editar fecha de fin (administrativo)
+export interface IEditSubscriptionEndDateParamsEntity {
+  endDate: string;
+  reason?: string;
+}
+
+// Parámetros para activar una suscripción (administrativo)
+export interface IActivateSubscriptionParamsEntity {
+  reason?: string;
+}
+
 // Parámetros para actualizar configuración de facturación
 export interface IUpdateBillingConfigParamsEntity {
   cutoffDay?: number | null;

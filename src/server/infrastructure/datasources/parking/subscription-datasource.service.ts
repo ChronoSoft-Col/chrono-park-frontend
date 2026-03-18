@@ -6,6 +6,8 @@ import {
   ICreateSubscriptionParamsEntity,
   IPaySubscriptionParamsEntity,
   ICancelSubscriptionParamsEntity,
+  IEditSubscriptionEndDateParamsEntity,
+  IActivateSubscriptionParamsEntity,
   IUpdateBillingConfigParamsEntity,
   ISubscriptionEntity,
   IMonthlyPlanEntity,
@@ -85,6 +87,30 @@ export class SubscriptionDatasourceService
     return this.api
       .post<IGeneralResponse<ISubscriptionEntity>>(
         `/subscriptions/${id}/cancel`,
+        params
+      )
+      .then((response) => response.data);
+  }
+
+  async editSubscriptionEndDate(
+    id: string,
+    params: IEditSubscriptionEndDateParamsEntity
+  ): Promise<IGeneralResponse<ISubscriptionEntity>> {
+    return this.api
+      .patch<IGeneralResponse<ISubscriptionEntity>>(
+        `/subscriptions/${id}/end-date`,
+        params
+      )
+      .then((response) => response.data);
+  }
+
+  async activateSubscription(
+    id: string,
+    params: IActivateSubscriptionParamsEntity
+  ): Promise<IGeneralResponse<ISubscriptionEntity>> {
+    return this.api
+      .post<IGeneralResponse<ISubscriptionEntity>>(
+        `/subscriptions/${id}/activate`,
         params
       )
       .then((response) => response.data);

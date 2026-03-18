@@ -6,6 +6,8 @@ import {
   ICreateSubscriptionParamsEntity,
   IPaySubscriptionParamsEntity,
   ICancelSubscriptionParamsEntity,
+  IEditSubscriptionEndDateParamsEntity,
+  IActivateSubscriptionParamsEntity,
   IUpdateBillingConfigParamsEntity,
   ISubscriptionEntity,
   IMonthlyPlanEntity,
@@ -64,6 +66,20 @@ export class SubscriptionUsecase implements SubscriptionRepository {
     params: ICancelSubscriptionParamsEntity
   ): Promise<IGeneralResponse<ISubscriptionEntity>> {
     return this.subscriptionRepository.cancelSubscription(id, params);
+  }
+
+  editSubscriptionEndDate(
+    id: string,
+    params: IEditSubscriptionEndDateParamsEntity
+  ): Promise<IGeneralResponse<ISubscriptionEntity>> {
+    return this.subscriptionRepository.editSubscriptionEndDate(id, params);
+  }
+
+  activateSubscription(
+    id: string,
+    params: IActivateSubscriptionParamsEntity
+  ): Promise<IGeneralResponse<ISubscriptionEntity>> {
+    return this.subscriptionRepository.activateSubscription(id, params);
   }
 
   getPaymentHistory(

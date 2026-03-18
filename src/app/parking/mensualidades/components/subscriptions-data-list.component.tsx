@@ -19,6 +19,7 @@ import { createSubscriptionColumns } from "./table/columns.component";
 import { SubscriptionDetailDialogContent } from "./subscription-detail-dialog-content";
 import { SubscriptionHistoryDialogContent } from "./subscription-history-dialog-content";
 import { CreateSubscriptionDialogContent } from "./create-subscription-dialog.component";
+import { EditSubscriptionDialogContent } from "./edit-subscription-dialog.component";
 import {
   PaySubscriptionDialogContent,
   PAY_SUBSCRIPTION_DIALOG_FORM_ID,
@@ -176,6 +177,19 @@ export default function SubscriptionsDataListComponent({
     [cancellingId, router, showYesNoDialog]
   );
 
+  const handleEditSubscription = React.useCallback(
+    (item: ISubscriptionEntity) => {
+      openDialog({
+        title: "Editar Mensualidad",
+        description: "Editar fecha de fin y/o estado (según permisos)",
+        dialogClassName: "w-full sm:max-w-2xl",
+        contentClassName: "max-h-[75vh] overflow-y-auto pr-1",
+        content: <EditSubscriptionDialogContent subscription={item} />,
+      });
+    },
+    [openDialog]
+  );
+
   const columns = React.useMemo(
     () =>
       createSubscriptionColumns(
@@ -183,6 +197,7 @@ export default function SubscriptionsDataListComponent({
         handleViewHistory,
         handlePaySubscription,
         handleCancelSubscription,
+        handleEditSubscription,
         (item) => cancellingId === item.id
       ),
     [
@@ -190,6 +205,7 @@ export default function SubscriptionsDataListComponent({
       handleViewHistory,
       handlePaySubscription,
       handleCancelSubscription,
+      handleEditSubscription,
       cancellingId,
     ]
   );

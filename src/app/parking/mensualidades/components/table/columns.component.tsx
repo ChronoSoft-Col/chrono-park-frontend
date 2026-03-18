@@ -10,7 +10,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/src/shared/components/ui/tooltip";
-import { CreditCard, Eye, History, XCircle } from "lucide-react";
+import { CreditCard, Eye, History, Pencil, XCircle } from "lucide-react";
 import PermissionGuard from "@/src/shared/components/permission-guard.component";
 import { MensualidadesAction } from "@/src/shared/enums/auth/permissions.enum";
 
@@ -18,6 +18,7 @@ type ViewDetailHandler = (item: ISubscriptionEntity) => void;
 type ViewHistoryHandler = (item: ISubscriptionEntity) => void;
 type PayHandler = (item: ISubscriptionEntity) => void;
 type CancelHandler = (item: ISubscriptionEntity) => void;
+type EditHandler = (item: ISubscriptionEntity) => void;
 type IsCancellingHandler = (item: ISubscriptionEntity) => boolean;
 
 
@@ -69,6 +70,7 @@ export const createSubscriptionColumns = (
   onViewHistory?: ViewHistoryHandler,
   onPay?: PayHandler,
   onCancel?: CancelHandler,
+  onEdit?: EditHandler,
   isCancelling?: IsCancellingHandler,
 ): ChronoDataTableColumn<ISubscriptionEntity>[] => [
   {
@@ -138,6 +140,7 @@ export const createSubscriptionColumns = (
       const canCancel =
         Boolean(onCancel) &&
         (row.status !== "CANCELADA");
+      const canEdit = Boolean(onEdit);
       const cancelLoading = isCancelling?.(row) ?? false;
 
       const payDisabledReason = !onPay
@@ -160,6 +163,30 @@ export const createSubscriptionColumns = (
 
       return (
         <div className="flex justify-end gap-2">
+          <PermissionGuard
+            actions={[
+              MensualidadesAction.EDITAR_FECHA_MENSUALIDAD,
+              MensualidadesAction.ACTIVAR_MENSUALIDAD,
+            ]}
+            mode="some"
+            hidden
+          >
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ChronoButton
+                  type="button"
+                  variant="outline"
+                  aria-label="Editar mensualidad"
+                  disabled={!canEdit}
+                  onClick={() => onEdit?.(row)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </ChronoButton>
+              </TooltipTrigger>
+              <TooltipContent side="top">Editar</TooltipContent>
+            </Tooltip>
+          </PermissionGuard>
+
           <PermissionGuard action={MensualidadesAction.PAGAR_MENSUALIDAD} hidden>
             <Tooltip>
               <TooltipTrigger asChild>
