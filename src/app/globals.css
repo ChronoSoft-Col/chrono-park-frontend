@@ -46,7 +46,7 @@
 :root {
   --ui-scale: 1;
   --radius: 0.875rem;
-  --background: oklch(1 0 0);
+  --background: oklch(0.955 0.005 265);
   --foreground: oklch(0.147 0.004 49.25);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.147 0.004 49.25);
@@ -54,16 +54,16 @@
   --popover-foreground: oklch(0.147 0.004 49.25);
   --primary: oklch(68.984% 0.16475 257.114);
   --primary-foreground: oklch(0.985 0.001 106.423);
-  --secondary: oklch(0.97 0.001 106.424);
-  --secondary-foreground: oklch(0.216 0.006 56.043);
-  --muted: oklch(0.97 0.001 106.424);
-  --muted-foreground: oklch(0.553 0.013 58.071);
-  --accent: oklch(0.97 0.001 106.424);
-  --accent-foreground: oklch(0.216 0.006 56.043);
+  --secondary: oklch(0.91 0.008 265);
+  --secondary-foreground: oklch(0.147 0.004 49.25);
+  --muted: oklch(0.91 0.008 265);
+  --muted-foreground: oklch(0.45 0.015 258);
+  --accent: oklch(0.91 0.008 265);
+  --accent-foreground: oklch(0.147 0.004 49.25);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.923 0.003 48.717);
-  --input: oklch(0.923 0.003 48.717);
-  --ring: oklch(0.709 0.01 56.259);
+  --border: oklch(0 0 0 / 10%);
+  --input: oklch(0 0 0 / 15%);
+  --ring: oklch(0.553 0.013 58.071);
   /* Chart palette — monochromatic, based on primary hue (257°).
      To rebrand: change the hue angle (257) in all 5 values. */
   --chart-1: oklch(0.69 0.17 257);
@@ -71,14 +71,14 @@
   --chart-3: oklch(0.82 0.10 257);
   --chart-4: oklch(0.38 0.12 257);
   --chart-5: oklch(0.90 0.06 257);
-  --sidebar: oklch(0.985 0.001 106.423);
+  --sidebar: oklch(0.985 0.003 265);
   --sidebar-foreground: oklch(0.147 0.004 49.25);
-  --primary: oklch(75.686% 0.12594 256.949);
+  --sidebar-primary: oklch(75.686% 0.12594 256.949);
   --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-accent: oklch(0.97 0.001 106.424);
-  --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
-  --sidebar-border: oklch(0.923 0.003 48.717);
-  --sidebar-ring: oklch(0.709 0.01 56.259);
+  --sidebar-accent: oklch(0.91 0.008 265);
+  --sidebar-accent-foreground: oklch(0.147 0.004 49.25);
+  --sidebar-border: oklch(0 0 0 / 10%);
+  --sidebar-ring: oklch(0.553 0.013 58.071);
 }
 
 .dark {
