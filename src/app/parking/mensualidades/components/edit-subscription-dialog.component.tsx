@@ -17,6 +17,7 @@ import {
 } from "@chrono/chrono-field.component";
 import { ChronoInput } from "@chrono/chrono-input.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
+import { ChronoDatePicker } from "@chrono/chrono-date-picker.component";
 
 import { editSubscriptionEndDateAction } from "../actions/edit-subscription-end-date.action";
 
@@ -24,24 +25,19 @@ type Props = {
   subscription: ISubscriptionEntity;
 };
 
-function toInputDate(value: Date | string | undefined | null): string {
-  if (!value) return "";
-  if (typeof value === "string") {
-    // Backend often sends YYYY-MM-DD
-    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
-    const d = new Date(value);
-    if (!Number.isNaN(d.getTime())) {
-      return d.toISOString().slice(0, 10);
-    }
-    return "";
-  }
-  return value.toISOString().slice(0, 10);
+function toDateObj(value: Date | string | undefined | null): Date | undefined {
+  if (!value) return undefined;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? undefined : value;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? undefined : d;
 }
 
-function isValidDateInput(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const d = new Date(`${value}T00:00:00.000Z`);
-  return !Number.isNaN(d.getTime());
+function formatISODate(date: Date | undefined): string {
+  if (!date) return "";
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 const statusStyles: Record<string, string> = {
@@ -67,11 +63,17 @@ export function EditSubscriptionDialogContent({ subscription }: Props) {
 
   const canEditEndDate = can(MensualidadesAction.EDITAR_FECHA_MENSUALIDAD);
 
-  const [endDate, setEndDate] = React.useState(() => toInputDate(subscription.endDate));
+  const [endDate, setEndDate] = React.useState<Date | undefined>(() => toDateObj(subscription.endDate));
   const [reason, setReason] = React.useState<string>("");
   const [submitting, setSubmitting] = React.useState(false);
 
   const [fieldError, setFieldError] = React.useState<string | null>(null);
+
+  const today = React.useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
 
   const customerName = subscription.customer
     ? `${subscription.customer.firstName} ${subscription.customer.lastName}`.trim()
@@ -89,16 +91,11 @@ export function EditSubscriptionDialogContent({ subscription }: Props) {
       return;
     }
 
-    if (!isValidDateInput(endDate)) {
-      setFieldError("Formato inválido. Use YYYY-MM-DD");
-      return;
-    }
-
     setSubmitting(true);
     const toastId = toast.loading("Actualizando fecha de fin...");
     try {
       const result = await editSubscriptionEndDateAction(subscription.id, {
-        endDate,
+        endDate: formatISODate(endDate),
         reason: reason.trim() || undefined,
       });
 
@@ -143,12 +140,13 @@ export function EditSubscriptionDialogContent({ subscription }: Props) {
 
       <div className="rounded-lg border border-border/60 bg-card/70 p-4 space-y-4">
         <ChronoField>
-          <ChronoFieldLabel htmlFor="endDate">Fecha de fin</ChronoFieldLabel>
-          <ChronoInput
-            id="endDate"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+          <ChronoFieldLabel>Fecha de fin</ChronoFieldLabel>
+          <ChronoDatePicker
+            date={endDate}
+            onDateChange={setEndDate}
+            placeholder="Seleccionar fecha de fin"
+            dateFormat="dd 'de' MMMM, yyyy"
+            fromDate={today}
             disabled={!canEditEndDate || submitting}
           />
           {fieldError ? <ChronoFieldError>{fieldError}</ChronoFieldError> : null}

@@ -20,13 +20,13 @@ import { SubscriptionDetailDialogContent } from "./subscription-detail-dialog-co
 import { SubscriptionHistoryDialogContent } from "./subscription-history-dialog-content";
 import { CreateSubscriptionDialogContent } from "./create-subscription-dialog.component";
 import { EditSubscriptionDialogContent } from "./edit-subscription-dialog.component";
+import { ActivateSubscriptionDialogContent } from "./activate-subscription-dialog.component";
 import {
   PaySubscriptionDialogContent,
   PAY_SUBSCRIPTION_DIALOG_FORM_ID,
 } from "./pay-subscription-dialog.component";
 import { PaySubscriptionDialogFooter } from "./pay-subscription-dialog-footer.component";
 import { cancelSubscriptionAction } from "../actions/cancel-subscription.action";
-import { activateSubscriptionAction } from "../actions/activate-subscription.action";
 import { MensualidadesAction } from "@/src/shared/enums/auth/permissions.enum";
 
 interface Props {
@@ -48,7 +48,6 @@ export default function SubscriptionsDataListComponent({
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const errorShownRef = React.useRef(false);
   const [cancellingId, setCancellingId] = React.useState<string | null>(null);
-  const [activatingId, setActivatingId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (error && !errorShownRef.current) {
@@ -181,37 +180,15 @@ export default function SubscriptionsDataListComponent({
 
   const handleActivateSubscription = React.useCallback(
     (item: ISubscriptionEntity) => {
-      if (activatingId) return;
-
-      showYesNoDialog({
-        title: "Activar suscripción",
-        description: "¿Está seguro de activar esta suscripción?",
-        handleYes: async () => {
-          setActivatingId(item.id);
-          const toastId = toast.loading("Activando suscripción...");
-          try {
-            const result = await activateSubscriptionAction(item.id, {
-              reason: "Activación administrativa",
-            });
-            if (result.success && result.data?.success) {
-              toast.success("Suscripción activada", { id: toastId });
-              router.refresh();
-            } else {
-              toast.error(result.error || "Error al activar la suscripción", {
-                id: toastId,
-              });
-            }
-          } catch (error) {
-            console.error("Error activating subscription:", error);
-            toast.error("Error al activar la suscripción", { id: toastId });
-          } finally {
-            setActivatingId(null);
-          }
-        },
-        handleNo: () => {},
+      openDialog({
+        title: "Activar Suscripción",
+        description: "Activar la suscripción seleccionada",
+        dialogClassName: "w-full sm:max-w-2xl",
+        contentClassName: "max-h-[75vh] overflow-y-auto pr-1",
+        content: <ActivateSubscriptionDialogContent subscription={item} />,
       });
     },
-    [activatingId, router, showYesNoDialog]
+    [openDialog]
   );
 
   const handleEditSubscription = React.useCallback(
@@ -237,7 +214,6 @@ export default function SubscriptionsDataListComponent({
         handleActivateSubscription,
         handleEditSubscription,
         (item) => cancellingId === item.id,
-        (item) => activatingId === item.id,
       ),
     [
       handleViewDetail,
@@ -247,7 +223,6 @@ export default function SubscriptionsDataListComponent({
       handleActivateSubscription,
       handleEditSubscription,
       cancellingId,
-      activatingId,
     ]
   );
 

@@ -15,7 +15,6 @@ type CancelHandler = (item: ISubscriptionEntity) => void;
 type ActivateHandler = (item: ISubscriptionEntity) => void;
 type EditHandler = (item: ISubscriptionEntity) => void;
 type IsCancellingHandler = (item: ISubscriptionEntity) => boolean;
-type IsActivatingHandler = (item: ISubscriptionEntity) => boolean;
 
 
 const isExpiredSubscription = (row: ISubscriptionEntity) => {
@@ -69,7 +68,6 @@ export const createSubscriptionColumns = (
   onActivate?: ActivateHandler,
   onEdit?: EditHandler,
   isCancelling?: IsCancellingHandler,
-  isActivating?: IsActivatingHandler,
 ): ChronoDataTableColumn<ISubscriptionEntity>[] => [
   {
     id: "customer",
@@ -145,7 +143,6 @@ export const createSubscriptionColumns = (
         row.status !== "CANCELADA";
       const canEdit = Boolean(onEdit);
       const cancelLoading = isCancelling?.(row) ?? false;
-      const activateLoading = isActivating?.(row) ?? false;
 
       const payDisabledReason = !onPay
         ? "Acción no disponible"
@@ -204,7 +201,6 @@ export const createSubscriptionColumns = (
               onClick: () => onActivate?.(row),
               disabled: !canActivate,
               disabledReason: activateDisabledReason,
-              loading: activateLoading,
               variant: "secondary",
               action: MensualidadesAction.ACTIVAR_MENSUALIDAD,
             },
