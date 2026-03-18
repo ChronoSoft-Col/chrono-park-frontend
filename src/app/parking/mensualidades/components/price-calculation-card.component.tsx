@@ -29,12 +29,6 @@ export function PriceCalculationCard({
     }).format(price);
   };
 
-  const formatDate = (date?: Date | string) => {
-    if (!date) return "-";
-    const d = date instanceof Date ? date : new Date(date);
-    return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(d);
-  };
-
   return (
     <div className={className}>
       <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
@@ -131,8 +125,7 @@ export function PriceCalculationCard({
             </div>
 
             <div className="mt-2 text-xs text-muted-foreground">
-              Período: {formatDate(priceCalculation.periodStart)} -{" "}
-              {formatDate(priceCalculation.periodEnd)}
+              Período: {`${priceCalculation.periodStart}`} - {`${priceCalculation.periodEnd}`}
             </div>
           </div>
         ) : null}

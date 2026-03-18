@@ -15,13 +15,6 @@ interface SubscriptionHistoryDialogContentProps {
   customerId: string;
   customerName: string;
 }
-
-const formatDate = (value?: Date | string) => {
-  if (!value) return "-";
-  const date = value instanceof Date ? value : new Date(value);
-  return new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(date);
-};
-
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("es-CO", {
     style: "currency",
@@ -171,7 +164,7 @@ export function SubscriptionHistoryDialogContent({
             <div>
               <span className="text-muted-foreground">Vigencia: </span>
               <span className="font-medium">
-                {formatDate(subscription.startDate)} - {formatDate(subscription.endDate)}
+                {`${subscription.startDate}`} - {`${subscription.endDate}`}
               </span>
             </div>
             <div>
@@ -198,13 +191,13 @@ export function SubscriptionHistoryDialogContent({
                         {payment.monthsCount} {payment.monthsCount === 1 ? "mes" : "meses"}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {formatDate(payment.periodStart)} - {formatDate(payment.periodEnd)}
+                        {`${payment.periodStart}`} - {`${payment.periodEnd}`}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">{formatCurrency(payment.amount)}</p>
                       <p className="text-xs text-muted-foreground">
-                        {formatDate(payment.createdAt)}
+                        {`${payment.createdAt}`}
                       </p>
                     </div>
                   </div>
