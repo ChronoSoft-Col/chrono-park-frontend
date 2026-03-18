@@ -3,23 +3,19 @@
 import type { ISubscriptionEntity, SubscriptionStatus } from "@/server/domain";
 import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
 
-import ChronoButton from "@chrono/chrono-button.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/src/shared/components/ui/tooltip";
-import { CreditCard, Eye, History, Pencil, XCircle } from "lucide-react";
-import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import { CheckCircle2, CreditCard, Eye, History, Pencil, XCircle } from "lucide-react";
 import { MensualidadesAction } from "@/src/shared/enums/auth/permissions.enum";
+import { ChronoRowActions } from "@/src/shared/components/chrono-soft/chrono-row-actions.component";
 
 type ViewDetailHandler = (item: ISubscriptionEntity) => void;
 type ViewHistoryHandler = (item: ISubscriptionEntity) => void;
 type PayHandler = (item: ISubscriptionEntity) => void;
 type CancelHandler = (item: ISubscriptionEntity) => void;
+type ActivateHandler = (item: ISubscriptionEntity) => void;
 type EditHandler = (item: ISubscriptionEntity) => void;
 type IsCancellingHandler = (item: ISubscriptionEntity) => boolean;
+type IsActivatingHandler = (item: ISubscriptionEntity) => boolean;
 
 
 const isExpiredSubscription = (row: ISubscriptionEntity) => {
@@ -70,8 +66,10 @@ export const createSubscriptionColumns = (
   onViewHistory?: ViewHistoryHandler,
   onPay?: PayHandler,
   onCancel?: CancelHandler,
+  onActivate?: ActivateHandler,
   onEdit?: EditHandler,
   isCancelling?: IsCancellingHandler,
+  isActivating?: IsActivatingHandler,
 ): ChronoDataTableColumn<ISubscriptionEntity>[] => [
   {
     id: "customer",
@@ -140,8 +138,14 @@ export const createSubscriptionColumns = (
       const canCancel =
         Boolean(onCancel) &&
         (row.status !== "CANCELADA");
+      const canActivate =
+        Boolean(onActivate) &&
+        !expired &&
+        row.status !== "ACTIVA" &&
+        row.status !== "CANCELADA";
       const canEdit = Boolean(onEdit);
       const cancelLoading = isCancelling?.(row) ?? false;
+      const activateLoading = isActivating?.(row) ?? false;
 
       const payDisabledReason = !onPay
         ? "Acción no disponible"
@@ -161,103 +165,78 @@ export const createSubscriptionColumns = (
               ? "Mensualidad inactiva"
               : undefined;
 
+      const activateDisabledReason = !onActivate
+        ? "Acción no disponible"
+        : expired
+          ? "Mensualidad vencida"
+          : row.status === "ACTIVA"
+            ? "Mensualidad ya activa"
+            : row.status === "CANCELADA"
+              ? "Mensualidad cancelada"
+              : undefined;
+
       return (
-        <div className="flex justify-end gap-2">
-          <PermissionGuard
-            actions={[
-              MensualidadesAction.EDITAR_FECHA_MENSUALIDAD,
-              MensualidadesAction.ACTIVAR_MENSUALIDAD,
-            ]}
-            mode="some"
-            hidden
-          >
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  variant="outline"
-                  aria-label="Editar mensualidad"
-                  disabled={!canEdit}
-                  onClick={() => onEdit?.(row)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">Editar</TooltipContent>
-            </Tooltip>
-          </PermissionGuard>
-
-          <PermissionGuard action={MensualidadesAction.PAGAR_MENSUALIDAD} hidden>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  variant="default"
-                  aria-label="Pagar mensualidad"
-                  disabled={!canPay}
-                  onClick={() => onPay?.(row)}
-                >
-                  <CreditCard className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                {canPay
-                  ? "Pagar"
-                  : `No disponible: ${payDisabledReason ?? "Estado no permitido"}`}
-              </TooltipContent>
-            </Tooltip>
-          </PermissionGuard>
-
-          <PermissionGuard action={MensualidadesAction.CANCELAR_MENSUALIDAD} hidden>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  variant="destructive"
-                  aria-label="Cancelar mensualidad"
-                  disabled={!canCancel || cancelLoading}
-                  loading={cancelLoading}
-                  onClick={() => onCancel?.(row)}
-                >
-                  <XCircle className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                {canCancel
-                  ? "Cancelar"
-                  : `No disponible: ${cancelDisabledReason ?? "Estado no permitido"}`}
-              </TooltipContent>
-            </Tooltip>
-          </PermissionGuard>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="secondary"
-                aria-label="Ver detalle"
-                onClick={() => onViewDetail?.(row)}
-              >
-                <Eye className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Ver detalle</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="outline"
-                aria-label="Ver historial"
-                onClick={() => onViewHistory?.(row)}
-              >
-                <History className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Ver historial de pagos</TooltipContent>
-          </Tooltip>
-        </div>
+        <ChronoRowActions
+          actions={[
+            {
+              key: "edit",
+              label: "Editar",
+              icon: <Pencil className="h-4 w-4" />,
+              onClick: () => onEdit?.(row),
+              disabled: !canEdit,
+              variant: "outline",
+              action: MensualidadesAction.EDITAR_FECHA_MENSUALIDAD,
+            },
+            {
+              key: "pay",
+              label: "Pagar",
+              icon: <CreditCard className="h-4 w-4" />,
+              onClick: () => onPay?.(row),
+              disabled: !canPay,
+              disabledReason: payDisabledReason,
+              variant: "default",
+              action: MensualidadesAction.PAGAR_MENSUALIDAD,
+            },
+            {
+              key: "activate",
+              label: "Activar",
+              icon: <CheckCircle2 className="h-4 w-4" />,
+              onClick: () => onActivate?.(row),
+              disabled: !canActivate,
+              disabledReason: activateDisabledReason,
+              loading: activateLoading,
+              variant: "secondary",
+              action: MensualidadesAction.ACTIVAR_MENSUALIDAD,
+            },
+            {
+              key: "cancel",
+              label: "Cancelar",
+              icon: <XCircle className="h-4 w-4" />,
+              onClick: () => onCancel?.(row),
+              disabled: !canCancel || cancelLoading,
+              disabledReason: cancelDisabledReason,
+              loading: cancelLoading,
+              variant: "destructive",
+              action: MensualidadesAction.CANCELAR_MENSUALIDAD,
+            },
+            {
+              key: "detail",
+              label: "Ver detalle",
+              icon: <Eye className="h-4 w-4" />,
+              onClick: () => onViewDetail?.(row),
+              variant: "secondary",
+            },
+            {
+              key: "history",
+              label: "Ver historial",
+              icon: <History className="h-4 w-4" />,
+              onClick: () => onViewHistory?.(row),
+              variant: "outline",
+            },
+          ]}
+          overflowAfter={4}
+          className="flex justify-end gap-2"
+        />
       );
     },
   },

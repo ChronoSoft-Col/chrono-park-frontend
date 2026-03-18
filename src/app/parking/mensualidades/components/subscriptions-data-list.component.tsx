@@ -26,6 +26,7 @@ import {
 } from "./pay-subscription-dialog.component";
 import { PaySubscriptionDialogFooter } from "./pay-subscription-dialog-footer.component";
 import { cancelSubscriptionAction } from "../actions/cancel-subscription.action";
+import { activateSubscriptionAction } from "../actions/activate-subscription.action";
 import { MensualidadesAction } from "@/src/shared/enums/auth/permissions.enum";
 
 interface Props {
@@ -47,6 +48,7 @@ export default function SubscriptionsDataListComponent({
   const { openDialog, closeDialog, showYesNoDialog } = UseDialogContext();
   const errorShownRef = React.useRef(false);
   const [cancellingId, setCancellingId] = React.useState<string | null>(null);
+  const [activatingId, setActivatingId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (error && !errorShownRef.current) {
@@ -177,6 +179,41 @@ export default function SubscriptionsDataListComponent({
     [cancellingId, router, showYesNoDialog]
   );
 
+  const handleActivateSubscription = React.useCallback(
+    (item: ISubscriptionEntity) => {
+      if (activatingId) return;
+
+      showYesNoDialog({
+        title: "Activar suscripción",
+        description: "¿Está seguro de activar esta suscripción?",
+        handleYes: async () => {
+          setActivatingId(item.id);
+          const toastId = toast.loading("Activando suscripción...");
+          try {
+            const result = await activateSubscriptionAction(item.id, {
+              reason: "Activación administrativa",
+            });
+            if (result.success && result.data?.success) {
+              toast.success("Suscripción activada", { id: toastId });
+              router.refresh();
+            } else {
+              toast.error(result.error || "Error al activar la suscripción", {
+                id: toastId,
+              });
+            }
+          } catch (error) {
+            console.error("Error activating subscription:", error);
+            toast.error("Error al activar la suscripción", { id: toastId });
+          } finally {
+            setActivatingId(null);
+          }
+        },
+        handleNo: () => {},
+      });
+    },
+    [activatingId, router, showYesNoDialog]
+  );
+
   const handleEditSubscription = React.useCallback(
     (item: ISubscriptionEntity) => {
       openDialog({
@@ -197,16 +234,20 @@ export default function SubscriptionsDataListComponent({
         handleViewHistory,
         handlePaySubscription,
         handleCancelSubscription,
+        handleActivateSubscription,
         handleEditSubscription,
-        (item) => cancellingId === item.id
+        (item) => cancellingId === item.id,
+        (item) => activatingId === item.id,
       ),
     [
       handleViewDetail,
       handleViewHistory,
       handlePaySubscription,
       handleCancelSubscription,
+      handleActivateSubscription,
       handleEditSubscription,
       cancellingId,
+      activatingId,
     ]
   );
 
