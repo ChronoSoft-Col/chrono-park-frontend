@@ -19,7 +19,6 @@ import { ChronoInput } from "@chrono/chrono-input.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
 
 import { editSubscriptionEndDateAction } from "../actions/edit-subscription-end-date.action";
-import { activateSubscriptionAction } from "../actions/activate-subscription.action";
 
 type Props = {
   subscription: ISubscriptionEntity;
@@ -67,7 +66,6 @@ export function EditSubscriptionDialogContent({ subscription }: Props) {
   const { can } = usePermissionsContext();
 
   const canEditEndDate = can(MensualidadesAction.EDITAR_FECHA_MENSUALIDAD);
-  const canActivate = can(MensualidadesAction.ACTIVAR_MENSUALIDAD);
 
   const [endDate, setEndDate] = React.useState(() => toInputDate(subscription.endDate));
   const [reason, setReason] = React.useState<string>("");
@@ -123,35 +121,6 @@ export function EditSubscriptionDialogContent({ subscription }: Props) {
     }
   };
 
-  const handleActivate = async () => {
-    if (!canActivate) return;
-
-    setSubmitting(true);
-    const toastId = toast.loading("Activando suscripción...");
-    try {
-      const result = await activateSubscriptionAction(subscription.id, {
-        reason: reason.trim() || undefined,
-      });
-
-      if (!result.success || !result.data?.success) {
-        toast.error(
-          result.error || result.data?.message || "Error al activar la suscripción",
-          { id: toastId },
-        );
-        return;
-      }
-
-      toast.success("Suscripción activada", { id: toastId });
-      closeDialog();
-      router.refresh();
-    } catch (error) {
-      console.error("Error activating subscription:", error);
-      toast.error("Error inesperado al activar la suscripción", { id: toastId });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -197,17 +166,6 @@ export function EditSubscriptionDialogContent({ subscription }: Props) {
         </ChronoField>
 
         <div className="flex flex-wrap justify-end gap-2">
-          {canActivate ? (
-            <ChronoButton
-              type="button"
-              variant="secondary"
-              onClick={handleActivate}
-              disabled={submitting || currentStatus === "ACTIVA"}
-            >
-              Activar
-            </ChronoButton>
-          ) : null}
-
           {canEditEndDate ? (
             <ChronoButton
               type="button"
@@ -230,7 +188,7 @@ export function EditSubscriptionDialogContent({ subscription }: Props) {
           </ChronoButton>
         </div>
 
-        {!canEditEndDate && !canActivate ? (
+        {!canEditEndDate ? (
           <p className="text-xs text-muted-foreground">
             No cuentas con permisos para editar esta mensualidad.
           </p>

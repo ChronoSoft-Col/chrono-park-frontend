@@ -3,12 +3,10 @@
 import type { IWhiteListEntity } from "@/server/domain";
 import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
 
-import ChronoButton from "@chrono/chrono-button.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
 import { Eye, Ban, Pencil } from "lucide-react";
-import PermissionGuard from "@/src/shared/components/permission-guard.component";
 import { ListaBlancaAction } from "@/src/shared/enums/auth/permissions.enum";
+import { ChronoRowActions } from "@/src/shared/components/chrono-soft/chrono-row-actions.component";
 
 type ViewDetailHandler = (item: IWhiteListEntity) => void;
 type EditHandler = (item: IWhiteListEntity) => void;
@@ -77,57 +75,40 @@ export const createWhiteListColumns = (
     headerClassName: "text-right",
     cellClassName: "text-right",
     cell: (row) => (
-      <div className="flex justify-end gap-2">
-        <PermissionGuard action={ListaBlancaAction.VER_LISTA_BLANCA} hidden>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="default"
-                aria-label="Ver detalle"
-                onClick={() => onViewDetail?.(row)}
-              >
-                <Eye className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Ver detalle</TooltipContent>
-          </Tooltip>
-        </PermissionGuard>
-
-        <PermissionGuard action={ListaBlancaAction.EDITAR_LISTA_BLANCA} hidden>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="outline"
-                aria-label="Editar registro"
-                onClick={() => onEdit?.(row)}
-              >
-                <Pencil className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Editar</TooltipContent>
-          </Tooltip>
-        </PermissionGuard>
-
-        <PermissionGuard action={ListaBlancaAction.INACTIVAR_LISTA_BLANCA} hidden>
-          {row.isActive && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  variant="destructive"
-                  aria-label="Desactivar registro"
-                  onClick={() => onDeactivate?.(row)}
-                >
-                  <Ban className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">Desactivar</TooltipContent>
-            </Tooltip>
-          )}
-        </PermissionGuard>
-      </div>
+      <ChronoRowActions
+        className="flex justify-end gap-2"
+        overflowAfter={4}
+        actions={[
+          {
+            key: "detail",
+            label: "Ver detalle",
+            icon: <Eye className="h-4 w-4" />,
+            onClick: () => onViewDetail?.(row),
+            disabled: !onViewDetail,
+            variant: "default",
+            action: ListaBlancaAction.VER_LISTA_BLANCA,
+          },
+          {
+            key: "edit",
+            label: "Editar",
+            icon: <Pencil className="h-4 w-4" />,
+            onClick: () => onEdit?.(row),
+            disabled: !onEdit,
+            variant: "outline",
+            action: ListaBlancaAction.EDITAR_LISTA_BLANCA,
+          },
+          {
+            key: "deactivate",
+            label: "Desactivar",
+            icon: <Ban className="h-4 w-4" />,
+            onClick: () => onDeactivate?.(row),
+            disabled: !row.isActive || !onDeactivate,
+            disabledReason: !row.isActive ? "Registro inactivo" : undefined,
+            variant: "destructive",
+            action: ListaBlancaAction.INACTIVAR_LISTA_BLANCA,
+          },
+        ]}
+      />
     ),
   },
 ];

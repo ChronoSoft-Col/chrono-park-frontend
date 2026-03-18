@@ -3,12 +3,10 @@
 import type { IMasterKeyEntity } from "@/server/domain";
 import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
 
-import ChronoButton from "@chrono/chrono-button.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
 import { Eye, Ban, Pencil } from "lucide-react";
-import PermissionGuard from "@/src/shared/components/permission-guard.component";
 import { LlavesMaestrasAction } from "@/src/shared/enums/auth/permissions.enum";
+import { ChronoRowActions } from "@/src/shared/components/chrono-soft/chrono-row-actions.component";
 
 type ViewDetailHandler = (item: IMasterKeyEntity) => void;
 type EditHandler = (item: IMasterKeyEntity) => void;
@@ -62,57 +60,40 @@ export const createMasterKeyColumns = (
     headerClassName: "text-right",
     cellClassName: "text-right",
     cell: (row) => (
-      <div className="flex justify-end gap-2">
-        <PermissionGuard action={LlavesMaestrasAction.VER_LLAVES_MAESTRAS} hidden>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="default"
-                aria-label="Ver detalle"
-                onClick={() => onViewDetail?.(row)}
-              >
-                <Eye className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Ver detalle</TooltipContent>
-          </Tooltip>
-        </PermissionGuard>
-
-        <PermissionGuard action={LlavesMaestrasAction.EDITAR_LLAVE_MAESTRA} hidden>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="outline"
-                aria-label="Editar llave"
-                onClick={() => onEdit?.(row)}
-              >
-                <Pencil className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Editar</TooltipContent>
-          </Tooltip>
-        </PermissionGuard>
-
-        <PermissionGuard action={LlavesMaestrasAction.INACTIVAR_LLAVE_MAESTRA} hidden>
-          {row.isActive && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  variant="destructive"
-                  aria-label="Desactivar llave"
-                  onClick={() => onDeactivate?.(row)}
-                >
-                  <Ban className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">Desactivar</TooltipContent>
-            </Tooltip>
-          )}
-        </PermissionGuard>
-      </div>
+      <ChronoRowActions
+        className="flex justify-end gap-2"
+        overflowAfter={4}
+        actions={[
+          {
+            key: "detail",
+            label: "Ver detalle",
+            icon: <Eye className="h-4 w-4" />,
+            onClick: () => onViewDetail?.(row),
+            disabled: !onViewDetail,
+            variant: "default",
+            action: LlavesMaestrasAction.VER_LLAVES_MAESTRAS,
+          },
+          {
+            key: "edit",
+            label: "Editar",
+            icon: <Pencil className="h-4 w-4" />,
+            onClick: () => onEdit?.(row),
+            disabled: !onEdit,
+            variant: "outline",
+            action: LlavesMaestrasAction.EDITAR_LLAVE_MAESTRA,
+          },
+          {
+            key: "deactivate",
+            label: "Desactivar",
+            icon: <Ban className="h-4 w-4" />,
+            onClick: () => onDeactivate?.(row),
+            disabled: !row.isActive || !onDeactivate,
+            disabledReason: !row.isActive ? "Llave inactiva" : undefined,
+            variant: "destructive",
+            action: LlavesMaestrasAction.INACTIVAR_LLAVE_MAESTRA,
+          },
+        ]}
+      />
     ),
   },
 ];

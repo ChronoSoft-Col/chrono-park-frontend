@@ -27,6 +27,8 @@ export type ChronoRowAction = {
   loading?: boolean;
   /** shadcn button variants via ChronoButton */
   variant?: React.ComponentProps<typeof ChronoButton>["variant"];
+  /** Keep existing tables' button sizes (e.g. icon-sm) */
+  size?: React.ComponentProps<typeof ChronoButton>["size"];
   /** Permission requirements */
   action?: AppAction | string;
   actions?: (AppAction | string)[];
@@ -85,7 +87,7 @@ export function ChronoRowActions({
               <TooltipTrigger asChild>
                 <ChronoButton
                   type="button"
-                  size="icon"
+                  size={a.size}
                   variant={a.variant ?? "outline"}
                   aria-label={a.label}
                   disabled={a.disabled}

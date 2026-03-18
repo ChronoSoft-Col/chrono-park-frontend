@@ -1,10 +1,9 @@
 "use client";
 
 import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
-import ChronoButton from "@chrono/chrono-button.component";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/components/ui/tooltip";
 import { Eye, Printer } from "lucide-react";
 import { IPaymentItemEntity } from "@/server/domain";
+import { ChronoRowActions } from "@/src/shared/components/chrono-soft/chrono-row-actions.component";
 
 
 const formatDateTime = (value?: string) => {
@@ -86,37 +85,30 @@ export const createPaymentColumns = (
     headerClassName: "text-right",
     cellClassName: "text-right",
     cell: (row) => (
-      <div className="flex justify-end gap-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <ChronoButton
-              type="button"
-              size="icon-sm"
-              variant="secondary"
-              aria-label="Ver detalle"
-              onClick={() => onViewDetail?.(row)}
-            >
-              <Eye className="h-4 w-4" />
-            </ChronoButton>
-          </TooltipTrigger>
-          <TooltipContent side="top">Ver detalle</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <ChronoButton
-              type="button"
-              size="icon-sm"
-              variant="default"
-              aria-label="Imprimir"
-              onClick={() => onPrint?.(row)}
-            >
-              <Printer className="h-4 w-4" />
-            </ChronoButton>
-          </TooltipTrigger>
-          <TooltipContent side="top">Imprimir</TooltipContent>
-        </Tooltip>
-      </div>
+      <ChronoRowActions
+        className="flex justify-end gap-2"
+        overflowAfter={4}
+        actions={[
+          {
+            key: "detail",
+            label: "Ver detalle",
+            icon: <Eye className="h-4 w-4" />,
+            onClick: () => onViewDetail?.(row),
+            disabled: !onViewDetail,
+            variant: "secondary",
+            size: "icon-sm",
+          },
+          {
+            key: "print",
+            label: "Imprimir",
+            icon: <Printer className="h-4 w-4" />,
+            onClick: () => onPrint?.(row),
+            disabled: !onPrint,
+            variant: "default",
+            size: "icon-sm",
+          },
+        ]}
+      />
     ),
   },
 ];

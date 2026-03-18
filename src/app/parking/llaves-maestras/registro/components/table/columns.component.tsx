@@ -2,8 +2,8 @@
 
 import type { IMasterKeyLogEntity } from "@/server/domain";
 import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
-import ChronoButton from "@chrono/chrono-button.component";
 import { Eye } from "lucide-react";
+import { ChronoRowActions } from "@/src/shared/components/chrono-soft/chrono-row-actions.component";
 
 const formatDateTime = (value?: Date | string) => {
   if (!value) return "-";
@@ -37,13 +37,20 @@ export const createMasterKeyLogColumns = (
     header: "Acciones",
     align: "center",
     cell: (row) => (
-      <ChronoButton
-        variant="ghost"
-        size="icon"
-        onClick={() => onViewDetail(row)}
-      >
-        <Eye className="h-4 w-4" />
-      </ChronoButton>
+      <ChronoRowActions
+        className="flex justify-center"
+        overflowAfter={4}
+        actions={[
+          {
+            key: "detail",
+            label: "Ver detalle",
+            icon: <Eye className="h-4 w-4" />,
+            onClick: () => onViewDetail(row),
+            variant: "ghost",
+            size: "icon",
+          },
+        ]}
+      />
     ),
   },
 ];

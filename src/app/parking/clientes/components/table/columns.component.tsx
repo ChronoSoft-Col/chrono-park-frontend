@@ -3,12 +3,10 @@
 import type { ICustomerEntity } from "@/server/domain";
 import type { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
 
-import ChronoButton from "@chrono/chrono-button.component";
 import { ChronoBadge } from "@chrono/chrono-badge.component";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
 import { Eye, Ban, CheckCircle2, Pencil } from "lucide-react";
-import PermissionGuard from "@/src/shared/components/permission-guard.component";
 import { ClientesAction } from "@/src/shared/enums/auth/permissions.enum";
+import { ChronoRowActions } from "@/src/shared/components/chrono-soft/chrono-row-actions.component";
 
 type ViewDetailHandler = (item: ICustomerEntity) => void;
 type ToggleActiveHandler = (item: ICustomerEntity, nextActive: boolean) => void;
@@ -82,71 +80,43 @@ export const createCustomerColumns = (
     headerClassName: "text-right",
     cellClassName: "text-right",
     cell: (row) => (
-      <div className="flex justify-end gap-2">
-        <PermissionGuard action={ClientesAction.VER_DETALLES_CLIENTE} hidden>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="default"
-                aria-label="Ver detalle"
-                onClick={() => onViewDetail?.(row)}
-              >
-                <Eye className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Ver detalle</TooltipContent>
-          </Tooltip>
-        </PermissionGuard>
-
-        <PermissionGuard action={ClientesAction.EDITAR_CLIENTE} hidden>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ChronoButton
-                type="button"
-                variant="outline"
-                aria-label="Editar cliente"
-                onClick={() => onEdit?.(row)}
-              >
-                <Pencil className="h-4 w-4" />
-              </ChronoButton>
-            </TooltipTrigger>
-            <TooltipContent side="top">Editar</TooltipContent>
-          </Tooltip>
-        </PermissionGuard>
-
-        <PermissionGuard action={ClientesAction.ELIMINAR_CLIENTE} hidden>
-          {row.isActive ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  variant="destructive"
-                  aria-label="Desactivar cliente"
-                  onClick={() => onToggleActive?.(row, false)}
-                >
-                  <Ban className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">Desactivar</TooltipContent>
-            </Tooltip>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  variant="outline"
-                  aria-label="Activar cliente"
-                  onClick={() => onToggleActive?.(row, true)}
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">Activar</TooltipContent>
-            </Tooltip>
-          )}
-        </PermissionGuard>
-      </div>
+      <ChronoRowActions
+        className="flex justify-end gap-2"
+        overflowAfter={4}
+        actions={[
+          {
+            key: "detail",
+            label: "Ver detalle",
+            icon: <Eye className="h-4 w-4" />,
+            onClick: () => onViewDetail?.(row),
+            disabled: !onViewDetail,
+            variant: "default",
+            action: ClientesAction.VER_DETALLES_CLIENTE,
+          },
+          {
+            key: "edit",
+            label: "Editar",
+            icon: <Pencil className="h-4 w-4" />,
+            onClick: () => onEdit?.(row),
+            disabled: !onEdit,
+            variant: "outline",
+            action: ClientesAction.EDITAR_CLIENTE,
+          },
+          {
+            key: "toggle-active",
+            label: row.isActive ? "Desactivar" : "Activar",
+            icon: row.isActive ? (
+              <Ban className="h-4 w-4" />
+            ) : (
+              <CheckCircle2 className="h-4 w-4" />
+            ),
+            onClick: () => onToggleActive?.(row, !row.isActive),
+            disabled: !onToggleActive,
+            variant: row.isActive ? "destructive" : "outline",
+            action: ClientesAction.ELIMINAR_CLIENTE,
+          },
+        ]}
+      />
     ),
   },
 ];

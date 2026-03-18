@@ -1,11 +1,9 @@
 "use client"
 import { IInOutEntity } from "@/server/domain";
 import { ChronoDataTableColumn } from "@chrono/chrono-data-table.component";
-import ChronoButton from "@chrono/chrono-button.component";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/src/shared/components/ui/tooltip";
 import { Eye, PenLine, Printer, RefreshCcw } from "lucide-react";
-import PermissionGuard from "@/src/shared/components/permission-guard.component";
 import { IngresosSalidasAction } from "@/src/shared/enums/auth/permissions.enum";
+import { ChronoRowActions } from "@/src/shared/components/chrono-soft/chrono-row-actions.component";
 
 const formatDateTime = (value?: string) => {
   if (!value) return "-";
@@ -71,75 +69,52 @@ export const createInOutColumns = (
     headerClassName: "text-right",
     cellClassName: "text-right",
     cell: (row: IInOutEntity) => (
-      <div className="flex justify-end gap-2">
-        {options?.showChangePlate && (
-          <PermissionGuard action={IngresosSalidasAction.EDITAR_INGRESOS_SALIDAS} hidden>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  size="icon-sm"
-                  variant="outline"
-                  aria-label="Cambiar placa"
-                  onClick={() => options.onChangePlate?.(row)}
-                >
-                  <PenLine className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">Cambiar placa</TooltipContent>
-            </Tooltip>
-          </PermissionGuard>
-        )}
-
-        {options?.showChangeRate && (
-          <PermissionGuard action={IngresosSalidasAction.EDITAR_INGRESOS_SALIDAS} hidden>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <ChronoButton
-                  type="button"
-                  size="icon-sm"
-                  variant="outline"
-                  aria-label="Cambiar tarifa"
-                  onClick={() => options.onChangeRate?.(row)}
-                >
-                  <RefreshCcw className="h-4 w-4" />
-                </ChronoButton>
-              </TooltipTrigger>
-              <TooltipContent side="top">Cambiar tarifa</TooltipContent>
-            </Tooltip>
-          </PermissionGuard>
-        )}
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <ChronoButton
-              type="button"
-              size="icon-sm"
-              variant="secondary"
-              aria-label="Ver detalle"
-              onClick={() => onViewDetail?.(row)}
-            >
-              <Eye className="h-4 w-4" />
-            </ChronoButton>
-          </TooltipTrigger>
-          <TooltipContent side="top">Ver detalle</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <ChronoButton
-              type="button"
-              size="icon-sm"
-              variant="default"
-              aria-label="Imprimir"
-              onClick={() => onPrint?.(row)}
-            >
-              <Printer className="h-4 w-4" />
-            </ChronoButton>
-          </TooltipTrigger>
-          <TooltipContent side="top">Imprimir</TooltipContent>
-        </Tooltip>
-      </div>
+      <ChronoRowActions
+        className="flex justify-end gap-2"
+        overflowAfter={4}
+        actions={[
+          {
+            key: "change-plate",
+            label: "Cambiar placa",
+            icon: <PenLine className="h-4 w-4" />,
+            onClick: () => options?.onChangePlate?.(row),
+            disabled: !options?.showChangePlate || !options?.onChangePlate,
+            disabledReason: !options?.showChangePlate ? "Acción no disponible" : undefined,
+            variant: "outline",
+            size: "icon-sm",
+            action: IngresosSalidasAction.EDITAR_INGRESOS_SALIDAS,
+          },
+          {
+            key: "change-rate",
+            label: "Cambiar tarifa",
+            icon: <RefreshCcw className="h-4 w-4" />,
+            onClick: () => options?.onChangeRate?.(row),
+            disabled: !options?.showChangeRate || !options?.onChangeRate,
+            disabledReason: !options?.showChangeRate ? "Acción no disponible" : undefined,
+            variant: "outline",
+            size: "icon-sm",
+            action: IngresosSalidasAction.EDITAR_INGRESOS_SALIDAS,
+          },
+          {
+            key: "detail",
+            label: "Ver detalle",
+            icon: <Eye className="h-4 w-4" />,
+            onClick: () => onViewDetail?.(row),
+            disabled: !onViewDetail,
+            variant: "secondary",
+            size: "icon-sm",
+          },
+          {
+            key: "print",
+            label: "Imprimir",
+            icon: <Printer className="h-4 w-4" />,
+            onClick: () => onPrint?.(row),
+            disabled: !onPrint,
+            variant: "default",
+            size: "icon-sm",
+          },
+        ]}
+      />
     ),
   },
 ];
