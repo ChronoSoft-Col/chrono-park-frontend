@@ -51,6 +51,9 @@ import {
 } from "@/src/shared/schemas/parking/create-subscription.schema";
 import { ChronoSectionLabel } from "@chrono/chrono-section-label.component";
 import { ChronoSeparator } from "@chrono/chrono-separator.component";
+import PermissionGuard from "@/src/shared/components/permission-guard.component";
+import { MensualidadesAction } from "@/src/shared/enums/auth/permissions.enum";
+import { usePermissionsContext } from "@/src/shared/context/permissions.context";
 import listCustomersAction from "@/src/app/parking/clientes/actions/list-customers.action";
 import { getMonthlyPlansByVehicleTypeAction } from "../actions/monthly-plans.action";
 import { IMonthlyPlanEntity } from "@/server/domain";
@@ -211,13 +214,16 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
     setSelectedCustomer(customer || null);
   };
 
+  const { can } = usePermissionsContext();
+  const canCustomizeDates = can(MensualidadesAction.PERSONALIZAR_FECHA_MENSUALIDAD);
+
   const handleFormSubmit = handleSubmit(async (data) => {
     // Limpiar campos opcionales vacíos
     const cleanData = {
       ...data,
       vehicleId: data.vehicleId || undefined,
-      startDate: data.startDate || undefined,
-      endDate: data.endDate || undefined,
+      startDate: canCustomizeDates ? (data.startDate || undefined) : undefined,
+      endDate: canCustomizeDates ? (data.endDate || undefined) : undefined,
     };
     await onSubmit(cleanData);
   });
@@ -420,7 +426,8 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
 
       <ChronoSeparator />
 
-      {/* Date Range Section (Optional) */}
+      {/* Date Range Section (Optional) – only visible with PERSONALIZAR_FECHA_MENSUALIDAD */}
+      <PermissionGuard action={MensualidadesAction.PERSONALIZAR_FECHA_MENSUALIDAD} hidden>
       <div className="space-y-4">
         <ChronoSectionLabel size="sm" className="tracking-[0.2em]">
           Fechas (Opcional)
@@ -559,6 +566,7 @@ export function CreateSubscriptionFormComponent({ onSubmit, onCancel }: Props) {
           Las fechas son opcionales. Formato esperado: YYYY-MM-DD.
         </p>
       </div>
+      </PermissionGuard>
 
       <ChronoSeparator />
 
