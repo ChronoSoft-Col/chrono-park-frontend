@@ -6,17 +6,29 @@ import { getSession } from "@/src/lib/session";
 import FooterComponent from "@/src/shared/components/layout/footer.component";
 import ParkingProviders from "./providers";
 import { AuthStoreInitializer } from "@/src/shared/components/auth-store-initializer.component";
+import { LicenseExpiryBanner } from "./components/license-expiry-banner";
+import { getLicenseRemainingDays } from "./lib/get-license-remaining-days";
+
+const LICENSE_WARNING_THRESHOLD_DAYS = 3;
 
 export default async function ParkingLayout({ children }: PropsWithChildren) {
   const session = await getSession();
   const actions = session?.permissions?.actions ?? [];
+  const remainingDays = await getLicenseRemainingDays();
+  const showLicenseBanner =
+    remainingDays !== null &&
+    remainingDays > 0 &&
+    remainingDays <= LICENSE_WARNING_THRESHOLD_DAYS;
 
   return (
     <ParkingProviders>
       <AuthStoreInitializer actions={actions} />
       <SidebarComponent />
         <ChronoSidebarInset className="min-w-0 overflow-hidden grid grid-rows-[auto_1fr_auto] h-screen p-0">
-          <HeaderComponent />
+          <div className="shrink-0">
+            {showLicenseBanner && <LicenseExpiryBanner remainingDays={remainingDays} />}
+            <HeaderComponent />
+          </div>
           <main className="overflow-y-auto overflow-x-hidden px-4 sm:px-6 md:px-8">
             <section className="max-w-full mx-auto w-full h-full">{children}</section>
           </main>
