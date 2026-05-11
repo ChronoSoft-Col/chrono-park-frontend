@@ -4,11 +4,37 @@
 import axios, { AxiosInstance } from "axios";
 import { ENVIRONMENT } from "../shared/constants/environment";
 import { getClientSession, signOut } from "./session-client";
+import {
+  LICENSE_BLOCKED_MESSAGE,
+  SKIP_LICENSE_REDIRECT_HEADER,
+  SUBSCRIPTION_BLOCKED_PATH,
+} from "./license-redirect";
+
+export { SKIP_LICENSE_REDIRECT_HEADER } from "./license-redirect";
 
 // Declaración global para singleton en HMR
 declare global {
   // For HMR-safe singleton in the browser
   var _axiosClient: AxiosInstance | undefined;
+}
+
+function readSkipHeader(headers: unknown): boolean {
+  if (!headers) return false;
+  const h = headers as Record<string, unknown> & {
+    get?: (key: string) => unknown;
+    has?: (key: string) => boolean;
+  };
+  if (typeof h.get === "function") {
+    const v = h.get(SKIP_LICENSE_REDIRECT_HEADER);
+    if (v != null && String(v).length > 0) return true;
+  }
+  for (const key of Object.keys(h)) {
+    if (key.toLowerCase() === SKIP_LICENSE_REDIRECT_HEADER.toLowerCase()) {
+      const v = (h as Record<string, unknown>)[key];
+      return v != null && String(v).length > 0;
+    }
+  }
+  return false;
 }
 
 function createAxiosClient() {
@@ -62,6 +88,18 @@ function createAxiosClient() {
     async (error) => {
       const status = error?.response?.status;
       const requestUrl = String(error?.config?.url ?? "");
+
+      if (status === 403 && typeof window !== "undefined") {
+        const data = error?.response?.data as { message?: string; error?: string } | undefined;
+        const skip = readSkipHeader(error?.config?.headers);
+        if (data?.message === LICENSE_BLOCKED_MESSAGE && !skip) {
+          const reason = data?.error ?? "";
+          const target = `${SUBSCRIPTION_BLOCKED_PATH}?reason=${encodeURIComponent(reason)}`;
+          if (window.location.pathname !== SUBSCRIPTION_BLOCKED_PATH) {
+            window.location.assign(target);
+          }
+        }
+      }
 
       if (status === 401 && typeof window !== "undefined") {
         // Evitar loop si justo estamos intentando loguear

@@ -3,8 +3,32 @@ import axios, { AxiosError } from "axios";
 import { ENVIRONMENT } from "../shared/constants/environment";
 import { getSession } from "./session";
 import { redirect } from "next/navigation";
+import {
+  LICENSE_BLOCKED_MESSAGE,
+  SKIP_LICENSE_REDIRECT_HEADER,
+  SUBSCRIPTION_BLOCKED_PATH,
+} from "./license-redirect";
 
 let apiServer: ReturnType<typeof axios.create> | null = null;
+
+function readSkipHeader(headers: unknown): boolean {
+  if (!headers) return false;
+  const h = headers as Record<string, unknown> & {
+    get?: (key: string) => unknown;
+    has?: (key: string) => boolean;
+  };
+  if (typeof h.get === "function") {
+    const v = h.get(SKIP_LICENSE_REDIRECT_HEADER);
+    if (v != null && String(v).length > 0) return true;
+  }
+  for (const key of Object.keys(h)) {
+    if (key.toLowerCase() === SKIP_LICENSE_REDIRECT_HEADER.toLowerCase()) {
+      const v = (h as Record<string, unknown>)[key];
+      return v != null && String(v).length > 0;
+    }
+  }
+  return false;
+}
 
 export function getServerApi(queryParams?: Record<string, unknown>) {
   if (apiServer) return apiServer;
@@ -60,6 +84,19 @@ export function getServerApi(queryParams?: Record<string, unknown>) {
       // 🧠 Si la URL contiene /auth/login, no ejecutar el interceptor de error
       if (requestUrl.includes("/auth/login")) {
         return Promise.reject(error);
+      }
+
+      if (status === 403) {
+        const data = error.response?.data as
+          | { message?: string; error?: string }
+          | undefined;
+        const skip = readSkipHeader(error.config?.headers);
+        if (data?.message === LICENSE_BLOCKED_MESSAGE && !skip) {
+          const reason = data?.error ?? "";
+          redirect(
+            `${SUBSCRIPTION_BLOCKED_PATH}?reason=${encodeURIComponent(reason)}`
+          );
+        }
       }
 
       // 🔐 Si hay un 401, cerrar sesión automáticamente
